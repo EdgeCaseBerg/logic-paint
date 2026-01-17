@@ -2,8 +2,8 @@ use std::str::FromStr;
 
 #[derive(Debug)]
 pub struct Pbm {
-    pub width: u16,
-    pub height: u16,
+    pub width: usize,
+    pub height: usize,
     pub cells: Vec<bool>,
 }
 
@@ -39,7 +39,7 @@ impl FromStr for Pbm {
 
         let width = characters.next().ok_or(LoadPbmErr::MissingWidthError)?;
         let width = width
-            .parse::<u16>()
+            .parse::<usize>()
             .map_err(|e| LoadPbmErr::InvalidWidthError {
                 found: width.to_owned(),
                 reason: e.to_string(),
@@ -47,7 +47,7 @@ impl FromStr for Pbm {
 
         let height = characters.next().ok_or(LoadPbmErr::MissingHeightError)?;
         let height = height
-            .parse::<u16>()
+            .parse::<usize>()
             .map_err(|e| LoadPbmErr::InvalidHeightError {
                 found: height.to_owned(),
                 reason: e.to_string(),
@@ -63,7 +63,7 @@ impl FromStr for Pbm {
             })
             .collect::<Result<_, _>>()?;
 
-        let expected_count = width as usize * height as usize;
+        let expected_count = width * height;
         if cells.len() != expected_count {
             return Err(LoadPbmErr::InvalidMatrixSize {
                 expected: expected_count,
@@ -146,12 +146,12 @@ mod pbm_tests {
 
     #[test]
     fn fails_to_load_invalid_width() {
-        let data = "P1\n100000 1\n";
+        let data = "P1\nw 1\n";
         let result: PbmResult<Pbm> = data.parse();
         match result {
             Err(LoadPbmErr::InvalidWidthError { found, reason }) => {
-                assert_eq!(reason, "number too large to fit in target type");
-                assert_eq!(found, "100000");
+                assert_eq!(reason, "invalid digit found in string");
+                assert_eq!(found, "w");
             }
             weird => {
                 panic!("Should not have parsed: {:?}", weird);
@@ -161,12 +161,12 @@ mod pbm_tests {
 
     #[test]
     fn fails_to_load_invalid_height() {
-        let data = "P1\n1 100000\n";
+        let data = "P1\n1 x\n";
         let result: PbmResult<Pbm> = data.parse();
         match result {
             Err(LoadPbmErr::InvalidHeightError { found, reason }) => {
-                assert_eq!(reason, "number too large to fit in target type");
-                assert_eq!(found, "100000");
+                assert_eq!(reason, "invalid digit found in string");
+                assert_eq!(found, "x");
             }
             weird => {
                 panic!("Should not have parsed: {:?}", weird);
