@@ -16,6 +16,7 @@ pub enum LoadPbmErr {
     MissingWidthError,
     MissingHeightError,
     InvalidSizeError { found: String },
+    InvalidMatrixSize { expected: usize, got: usize }
 }
 
 impl Pbm {
@@ -41,13 +42,21 @@ impl Pbm {
             }
         };
 
-        let cells = characters
+        let cells: Vec<bool> = characters
             .filter_map(|c| match c {
                 "0" => Some(false),
                 "1" => Some(true),
                 _ => None,
             })
             .collect();
+
+        let expected_count = width as usize * height as usize;
+        if cells.len() != expected_count {
+            return Err(LoadPbmErr::InvalidMatrixSize {
+                expected: expected_count,
+                got: cells.len(),
+            });
+        }
 
         Ok(Pbm {
             width,
