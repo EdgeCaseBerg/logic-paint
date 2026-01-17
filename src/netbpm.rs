@@ -38,8 +38,6 @@ impl FromStr for Pbm {
         };
 
         let width = characters.next().ok_or(LoadPbmErr::MissingWidthError)?;
-        let height = characters.next().ok_or(LoadPbmErr::MissingHeightError)?;
-
         let width = width
             .parse::<u16>()
             .map_err(|e| LoadPbmErr::InvalidWidthError {
@@ -47,6 +45,7 @@ impl FromStr for Pbm {
                 reason: e.to_string(),
             })?;
 
+        let height = characters.next().ok_or(LoadPbmErr::MissingHeightError)?;
         let height = height
             .parse::<u16>()
             .map_err(|e| LoadPbmErr::InvalidHeightError {
