@@ -15,8 +15,8 @@ pub enum LoadPbmErr {
     InvalidHeader { found: String },
     MissingWidthError,
     MissingHeightError,
-    InvalidWidthError { found: String },
-    InvalidHeightError { found: String },
+    InvalidWidthError { found: String, reason: String },
+    InvalidHeightError { found: String, reason: String },
     InvalidMatrixSize { expected: usize, got: usize },
     UnexpectedCellValue { found: String },
 }
@@ -43,12 +43,15 @@ impl FromStr for Pbm {
         let width = width
             .parse::<u16>()
             .map_err(|e| LoadPbmErr::InvalidWidthError {
-                found: e.to_string(),
+                found: width.to_string(),
+                reason: e.to_string(),
             })?;
+
         let height = height
             .parse::<u16>()
             .map_err(|e| LoadPbmErr::InvalidHeightError {
-                found: e.to_string(),
+                found: height.to_string(),
+                reason: e.to_string(),
             })?;
 
         let cells: Vec<bool> = characters
@@ -117,4 +120,87 @@ mod pbm_tests {
             }
         }
     }
+
+    #[test]
+    fn fails_to_load_missing_width() {
+        let data = "P1\n\n";
+        let result: PbmResult<Pbm> = data.parse();
+        match result {
+            Err(LoadPbmErr::MissingWidthError) => {}
+            weird => {
+                panic!("Should not have parsed: {:?}", weird);
+            }
+        }
+    }
+
+    #[test]
+    fn fails_to_load_missing_height() {
+        let data = "P1\n1\n";
+        let result: PbmResult<Pbm> = data.parse();
+        match result {
+            Err(LoadPbmErr::MissingHeightError) => {}
+            weird => {
+                panic!("Should not have parsed: {:?}", weird);
+            }
+        }
+    }
+
+    #[test]
+    fn fails_to_load_invalid_width() {
+        let data = "P1\n100000 1\n";
+        let result: PbmResult<Pbm> = data.parse();
+        match result {
+            Err(LoadPbmErr::InvalidWidthError { found, reason } ) => {
+                assert_eq!(reason, "number too large to fit in target type");
+                assert_eq!(found, "100000");
+            }
+            weird => {
+                panic!("Should not have parsed: {:?}", weird);
+            }
+        }
+    }
+
+    #[test]
+    fn fails_to_load_invalid_height() {
+        let data = "P1\n1 100000\n";
+        let result: PbmResult<Pbm> = data.parse();
+        match result {
+            Err(LoadPbmErr::InvalidHeightError { found, reason } ) => {
+                assert_eq!(reason, "number too large to fit in target type");
+                assert_eq!(found, "100000");
+            }
+            weird => {
+                panic!("Should not have parsed: {:?}", weird);
+            }
+        }
+    }
+
+    #[test]
+    fn fails_to_load_invalid_matrix() {
+        let data = "P1\n2 2\n1";
+        let result: PbmResult<Pbm> = data.parse();
+        match result {
+            Err(LoadPbmErr::InvalidMatrixSize { expected, got } ) => {
+                assert_eq!(expected, 4);
+                assert_eq!(got, 1);
+            }
+            weird => {
+                panic!("Should not have parsed: {:?}", weird);
+            }
+        }
+    }
+
+    #[test]
+    fn fails_to_load_invalid_matrix_cell() {
+        let data = "P1\n1 1\na";
+        let result: PbmResult<Pbm> = data.parse();
+        match result {
+            Err(LoadPbmErr::UnexpectedCellValue { found, } ) => {
+                assert_eq!(found, "a");
+            }
+            weird => {
+                panic!("Should not have parsed: {:?}", weird);
+            }
+        }
+    }    
 }
