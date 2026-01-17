@@ -15,7 +15,8 @@ pub enum LoadPbmErr {
     InvalidHeader { found: String },
     MissingWidthError,
     MissingHeightError,
-    InvalidSizeError { found: String },
+    InvalidWidthError { found: String },
+    InvalidHeightError { found: String },
     InvalidMatrixSize { expected: usize, got: usize },
     UnexpectedCellValue { found: String },
 }
@@ -39,21 +40,24 @@ impl FromStr for Pbm {
         let width = characters.next().ok_or(LoadPbmErr::MissingWidthError)?;
         let height = characters.next().ok_or(LoadPbmErr::MissingHeightError)?;
 
-        let (width, height): (u16, u16) = match (width.parse(), height.parse()) {
-            (Ok(w), Ok(h)) => (w, h),
-            (res1, res2) => {
-                let error_string = format!("{:?}, {:?}", res1, res2);
-                return Err(LoadPbmErr::InvalidSizeError {
-                    found: "Failed to convert size line into u16".to_owned() + &error_string,
-                });
-            }
-        };
+        let width = width
+            .parse::<u16>()
+            .map_err(|e| LoadPbmErr::InvalidWidthError {
+                found: e.to_string(),
+            })?;
+        let height = height
+            .parse::<u16>()
+            .map_err(|e| LoadPbmErr::InvalidHeightError {
+                found: e.to_string(),
+            })?;
 
         let cells: Vec<bool> = characters
             .map(|c| match c {
                 "0" => Ok(false),
                 "1" => Ok(true),
-                _ => Err(LoadPbmErr::UnexpectedCellValue { found: c.into() })
+                _ => Err(LoadPbmErr::UnexpectedCellValue {
+                    found: c.to_string(),
+                }),
             })
             .collect::<Result<_, _>>()?;
 
