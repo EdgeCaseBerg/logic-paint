@@ -13,7 +13,8 @@ type PbmResult<T> = Result<T, LoadPbmErr>;
 pub enum LoadPbmErr {
     MissingHeader,
     InvalidHeader { found: String },
-    MissingSizeError,
+    MissingWidthError,
+    MissingHeightError,
     InvalidSizeError { found: String },
 }
 
@@ -27,13 +28,10 @@ impl Pbm {
             });
         };
 
-        let width = characters.next();
-        let height = characters.next();
+        let width = characters.next().ok_or(LoadPbmErr::MissingWidthError)?;
+        let height = characters.next().ok_or(LoadPbmErr::MissingHeightError)?;
 
-        if width.is_none() || height.is_none() {
-            return Err(LoadPbmErr::MissingSizeError);
-        }
-        let (width, height): (u16, u16) = match (width.unwrap().parse(), height.unwrap().parse()) {
+        let (width, height): (u16, u16) = match (width.parse(), height.parse()) {
             (Ok(w), Ok(h)) => (w, h),
             (res1, res2) => {
                 let error_string = format!("{:?}, {:?}", res1, res2);
