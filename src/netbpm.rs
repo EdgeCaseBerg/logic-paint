@@ -22,7 +22,12 @@ pub enum LoadPbmErr {
 impl FromStr for Pbm {
     type Err = LoadPbmErr;
     fn from_str(string: &str) -> PbmResult<Pbm> {
-        let mut characters = string.split_whitespace();
+        /* Ignore comment lines, but grab all the characters out otherwise. */
+        let mut characters = string
+            .lines()
+            .filter(|line| !line.trim_start().starts_with('#'))
+            .flat_map(str::split_whitespace);
+
         let header = characters.next().ok_or(LoadPbmErr::MissingHeader)?;
         let "P1" = header else {
             return Err(LoadPbmErr::InvalidHeader {
