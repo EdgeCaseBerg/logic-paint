@@ -1,7 +1,7 @@
 use std::fs::read_to_string;
 
 #[derive(Debug)]
-pub struct PBM {
+pub struct Pbm {
     pub width: u16,
     pub height: u16,
     pub cells: Vec<bool>,
@@ -11,27 +11,20 @@ type PbmResult<T> = Result<T, LoadPbmErr>;
 
 #[derive(Debug)]
 pub enum LoadPbmErr {
-    HeaderError(String),
+    MissingHeader,
+    InvalidHeader { found: String },
     MissingSizeError,
-    InvalidSizeError(String),
+    InvalidSizeError { found: String },
 }
 
-impl PBM {
-    pub fn from_ascii(string: &str) -> PbmResult<PBM> {
+impl Pbm {
+    pub fn from_ascii(string: &str) -> PbmResult<Pbm> {
         let mut characters = string.split_whitespace();
-        let flag = characters.next();
-        match flag {
-            Some("P1") => {}
-            Some(bad) => {
-                return Err(LoadPbmErr::HeaderError(
-                    "PBM file did not contain starting header of P1 contains:".to_owned() + bad,
-                ));
-            }
-            None => {
-                return Err(LoadPbmErr::HeaderError(
-                    "PBM file did not contain starting header.".to_owned(),
-                ));
-            }
+        let header = characters.next().ok_or(LoadPbmErr::MissingHeader)?;
+        let "P1" = header else {
+            return Err(LoadPbmErr::InvalidHeader {
+                found: header.to_owned(),
+            });
         };
 
         let width = characters.next();
@@ -44,9 +37,9 @@ impl PBM {
             (Ok(w), Ok(h)) => (w, h),
             (res1, res2) => {
                 let error_string = format!("{:?}, {:?}", res1, res2);
-                return Err(LoadPbmErr::InvalidSizeError(
-                    "Failed to convert size line into u16".to_owned() + &error_string,
-                ));
+                return Err(LoadPbmErr::InvalidSizeError {
+                    found: "Failed to convert size line into u16".to_owned() + &error_string,
+                });
             }
         };
 
@@ -58,7 +51,7 @@ impl PBM {
             })
             .collect();
 
-        Ok(PBM {
+        Ok(Pbm {
             width,
             height,
             cells,
@@ -76,7 +69,7 @@ mod pbm_tests {
         let data =
             read_to_string("assets/P1.pbm").expect("Could not load asset file for test (P1.pbm)");
 
-        if let Ok(pbm) = PBM::from_ascii(&data) {
+        if let Ok(pbm) = Pbm::from_ascii(&data) {
             assert_eq!(pbm.width, 5);
             assert_eq!(pbm.height, 5);
             assert_eq!(pbm.cells, vec![
@@ -87,7 +80,7 @@ mod pbm_tests {
                 false, true , true, true , false
             ]);
         } else {
-            panic!("Failed to load PBM file, got {:?}", PBM::from_ascii(&data));
+            panic!("Failed to load PBM file, got {:?}", Pbm::from_ascii(&data));
         }
     }
 }
