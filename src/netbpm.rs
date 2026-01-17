@@ -43,14 +43,14 @@ impl FromStr for Pbm {
         let width = width
             .parse::<u16>()
             .map_err(|e| LoadPbmErr::InvalidWidthError {
-                found: width.to_string(),
+                found: width.to_owned(),
                 reason: e.to_string(),
             })?;
 
         let height = height
             .parse::<u16>()
             .map_err(|e| LoadPbmErr::InvalidHeightError {
-                found: height.to_string(),
+                found: height.to_owned(),
                 reason: e.to_string(),
             })?;
 
@@ -59,7 +59,7 @@ impl FromStr for Pbm {
                 "0" => Ok(false),
                 "1" => Ok(true),
                 _ => Err(LoadPbmErr::UnexpectedCellValue {
-                    found: c.to_string(),
+                    found: c.to_owned(),
                 }),
             })
             .collect::<Result<_, _>>()?;
