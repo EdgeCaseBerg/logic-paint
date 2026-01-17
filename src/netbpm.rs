@@ -1,4 +1,4 @@
-use std::fs::read_to_string;
+use std::str::FromStr;
 
 #[derive(Debug)]
 pub struct Pbm {
@@ -7,7 +7,7 @@ pub struct Pbm {
     pub cells: Vec<bool>,
 }
 
-type PbmResult<T> = Result<T, LoadPbmErr>;
+pub type PbmResult<T> = Result<T, LoadPbmErr>;
 
 #[derive(Debug)]
 pub enum LoadPbmErr {
@@ -16,11 +16,12 @@ pub enum LoadPbmErr {
     MissingWidthError,
     MissingHeightError,
     InvalidSizeError { found: String },
-    InvalidMatrixSize { expected: usize, got: usize }
+    InvalidMatrixSize { expected: usize, got: usize },
 }
 
-impl Pbm {
-    pub fn from_ascii(string: &str) -> PbmResult<Pbm> {
+impl FromStr for Pbm {
+    type Err = LoadPbmErr;
+    fn from_str(string: &str) -> PbmResult<Pbm> {
         let mut characters = string.split_whitespace();
         let header = characters.next().ok_or(LoadPbmErr::MissingHeader)?;
         let "P1" = header else {
@@ -69,6 +70,7 @@ impl Pbm {
 #[cfg(test)]
 mod pbm_tests {
     use super::*;
+    use std::fs::read_to_string;
 
     #[rustfmt::skip]
     #[test]
@@ -76,7 +78,8 @@ mod pbm_tests {
         let data =
             read_to_string("assets/P1.pbm").expect("Could not load asset file for test (P1.pbm)");
 
-        if let Ok(pbm) = Pbm::from_ascii(&data) {
+        let result: PbmResult<Pbm> = data.parse();
+        if let Ok(pbm) = result {
             assert_eq!(pbm.width, 5);
             assert_eq!(pbm.height, 5);
             assert_eq!(pbm.cells, vec![
@@ -87,7 +90,7 @@ mod pbm_tests {
                 false, true , true, true , false
             ]);
         } else {
-            panic!("Failed to load PBM file, got {:?}", Pbm::from_ascii(&data));
+            panic!("Failed to load PBM file, got {:?}", result);
         }
     }
 }
