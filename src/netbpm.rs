@@ -149,7 +149,7 @@ mod pbm_tests {
         let data = "P1\n100000 1\n";
         let result: PbmResult<Pbm> = data.parse();
         match result {
-            Err(LoadPbmErr::InvalidWidthError { found, reason } ) => {
+            Err(LoadPbmErr::InvalidWidthError { found, reason }) => {
                 assert_eq!(reason, "number too large to fit in target type");
                 assert_eq!(found, "100000");
             }
@@ -164,7 +164,7 @@ mod pbm_tests {
         let data = "P1\n1 100000\n";
         let result: PbmResult<Pbm> = data.parse();
         match result {
-            Err(LoadPbmErr::InvalidHeightError { found, reason } ) => {
+            Err(LoadPbmErr::InvalidHeightError { found, reason }) => {
                 assert_eq!(reason, "number too large to fit in target type");
                 assert_eq!(found, "100000");
             }
@@ -179,7 +179,7 @@ mod pbm_tests {
         let data = "P1\n2 2\n1";
         let result: PbmResult<Pbm> = data.parse();
         match result {
-            Err(LoadPbmErr::InvalidMatrixSize { expected, got } ) => {
+            Err(LoadPbmErr::InvalidMatrixSize { expected, got }) => {
                 assert_eq!(expected, 4);
                 assert_eq!(got, 1);
             }
@@ -194,12 +194,12 @@ mod pbm_tests {
         let data = "P1\n1 1\na";
         let result: PbmResult<Pbm> = data.parse();
         match result {
-            Err(LoadPbmErr::UnexpectedCellValue { found, } ) => {
+            Err(LoadPbmErr::UnexpectedCellValue { found }) => {
                 assert_eq!(found, "a");
             }
             weird => {
                 panic!("Should not have parsed: {:?}", weird);
             }
         }
-    }    
+    }
 }
