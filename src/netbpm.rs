@@ -103,4 +103,18 @@ mod pbm_tests {
             panic!("Failed to load PBM file, got {:?}", result);
         }
     }
+
+    #[test]
+    fn fails_to_load_bad_header() {
+        let data = "P2\n1 1\n1";
+        let result: PbmResult<Pbm> = data.parse();
+        match result {
+            Err(LoadPbmErr::InvalidHeader { found }) => {
+                assert_eq!(found, "P2");
+            }
+            weird => {
+                panic!("Should not have parsed: {:?}", weird);
+            }
+        }
+    }
 }
