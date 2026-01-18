@@ -7,6 +7,17 @@ pub struct Pbm {
     pub cells: Vec<bool>,
 }
 
+impl Pbm {
+    pub fn rows(&self) -> Vec<Vec<bool>> {
+        let mut result = vec![];
+        for chunk in self.cells.chunks(self.width) {
+            result.push(chunk.to_vec());
+        }
+        return result;
+    }
+
+}
+
 pub type PbmResult<T> = Result<T, LoadPbmErr>;
 
 #[derive(Debug)]
@@ -226,5 +237,38 @@ mod pbm_tests {
                 panic!("Should not have parsed: {:?}", weird);
             }
         }
+    }
+
+    #[test]
+    #[rustfmt::skip]
+    fn returns_rows_as_expected() {
+        let pbm = Pbm {
+            width: 3,
+            height: 4,
+            cells: vec![
+                false, false, false,
+                true , true , true ,
+                false, true , false,
+                true,  false, false,
+            ],
+        };
+        let mut rows = pbm.rows().into_iter();
+        let [false, false, false] = rows.next().expect("bad iter 1st row")[..] else {
+            eprintln!("{:?}", pbm.rows());
+            panic!("failed 1st row")
+        };
+        let [true, true, true] = rows.next().expect("bad iter 2nd row")[..] else {
+            eprintln!("{:?}", pbm.rows());
+            panic!("failed 2nd row")
+        };
+        let [false, true, false] = rows.next().expect("bad iter 3rd row")[..] else {
+            eprintln!("{:?}", pbm.rows());
+            panic!("failed 3rd row")
+        };
+        let [true, false, false] = rows.next().expect("bad iter 4th row")[..] else {
+            eprintln!("{:?}", pbm.rows());
+            panic!("failed 4th row")
+        };
+        assert!(rows.next().is_none());
     }
 }
