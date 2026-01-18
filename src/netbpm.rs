@@ -21,6 +21,31 @@ pub enum LoadPbmErr {
     UnexpectedCellValue { found: String },
 }
 
+impl std::error::Error for LoadPbmErr {}
+
+impl std::fmt::Display for LoadPbmErr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        use LoadPbmErr::*;
+        let s = match self {
+            MissingHeader => "missing expected header for pbm file (should be P1)".to_owned(),
+            InvalidHeader { found } => format!("invalid header found: {}", found),
+            MissingWidthError => "missing width in pbm file".to_owned(),
+            MissingHeightError => "missing height in pbm file".to_owned(),
+            InvalidWidthError { found, reason } => {
+                "invalid width of ".to_owned() + found + ": " + reason
+            }
+            InvalidHeightError { found, reason } => {
+                "invalid width of ".to_owned() + found + ": " + reason
+            }
+            InvalidMatrixSize { expected, got } => {
+                format!("invalid matrix cell, expected: {} got {}", expected, got)
+            }
+            UnexpectedCellValue { found } => format!("invalid pbm cell value: {}", found),
+        };
+        write!(f, "{}", s)
+    }
+}
+
 impl FromStr for Pbm {
     type Err = LoadPbmErr;
     fn from_str(string: &str) -> PbmResult<Pbm> {
