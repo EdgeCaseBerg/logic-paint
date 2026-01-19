@@ -18,7 +18,7 @@ fn groups(cells: &[Vec<bool>]) -> Vec<Vec<Group>> {
         .iter()
         .map(|row| {
             let groups: Vec<Group> = row
-                .split(|b| !*b)
+                .split(|boolean| !*boolean)
                 .filter(|v| !v.is_empty())
                 .map(|run| Group {
                     num_cells: run.len(),
