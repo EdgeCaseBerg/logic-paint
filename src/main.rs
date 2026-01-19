@@ -22,5 +22,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let test_pbm: netbpm::Pbm = test_pbm.parse()?;
     println!("{:?}", test_pbm);
 
+    let state: gamestate::PlayState = (&test_pbm).into();
+    println!("{:?}", state);
+
     Ok(())
 }
