@@ -16,6 +16,15 @@ impl Pbm {
         return result;
     }
 
+    pub fn cols(&self) -> Vec<Vec<bool>> {
+        let mut cols = vec![vec![]; self.width];
+        for c in 0..self.width {
+            for row in self.rows() {
+                cols[c].push(row[c]);
+            }
+        }
+        return cols;
+    }
 }
 
 pub type PbmResult<T> = Result<T, LoadPbmErr>;
@@ -270,5 +279,34 @@ mod pbm_tests {
             panic!("failed 4th row")
         };
         assert!(rows.next().is_none());
+    }
+
+    #[rustfmt::skip]
+    #[test]
+    fn returns_cols_as_expected() {
+        let pbm = Pbm {
+            width: 3,
+            height: 4,
+            cells: vec![
+                false, false, false,
+                true , true , true ,
+                false, true , false,
+                true,  false, false,
+            ],
+        };
+        let mut cols = pbm.cols().into_iter();
+        let [false, true, false, true] = cols.next().expect("bad iter 1st col")[..] else {
+            eprintln!("{:?}", pbm.cols());
+            panic!("failed 1st col")
+        };
+        let [false, true, true, false] = cols.next().expect("bad iter 2nd col")[..] else {
+            eprintln!("{:?}", pbm.cols());
+            panic!("failed 2nd col")
+        };
+        let [false, true, false, false] = cols.next().expect("bad iter 3rd col")[..] else {
+            eprintln!("{:?}", pbm.cols());
+            panic!("failed 3rd col")
+        };
+        assert!(cols.next().is_none());
     }
 }
