@@ -67,8 +67,9 @@ impl PlayState {
         if self.column_groups.is_empty() || self.row_groups.is_empty() {
             panic!("Called is_complete before groups were computed");
         }
-        self.column_groups.iter().flatten().all(|g| g.filled)
-            && self.row_groups.iter().flatten().all(|g| g.filled)
+        let all_columns_filled = self.column_groups.iter().flatten().all(|g| g.filled);
+        let all_rows_filled = self.row_groups.iter().flatten().all(|g| g.filled);
+        all_rows_filled && all_columns_filled
     }
 }
 
