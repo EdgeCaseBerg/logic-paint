@@ -6,7 +6,7 @@ pub struct Group {
     pub filled: bool,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum CellState {
     Empty,
     Filled,
@@ -17,10 +17,56 @@ pub enum CellState {
 
 #[derive(Debug)]
 pub struct PlayState {
-    player_moves: Vec<CellState>,
+    cells: Vec<CellState>,
     column_groups: Vec<Vec<Group>>,
     row_groups: Vec<Vec<Group>>,
     goal_state: Vec<CellState>,
+    num_rows: usize,
+    num_columns: usize,
+}
+
+impl PlayState {
+    pub fn rows(&self) -> Vec<Vec<CellState>> {
+        let mut result = vec![];
+        for chunk in self.cells.chunks(self.num_columns) {
+            result.push(chunk.to_vec());
+        }
+        result
+    }
+
+    pub fn row_goal_pairs(&self) -> Vec<Vec<(CellState, CellState)>> {
+        let mut result = vec![];
+        use std::iter::zip;
+        let pairs: Vec<(CellState, CellState)> = zip(
+            self.cells.clone().into_iter(),
+            self.goal_state.clone().into_iter(),
+        )
+        .collect();
+        for chunk in pairs.chunks(self.num_columns) {
+            result.push(chunk.to_vec());
+        }
+        result
+    }
+
+    pub fn cols(&self) -> Vec<Vec<CellState>> {
+        let mut cols = vec![vec![]; self.num_columns];
+        for c in 0..self.num_columns {
+            for row in self.rows() {
+                cols[c].push(row[c]);
+            }
+        }
+        cols
+    }
+
+    pub fn column_goal_pairs(&self) -> Vec<Vec<(CellState, CellState)>> {
+        let mut cols = vec![vec![]; self.num_columns];
+        for c in 0..self.num_columns {
+            for row in self.row_goal_pairs() {
+                cols[c].push(row[c]);
+            }
+        }
+        cols
+    }
 }
 
 fn groups(cells: &[Vec<bool>]) -> Vec<Vec<Group>> {
@@ -48,30 +94,61 @@ fn groups(cells: &[Vec<bool>]) -> Vec<Vec<Group>> {
         .collect()
 }
 
+// TODO better name for this? Shoudl we just use a From?
+// https://youtu.be/gkIpRTq1S6A
+type PlayerSetState = CellState;
+type GoalState = CellState;
+fn groups2(state_and_goal_pairs: &[Vec<(PlayerSetState, GoalState)>]) -> Vec<Vec<Group>> {
+    state_and_goal_pairs
+        .iter()
+        .map(|row| {
+            if row.iter().all(|(_, goal)| *goal == CellState::Empty) {
+                return vec![Group {
+                    num_cells: 0,
+                    filled: true,
+                }];
+            }
+
+            let groups: Vec<Group> = row
+                .split(|(_, goal)| *goal == CellState::Empty)
+                .filter(|v| !v.is_empty())
+                .map(|run| Group {
+                    num_cells: run.len(),
+                    filled: run.iter().all(|(state, _)| *state == CellState::Filled),
+                })
+                .collect();
+
+            groups
+        })
+        .collect()
+}
+
 impl From<&Pbm> for PlayState {
     fn from(pbm: &Pbm) -> PlayState {
         PlayState {
-            player_moves: pbm.cells.iter().map(|_| CellState::Empty).collect(),
+            cells: pbm.cells.iter().map(|_| CellState::Empty).collect(),
             goal_state: pbm
                 .cells
                 .iter()
-                .map(|filled| {
-                    if *filled {
-                        CellState::Filled
-                    } else {
-                        CellState::Empty
-                    }
+                .map(|filled| match filled {
+                    true => CellState::Filled,
+                    false => CellState::Empty,
                 })
                 .collect(),
             column_groups: groups(&pbm.cols()),
             row_groups: groups(&pbm.rows()),
+            num_rows: pbm.height,
+            num_columns: pbm.width,
         }
     }
 }
 
 impl PlayState {
-    pub fn update_groups(&mut self, _truth: &Pbm) {
-        todo!();
+    pub fn update_groups(&mut self) {
+        // TODO: should we validate the cells against goal_state first?
+        //       or just leave that as a different thing that's always done before this is called?
+        self.row_groups = groups2(&self.row_goal_pairs());
+        self.column_groups = groups2(&self.column_goal_pairs());
     }
 
     pub fn is_complete(&self) -> bool {
@@ -124,7 +201,7 @@ mod pbm_tests {
         let state: PlayState = (&pbm).into();
         assert_eq!(
             true,
-            state.player_moves.iter().all(|cell| *cell == CellState::Empty),
+            state.cells.iter().all(|cell| *cell == CellState::Empty),
             "all cells start empty"
         );
         let expected_row_groups = vec![
@@ -145,5 +222,44 @@ mod pbm_tests {
         ];
         assert_eq!(expected_col_groups, state.column_groups);
         assert_eq!(false, state.is_complete());
+    }
+
+    #[test]
+    #[rustfmt::skip]
+    fn validates_row_groups_correctly() {
+        use CellState::*;
+
+        let pbm = Pbm {
+            width: 5,
+            height: 5,
+            cells: vec![
+                false, false, false, false, false,
+                true , true , false, false ,true,
+                true , true , true , true , true,
+                true , false, true , false, true,
+                true , false, false, true , true,
+            ]
+        };
+
+        let mut state: PlayState = (&pbm).into();
+
+        state.cells = vec![
+            Empty , Empty, Empty, Empty, Empty ,
+            Filled, Empty, Empty, Empty, Filled, // <-- we fill in 1/2 of group 1, and all of group 2
+            Empty , Empty, Empty, Empty, Filled,
+            Empty , Empty, Empty, Empty, Filled,
+            Empty , Empty, Empty, Empty, Filled,
+            //^--- not full column group   ^------ we fill in all of this column group
+        ];
+
+        eprintln!("BEFORE: {:?}", state);
+        state.update_groups();
+        eprintln!("AFTER: {:?}", state);
+
+        assert_eq!(false, state.row_groups[1][0].filled);
+        assert_eq!(true, state.row_groups[1][1].filled);
+
+        assert_eq!(false, state.column_groups[0][0].filled);
+        assert_eq!(true, state.column_groups[4][0].filled);
     }
 }
