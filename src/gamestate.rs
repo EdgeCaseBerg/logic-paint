@@ -6,11 +6,21 @@ pub struct Group {
     pub filled: bool,
 }
 
+#[derive(Debug, PartialEq)]
+pub enum CellState {
+    Empty,
+    Filled,
+    Incorrect,
+    UserRuledOut,
+    RuledOut,
+}
+
 #[derive(Debug)]
 pub struct PlayState {
-    player_moves: Pbm,
+    player_moves: Vec<Vec<CellState>>,
     column_groups: Vec<Vec<Group>>,
     row_groups: Vec<Vec<Group>>,
+    goal_state: Vec<Vec<CellState>>,
 }
 
 fn groups(cells: &[Vec<bool>]) -> Vec<Vec<Group>> {
@@ -40,16 +50,28 @@ fn groups(cells: &[Vec<bool>]) -> Vec<Vec<Group>> {
 
 impl From<&Pbm> for PlayState {
     fn from(pbm: &Pbm) -> PlayState {
-        let empty_pbm = Pbm {
-            width: pbm.width,
-            height: pbm.height,
-            cells: pbm.cells.iter().map(|_| false).collect(),
-        };
-
+        let rows = pbm.rows();
         PlayState {
-            player_moves: empty_pbm,
+            player_moves: rows
+                .iter()
+                .map(|row| row.iter().map(|_| CellState::Empty).collect())
+                .collect(),
+            goal_state: rows
+                .iter()
+                .map(|row| {
+                    row.iter()
+                        .map(|filled| {
+                            if *filled {
+                                CellState::Filled
+                            } else {
+                                CellState::Empty
+                            }
+                        })
+                        .collect()
+                })
+                .collect(),
             column_groups: groups(&pbm.cols()),
-            row_groups: groups(&pbm.rows()),
+            row_groups: groups(&rows),
         }
     }
 }
@@ -109,7 +131,7 @@ mod pbm_tests {
         let state: PlayState = (&pbm).into();
         assert_eq!(
             true,
-            state.player_moves.cells.iter().all(|b| !*b),
+            state.player_moves.iter().flatten().all(|cell| *cell == CellState::Empty),
             "all cells start empty"
         );
         let expected_row_groups = vec![
