@@ -46,13 +46,10 @@ impl From<&Pbm> for PlayState {
             cells: pbm.cells.iter().map(|_| false).collect(),
         };
 
-        let row_groups = groups(&pbm.rows());
-        let column_groups = groups(&pbm.cols());
-
         PlayState {
             player_moves: empty_pbm,
-            column_groups,
-            row_groups,
+            column_groups: groups(&pbm.cols()),
+            row_groups: groups(&pbm.rows()),
         }
     }
 }
