@@ -13,7 +13,7 @@ impl Pbm {
         for chunk in self.cells.chunks(self.width) {
             result.push(chunk.to_vec());
         }
-        return result;
+        result
     }
 
     pub fn cols(&self) -> Vec<Vec<bool>> {
@@ -23,7 +23,7 @@ impl Pbm {
                 cols[c].push(row[c]);
             }
         }
-        return cols;
+        cols
     }
 }
 
