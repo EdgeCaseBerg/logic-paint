@@ -1,4 +1,5 @@
 use crate::netbpm::Pbm;
+use std::iter::zip;
 
 #[derive(Debug, PartialEq)]
 pub struct Group {
@@ -36,7 +37,7 @@ impl PlayState {
 
     pub fn row_goal_pairs(&self) -> Vec<Vec<(CellState, CellState)>> {
         let mut result = vec![];
-        use std::iter::zip;
+
         let pairs: Vec<(CellState, CellState)> = zip(
             self.cells.clone().into_iter(),
             self.goal_state.clone().into_iter(),
