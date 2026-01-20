@@ -97,6 +97,31 @@ impl PlayState {
         //       or just leave that as a different thing that's always done before this is called?
         self.row_groups = groups_from_goal_pairs(&self.row_goal_pairs());
         self.column_groups = groups_from_goal_pairs(&self.column_goal_pairs());
+        self.fill_in_completed_groups();
+    }
+
+    fn fill_in_completed_groups(&mut self) {
+        // Rows first.
+        let row_pairs = self.row_goal_pairs();
+        let mut updatedable_rows: Vec<_> = self.cells.chunks_mut(self.num_columns).collect();
+
+        for (row, groups) in self.row_groups.iter().enumerate() {
+            let complete = groups.iter().all(|g| g.filled);
+            if !complete {
+                continue;
+            }
+
+            let mut to_update = &mut updatedable_rows[row];
+            for (column, (state, goal)) in row_pairs[row].iter().enumerate() {
+                to_update[column] = match (*state, *goal) {
+                    (CellState::Empty, _) => CellState::RuledOut,
+                    (CellState::Filled, _) => CellState::Filled,
+                    (CellState::Incorrect, _) => CellState::Incorrect,
+                    (CellState::UserRuledOut, _) => CellState::RuledOut,
+                    (CellState::RuledOut, _) => CellState::RuledOut,
+                };
+            }
+        }
     }
 
     pub fn is_complete(&self) -> bool {
