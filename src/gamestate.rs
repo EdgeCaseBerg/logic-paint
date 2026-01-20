@@ -164,7 +164,6 @@ fn groups_from_goal_pairs(
         .collect()
 }
 
-
 #[cfg(test)]
 mod pbm_tests {
     use super::*;
@@ -264,5 +263,45 @@ mod pbm_tests {
 
         assert_eq!(false, state.column_groups[0][0].filled);
         assert_eq!(true, state.column_groups[4][0].filled);
+    }
+
+    #[test]
+    #[rustfmt::skip]
+    fn fill_in_row_on_groups_complete() {
+        use CellState::*;
+
+        let pbm = Pbm {
+            width: 5,
+            height: 5,
+            cells: vec![
+                false, false, false, false, false,
+                true , true , false, false ,true,
+                true , true , true , true , true,
+                true , false, true , false, true,
+                true , false, false, true , true,
+            ]
+        };
+
+        let mut state: PlayState = (&pbm).into();
+
+        state.cells = vec![
+            Empty , Empty    , Empty       , Empty , Empty ,
+            Filled, Filled   , Empty       , Empty , Filled,
+            Empty , Empty    , Empty       , Empty , Empty ,
+            Filled, Incorrect, Filled      , Empty , Filled,
+            Filled, Empty    , UserRuledOut, Filled, Filled,
+        ];
+
+        state.update_groups();
+
+        let expected = vec![
+            RuledOut, RuledOut , RuledOut, RuledOut, RuledOut,
+            Filled  , Filled   , RuledOut, RuledOut, Filled  ,
+            Empty   , Empty    , Empty   , Empty   , Empty   ,
+            Filled  , Incorrect, Filled  , RuledOut, Filled  ,
+            Filled  , RuledOut , RuledOut, Filled  , Filled  ,
+        ];
+
+        assert_eq!(expected, state.cells);
     }
 }
