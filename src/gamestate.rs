@@ -101,7 +101,10 @@ impl PlayState {
     }
 
     fn fill_in_completed_groups(&mut self) {
-        // Rows first.
+        self.fill_in_completed_row_groups();
+    }
+
+    fn fill_in_completed_row_groups(&mut self) {
         let row_pairs = self.row_goal_pairs();
         let mut updatedable_rows: Vec<_> = self.cells.chunks_mut(self.num_columns).collect();
 
