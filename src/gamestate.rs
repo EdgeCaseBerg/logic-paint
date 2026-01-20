@@ -119,7 +119,10 @@ impl PlayState {
                 to_update[column] = match (*state, *goal) {
                     (CellState::Empty, _) => CellState::RuledOut,
                     (CellState::Filled, CellState::Filled) => CellState::Filled,
-                    (CellState::Filled, oops) => panic!("despite filled groups, player set cell state did not match desired goal of {:?}", oops),
+                    (CellState::Filled, oops) => panic!(
+                        "despite filled groups, player set cell state did not match desired goal of {:?}",
+                        oops
+                    ),
                     (CellState::Incorrect, _) => CellState::Incorrect,
                     (CellState::UserRuledOut, _) => CellState::RuledOut,
                     (CellState::RuledOut, _) => CellState::RuledOut,
