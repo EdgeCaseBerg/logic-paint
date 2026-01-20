@@ -98,9 +98,9 @@ fn groups(cells: &[Vec<bool>]) -> Vec<Vec<Group>> {
         .collect()
 }
 
-// TODO better name for this? Shoudl we just use a From?
+// TODO Should we just use a From?
 // https://youtu.be/gkIpRTq1S6A
-fn groups2(state_and_goal_pairs: &[Vec<(PlayerSetState, GoalState)>]) -> Vec<Vec<Group>> {
+fn groups_from_goal_pairs(state_and_goal_pairs: &[Vec<(PlayerSetState, GoalState)>]) -> Vec<Vec<Group>> {
     state_and_goal_pairs
         .iter()
         .map(|row| {
@@ -149,8 +149,8 @@ impl PlayState {
     pub fn update_groups(&mut self) {
         // TODO: should we validate the cells against goal_state first?
         //       or just leave that as a different thing that's always done before this is called?
-        self.row_groups = groups2(&self.row_goal_pairs());
-        self.column_groups = groups2(&self.column_goal_pairs());
+        self.row_groups = groups_from_goal_pairs(&self.row_goal_pairs());
+        self.column_groups = groups_from_goal_pairs(&self.column_goal_pairs());
     }
 
     pub fn is_complete(&self) -> bool {
