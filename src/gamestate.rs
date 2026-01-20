@@ -333,4 +333,44 @@ mod pbm_tests {
 
         assert_eq!(expected, state.cells);
     }
+
+    #[test]
+    #[rustfmt::skip]
+    fn fill_in_cols_on_groups_complete() {
+        use CellState::*;
+
+        let pbm = Pbm {
+            width: 5,
+            height: 5,
+            cells: vec![
+                false, false, false, false, false,
+                true , true , false, false ,true,
+                true , true , true , true , true,
+                true , false, true , false, true,
+                true , false, false, true , true,
+            ]
+        };
+
+        let mut state: PlayState = (&pbm).into();
+
+        state.cells = vec![
+            Empty , Empty    , Empty       , Empty , Empty,
+            Filled, Filled   , Empty       , Empty , Empty,
+            Filled ,Filled   , Filled      , Empty , Empty,
+            Filled, Incorrect, Filled      , Empty , Empty,
+            Filled, Empty    , UserRuledOut, Empty , Empty,
+        ];
+
+        state.update_groups();
+
+        let expected = vec![
+            RuledOut, RuledOut  , RuledOut , Empty , Empty,
+            Filled  , Filled    , RuledOut , Empty , Empty,
+            Filled  , Filled    , Filled   , Empty , Empty,
+            Filled  , Incorrect , Filled   , Empty , Empty,
+            Filled  , RuledOut  , RuledOut , Empty , Empty,
+        ];
+
+        assert_eq!(expected, state.cells);
+    }
 }
