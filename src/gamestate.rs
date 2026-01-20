@@ -112,13 +112,14 @@ impl PlayState {
             }
 
             let mut to_update = &mut updatedable_rows[row];
-            for (column, (state, _)) in row_pairs[row].iter().enumerate() {
-                to_update[column] = match *state {
-                    CellState::Empty => CellState::RuledOut,
-                    CellState::Filled => CellState::Filled,
-                    CellState::Incorrect => CellState::Incorrect,
-                    CellState::UserRuledOut => CellState::RuledOut,
-                    CellState::RuledOut => CellState::RuledOut,
+            for (column, (state, goal)) in row_pairs[row].iter().enumerate() {
+                to_update[column] = match (*state, *goal) {
+                    (CellState::Empty, _) => CellState::RuledOut,
+                    (CellState::Filled, CellState::Filled) => CellState::Filled,
+                    (CellState::Filled, oops) => panic!("despite filled groups, player set cell state did not match desired goal of {:?}", oops),
+                    (CellState::Incorrect, _) => CellState::Incorrect,
+                    (CellState::UserRuledOut, _) => CellState::RuledOut,
+                    (CellState::RuledOut, _) => CellState::RuledOut,
                 };
             }
         }
