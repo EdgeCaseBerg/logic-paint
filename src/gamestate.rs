@@ -167,8 +167,6 @@ fn groups(cells: &[Vec<bool>]) -> Vec<Vec<Group>> {
         .collect()
 }
 
-// TODO Should we just use a From?
-// https://youtu.be/gkIpRTq1S6A
 fn groups_from_goal_pairs(
     state_and_goal_pairs: &[Vec<(PlayerSetState, GoalState)>],
 ) -> Vec<Vec<Group>> {
