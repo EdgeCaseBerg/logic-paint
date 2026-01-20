@@ -29,6 +29,26 @@ pub struct PlayState {
     num_columns: usize,
 }
 
+impl From<&Pbm> for PlayState {
+    fn from(pbm: &Pbm) -> PlayState {
+        PlayState {
+            cells: pbm.cells.iter().map(|_| CellState::Empty).collect(),
+            goal_state: pbm
+                .cells
+                .iter()
+                .map(|filled| match filled {
+                    true => CellState::Filled,
+                    false => CellState::Empty,
+                })
+                .collect(),
+            column_groups: groups(&pbm.cols()),
+            row_groups: groups(&pbm.rows()),
+            num_rows: pbm.height,
+            num_columns: pbm.width,
+        }
+    }
+}
+
 impl PlayState {
     pub fn rows(&self) -> Vec<Vec<CellState>> {
         let mut result = vec![];
@@ -70,6 +90,23 @@ impl PlayState {
             }
         }
         cols
+    }
+
+    pub fn update_groups(&mut self) {
+        // TODO: should we validate the cells against goal_state first?
+        //       or just leave that as a different thing that's always done before this is called?
+        self.row_groups = groups_from_goal_pairs(&self.row_goal_pairs());
+        self.column_groups = groups_from_goal_pairs(&self.column_goal_pairs());
+    }
+
+    pub fn is_complete(&self) -> bool {
+        // assumes that groups have been computed at least once or else they'll all be empty
+        if self.column_groups.is_empty() || self.row_groups.is_empty() {
+            panic!("Called is_complete before groups were computed");
+        }
+        let all_columns_filled = self.column_groups.iter().flatten().all(|g| g.filled);
+        let all_rows_filled = self.row_groups.iter().flatten().all(|g| g.filled);
+        all_rows_filled && all_columns_filled
     }
 }
 
@@ -127,44 +164,6 @@ fn groups_from_goal_pairs(
         .collect()
 }
 
-impl From<&Pbm> for PlayState {
-    fn from(pbm: &Pbm) -> PlayState {
-        PlayState {
-            cells: pbm.cells.iter().map(|_| CellState::Empty).collect(),
-            goal_state: pbm
-                .cells
-                .iter()
-                .map(|filled| match filled {
-                    true => CellState::Filled,
-                    false => CellState::Empty,
-                })
-                .collect(),
-            column_groups: groups(&pbm.cols()),
-            row_groups: groups(&pbm.rows()),
-            num_rows: pbm.height,
-            num_columns: pbm.width,
-        }
-    }
-}
-
-impl PlayState {
-    pub fn update_groups(&mut self) {
-        // TODO: should we validate the cells against goal_state first?
-        //       or just leave that as a different thing that's always done before this is called?
-        self.row_groups = groups_from_goal_pairs(&self.row_goal_pairs());
-        self.column_groups = groups_from_goal_pairs(&self.column_goal_pairs());
-    }
-
-    pub fn is_complete(&self) -> bool {
-        // assumes that groups have been computed at least once or else they'll all be empty
-        if self.column_groups.is_empty() || self.row_groups.is_empty() {
-            panic!("Called is_complete before groups were computed");
-        }
-        let all_columns_filled = self.column_groups.iter().flatten().all(|g| g.filled);
-        let all_rows_filled = self.row_groups.iter().flatten().all(|g| g.filled);
-        all_rows_filled && all_columns_filled
-    }
-}
 
 #[cfg(test)]
 mod pbm_tests {
