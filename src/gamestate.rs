@@ -16,6 +16,9 @@ pub enum CellState {
     RuledOut,
 }
 
+type PlayerSetState = CellState;
+type GoalState = CellState;
+
 #[derive(Debug)]
 pub struct PlayState {
     cells: Vec<CellState>,
@@ -35,7 +38,7 @@ impl PlayState {
         result
     }
 
-    pub fn row_goal_pairs(&self) -> Vec<Vec<(CellState, CellState)>> {
+    pub fn row_goal_pairs(&self) -> Vec<Vec<(PlayerSetState, GoalState)>> {
         let mut result = vec![];
 
         let pairs: Vec<(CellState, CellState)> = zip(
@@ -59,7 +62,7 @@ impl PlayState {
         cols
     }
 
-    pub fn column_goal_pairs(&self) -> Vec<Vec<(CellState, CellState)>> {
+    pub fn column_goal_pairs(&self) -> Vec<Vec<(PlayerSetState, GoalState)>> {
         let mut cols = vec![vec![]; self.num_columns];
         for c in 0..self.num_columns {
             for row in self.row_goal_pairs() {
@@ -97,8 +100,6 @@ fn groups(cells: &[Vec<bool>]) -> Vec<Vec<Group>> {
 
 // TODO better name for this? Shoudl we just use a From?
 // https://youtu.be/gkIpRTq1S6A
-type PlayerSetState = CellState;
-type GoalState = CellState;
 fn groups2(state_and_goal_pairs: &[Vec<(PlayerSetState, GoalState)>]) -> Vec<Vec<Group>> {
     state_and_goal_pairs
         .iter()
