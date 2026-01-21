@@ -16,6 +16,22 @@ pub enum CellState {
     RuledOut,
 }
 
+impl CellState {
+    pub fn to_goal(&self, goal: CellState) -> CellState {
+        match (self, goal) {
+            (CellState::Empty, _) => CellState::RuledOut,
+            (CellState::Filled, CellState::Filled) => CellState::Filled,
+            (CellState::Filled, oops) => panic!(
+                "despite filled groups, player set cell state did not match desired goal of {:?}",
+                oops
+            ),
+            (CellState::Incorrect, _) => CellState::Incorrect,
+            (CellState::UserRuledOut, _) => CellState::RuledOut,
+            (CellState::RuledOut, _) => CellState::RuledOut,
+        }
+    }
+}
+
 type PlayerSetState = CellState;
 type GoalState = CellState;
 
