@@ -133,17 +133,7 @@ impl PlayState {
 
             // let mut to_update = &mut updatedable_rows[row];
             for (column, (state, goal)) in row_pairs[row].iter().enumerate() {
-                let new_value = match (*state, *goal) {
-                    (CellState::Empty, _) => CellState::RuledOut,
-                    (CellState::Filled, CellState::Filled) => CellState::Filled,
-                    (CellState::Filled, oops) => panic!(
-                        "despite filled groups, player set cell state did not match desired goal of {:?}",
-                        oops
-                    ),
-                    (CellState::Incorrect, _) => CellState::Incorrect,
-                    (CellState::UserRuledOut, _) => CellState::RuledOut,
-                    (CellState::RuledOut, _) => CellState::RuledOut,
-                };
+                let new_value = state.to_goal(*goal);
                 self.cells[row * self.num_rows + column] = new_value;
             }
         }
@@ -151,7 +141,6 @@ impl PlayState {
 
     pub fn fill_incompleted_column_groups(&mut self) {
         let column_pairs = self.column_goal_pairs();
-        // TODO: figure out how to properly mutate the columns.
 
         for (column, groups) in self.column_groups.iter().enumerate() {
             let complete = groups.iter().all(|g| g.filled);
@@ -160,17 +149,7 @@ impl PlayState {
             }
 
             for (row, (state, goal)) in column_pairs[column].iter().enumerate() {
-                let new_value = match (*state, *goal) {
-                    (CellState::Empty, _) => CellState::RuledOut,
-                    (CellState::Filled, CellState::Filled) => CellState::Filled,
-                    (CellState::Filled, oops) => panic!(
-                        "despite filled groups, player set cell state did not match desired goal of {:?}",
-                        oops
-                    ),
-                    (CellState::Incorrect, _) => CellState::Incorrect,
-                    (CellState::UserRuledOut, _) => CellState::RuledOut,
-                    (CellState::RuledOut, _) => CellState::RuledOut,
-                };
+                let new_value = state.to_goal(*goal);
                 self.cells[row * self.num_rows + column] = new_value;
             }
         }
