@@ -109,8 +109,6 @@ impl PlayState {
     }
 
     pub fn update_groups(&mut self) {
-        // TODO: should we validate the cells against goal_state first?
-        //       or just leave that as a different thing that's always done before this is called?
         self.row_groups = groups_from_goal_pairs(&self.row_goal_pairs());
         self.column_groups = groups_from_goal_pairs(&self.column_goal_pairs());
         self.fill_in_completed_groups();
