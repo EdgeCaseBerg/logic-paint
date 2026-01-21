@@ -30,6 +30,34 @@ impl CellState {
             (CellState::RuledOut, _) => CellState::RuledOut,
         }
     }
+
+    pub fn attempt_fill(&self, goal: CellState) -> CellState {
+        if *self == goal {
+            return goal;
+        }
+        use CellState::*;
+        match (self, goal) {
+            (Empty, Filled) => goal,
+            (Empty, _ ) => Incorrect,
+            (Filled, _) => Filled,
+            (Incorrect, _) => Incorrect,
+            (RuledOut, _) => RuledOut,
+            (UserRuledOut, Filled) => Filled,
+            (UserRuledOut, _) => Incorrect,
+        }
+    }
+
+    // TODO: should this and attempt_file do &mut instead so we dont have to always assign a result?
+    pub fn mark_cell(&self) -> CellState {
+        use CellState::*;
+        match *self {
+            Empty => UserRuledOut,
+            Filled => Filled,
+            Incorrect => Incorrect,
+            UserRuledOut => Empty,
+            RuledOut => RuledOut,
+        }
+    }
 }
 
 type PlayerSetState = CellState;
