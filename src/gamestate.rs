@@ -115,9 +115,9 @@ impl PlayState {
                 continue;
             }
 
-            let mut to_update = &mut updatedable_rows[row];
+            // let mut to_update = &mut updatedable_rows[row];
             for (column, (state, goal)) in row_pairs[row].iter().enumerate() {
-                to_update[column] = match (*state, *goal) {
+                let new_value = match (*state, *goal) {
                     (CellState::Empty, _) => CellState::RuledOut,
                     (CellState::Filled, CellState::Filled) => CellState::Filled,
                     (CellState::Filled, oops) => panic!(
@@ -128,6 +128,7 @@ impl PlayState {
                     (CellState::UserRuledOut, _) => CellState::RuledOut,
                     (CellState::RuledOut, _) => CellState::RuledOut,
                 };
+                self.cells[row * self.num_rows + column] = new_value;
             }
         }
     }
