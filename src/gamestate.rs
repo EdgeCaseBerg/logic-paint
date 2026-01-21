@@ -102,6 +102,7 @@ impl PlayState {
 
     fn fill_in_completed_groups(&mut self) {
         self.fill_in_completed_row_groups();
+        self.fill_incompleted_column_groups();
     }
 
     fn fill_in_completed_row_groups(&mut self) {
@@ -127,6 +128,33 @@ impl PlayState {
                     (CellState::UserRuledOut, _) => CellState::RuledOut,
                     (CellState::RuledOut, _) => CellState::RuledOut,
                 };
+            }
+        }
+    }
+
+    pub fn fill_incompleted_column_groups(&mut self) {
+        let column_pairs = self.column_goal_pairs();
+        // TODO: figure out how to properly mutate the columns.
+
+        for (column, groups) in self.column_groups.iter().enumerate() {
+            let complete = groups.iter().all(|g| g.filled);
+            if !complete {
+                continue;
+            }
+
+            for (row, (state, goal)) in column_pairs[column].iter().enumerate() {
+                let new_value = match (*state, *goal) {
+                    (CellState::Empty, _) => CellState::RuledOut,
+                    (CellState::Filled, CellState::Filled) => CellState::Filled,
+                    (CellState::Filled, oops) => panic!(
+                        "despite filled groups, player set cell state did not match desired goal of {:?}",
+                        oops
+                    ),
+                    (CellState::Incorrect, _) => CellState::Incorrect,
+                    (CellState::UserRuledOut, _) => CellState::RuledOut,
+                    (CellState::RuledOut, _) => CellState::RuledOut,
+                };
+                self.cells[row * self.num_rows + column] = new_value;
             }
         }
     }
@@ -365,11 +393,11 @@ mod pbm_tests {
         state.update_groups();
 
         let expected = vec![
-            RuledOut, RuledOut  , RuledOut , Empty , Empty,
-            Filled  , Filled    , RuledOut , Empty , Empty,
-            Filled  , Filled    , Filled   , Empty , Empty,
-            Filled  , Incorrect , Filled   , Empty , Empty,
-            Filled  , RuledOut  , RuledOut , Empty , Empty,
+            RuledOut, RuledOut  , RuledOut , RuledOut , RuledOut,
+            Filled  , Filled    , RuledOut , Empty    , Empty,
+            Filled  , Filled    , Filled   , Empty    , Empty,
+            Filled  , Incorrect , Filled   , Empty    , Empty,
+            Filled  , RuledOut  , RuledOut , Empty    , Empty,
         ];
 
         assert_eq!(expected, state.cells);
