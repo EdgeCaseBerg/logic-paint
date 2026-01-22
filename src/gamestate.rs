@@ -38,7 +38,7 @@ impl CellState {
         use CellState::*;
         match (self, goal) {
             (Empty, Filled) => goal,
-            (Empty, _ ) => Incorrect,
+            (Empty, _) => Incorrect,
             (Filled, _) => Filled,
             (Incorrect, _) => Incorrect,
             (RuledOut, _) => RuledOut,
@@ -294,6 +294,7 @@ fn groups_from_goal_pairs(
 mod pbm_tests {
     use super::*;
 
+    #[rustfmt::skip]
     fn test_play_state() -> PlayState {
         let pbm = Pbm {
             width: 5,
@@ -444,7 +445,7 @@ mod pbm_tests {
         let mut state = test_play_state();
         eprintln!("BEFORE: {}", state);
         state.cells[0] = CellState::Empty;
-        state.goal_state[0] = CellState::Empty;;
+        state.goal_state[0] = CellState::Empty;
         state.attempt_fill(0, 0);
         eprintln!("AFTER: {}", state);
         assert_eq!(CellState::Filled, state.cells[0]);
