@@ -190,6 +190,20 @@ impl PlayState {
         let all_rows_filled = self.row_groups.iter().flatten().all(|g| g.filled);
         all_rows_filled && all_columns_filled
     }
+
+    pub fn attempt_fill(&mut self, row: usize, column: usize) {
+        // todo validate
+        let offset = row * self.num_rows + column;
+        let goal = self.goal_state[offset];
+        self.cells[offset] = self.cells[offset].attempt_fill(goal);
+    }
+
+    pub fn mark_cell(&mut self, row: usize, column: usize) {
+        // todo validate
+        let offset = row * self.num_rows + column;
+        let goal = self.goal_state[offset];
+        self.cells[offset] = self.cells[offset].mark_cell();
+    }
 }
 
 fn groups(cells: &[Vec<bool>]) -> Vec<Vec<Group>> {
