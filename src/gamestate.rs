@@ -406,4 +406,13 @@ mod pbm_tests {
 
         assert_eq!(expected, state.cells);
     }
+
+    #[test]
+    fn can_fill_in_cell_that_is_empty() {
+        let mut state = test_play_state();
+        state.cells[0] = CellState::Empty;
+        state.goal_state[0] = CellState::Empty;
+        state.attempt_fill(0, 0);
+        assert_eq!(CellState::Filled, state.cells[0]);
+    }
 }
