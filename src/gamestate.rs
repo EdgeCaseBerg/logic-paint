@@ -262,6 +262,21 @@ fn groups_from_goal_pairs(
 mod pbm_tests {
     use super::*;
 
+    fn test_play_state() -> PlayState {
+        let pbm = Pbm {
+            width: 5,
+            height: 5,
+            cells: vec![
+                false, false, false, false, false,
+                true , true , false, false ,true,
+                true , true , true , true , true,
+                true , false, true , false, true,
+                true , false, false, true , true,
+            ]
+        };
+        (&pbm).into()
+    }
+
     fn empty_group() -> Vec<Group> {
         vec![Group {
             num_cells: 0,
@@ -282,19 +297,8 @@ mod pbm_tests {
     #[test]
     #[rustfmt::skip]
     fn constructs_row_groups_correctly() {
-        let pbm = Pbm {
-            width: 5,
-            height: 5,
-            cells: vec![
-                false, false, false, false, false,
-                true , true , false, false ,true,
-                true , true , true , true , true,
-                true , false, true , false, true,
-                true , false, false, true , true,
-            ]
-        };
+        let mut state = test_play_state();
 
-        let state: PlayState = (&pbm).into();
         assert_eq!(
             true,
             state.cells.iter().all(|cell| *cell == CellState::Empty),
@@ -325,19 +329,7 @@ mod pbm_tests {
     fn validates_row_groups_correctly() {
         use CellState::*;
 
-        let pbm = Pbm {
-            width: 5,
-            height: 5,
-            cells: vec![
-                false, false, false, false, false,
-                true , true , false, false ,true,
-                true , true , true , true , true,
-                true , false, true , false, true,
-                true , false, false, true , true,
-            ]
-        };
-
-        let mut state: PlayState = (&pbm).into();
+        let mut state = test_play_state();
 
         state.cells = vec![
             Empty , Empty, Empty, Empty, Empty ,
@@ -364,19 +356,7 @@ mod pbm_tests {
     fn fill_in_row_on_groups_complete() {
         use CellState::*;
 
-        let pbm = Pbm {
-            width: 5,
-            height: 5,
-            cells: vec![
-                false, false, false, false, false,
-                true , true , false, false ,true,
-                true , true , true , true , true,
-                true , false, true , false, true,
-                true , false, false, true , true,
-            ]
-        };
-
-        let mut state: PlayState = (&pbm).into();
+        let mut state = test_play_state();
 
         state.cells = vec![
             Empty , Empty    , Empty       , Empty , Empty ,
@@ -404,19 +384,7 @@ mod pbm_tests {
     fn fill_in_cols_on_groups_complete() {
         use CellState::*;
 
-        let pbm = Pbm {
-            width: 5,
-            height: 5,
-            cells: vec![
-                false, false, false, false, false,
-                true , true , false, false ,true,
-                true , true , true , true , true,
-                true , false, true , false, true,
-                true , false, false, true , true,
-            ]
-        };
-
-        let mut state: PlayState = (&pbm).into();
+        let mut state = test_play_state();
 
         state.cells = vec![
             Empty , Empty    , Empty       , Empty , Empty,
