@@ -167,6 +167,34 @@ impl PlayState {
         cols
     }
 
+    pub fn is_complete(&self) -> bool {
+        // assumes that groups have been computed at least once or else they'll all be empty
+        if self.column_groups.is_empty() || self.row_groups.is_empty() {
+            panic!("Called is_complete before groups were computed");
+        }
+        let all_columns_filled = self.column_groups.iter().flatten().all(|g| g.filled);
+        let all_rows_filled = self.row_groups.iter().flatten().all(|g| g.filled);
+        all_rows_filled && all_columns_filled
+    }
+
+    pub fn attempt_fill(&mut self, row: usize, column: usize) {
+        if row >= self.num_rows || column >= self.num_columns {
+            return;
+        }
+        let offset = row * self.num_rows + column;
+        let goal = self.goal_state[offset];
+        self.cells[offset] = self.cells[offset].attempt_fill(goal);
+    }
+
+    pub fn mark_cell(&mut self, row: usize, column: usize) {
+        if row >= self.num_rows || column >= self.num_columns {
+            return;
+        }
+        let offset = row * self.num_rows + column;
+        let goal = self.goal_state[offset];
+        self.cells[offset] = self.cells[offset].mark_cell();
+    }
+
     pub fn update_groups(&mut self) {
         self.row_groups = groups_from_goal_pairs(&self.row_goal_pairs());
         self.column_groups = groups_from_goal_pairs(&self.column_goal_pairs());
@@ -210,34 +238,6 @@ impl PlayState {
                 self.cells[row * self.num_rows + column] = new_value;
             }
         }
-    }
-
-    pub fn is_complete(&self) -> bool {
-        // assumes that groups have been computed at least once or else they'll all be empty
-        if self.column_groups.is_empty() || self.row_groups.is_empty() {
-            panic!("Called is_complete before groups were computed");
-        }
-        let all_columns_filled = self.column_groups.iter().flatten().all(|g| g.filled);
-        let all_rows_filled = self.row_groups.iter().flatten().all(|g| g.filled);
-        all_rows_filled && all_columns_filled
-    }
-
-    pub fn attempt_fill(&mut self, row: usize, column: usize) {
-        if row >= self.num_rows || column >= self.num_columns {
-            return;
-        }
-        let offset = row * self.num_rows + column;
-        let goal = self.goal_state[offset];
-        self.cells[offset] = self.cells[offset].attempt_fill(goal);
-    }
-
-    pub fn mark_cell(&mut self, row: usize, column: usize) {
-        if row >= self.num_rows || column >= self.num_columns {
-            return;
-        }
-        let offset = row * self.num_rows + column;
-        let goal = self.goal_state[offset];
-        self.cells[offset] = self.cells[offset].mark_cell();
     }
 }
 
