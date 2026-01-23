@@ -91,14 +91,14 @@ impl std::fmt::Display for PlayState {
                 .collect::<String>();
             write!(f, "{}", format!("{:>1}{:>10}", "|", group_numbers))?;
         }
-        writeln!(f, "")?;
+        writeln!(f)?;
 
         writeln!(f, "goals:")?;
         for r in 0..self.num_rows {
             for c in 0..self.num_columns {
                 write!(f, "{:>10?} ", self.goal_state[r * self.num_rows + c])?;
             }
-            write!(f, "\n")?;
+            writeln!(f)?;
         }
         Ok(())
     }
