@@ -75,30 +75,30 @@ pub struct PlayState {
 // Simple, not full fields display, of PlayState for easy test debugging
 impl std::fmt::Display for PlayState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        writeln!(f, "size: {} x {} ", self.num_rows, self.num_columns);
-        writeln!(f, "cells:");
+        writeln!(f, "size: {} x {} ", self.num_rows, self.num_columns)?;
+        writeln!(f, "cells:")?;
         for (r, row) in self.rows().into_iter().enumerate() {
             let group_numbers: String = self.row_groups[r]
                 .iter()
                 .map(|g| g.num_cells.to_string() + ",")
                 .collect::<String>();
-            write!(f, "{}", format!("{:>10} {:?}\n", group_numbers, row));
+            write!(f, "{}", format!("{:>10} {:?}\n", group_numbers, row))?;
         }
         for r in 0..self.num_rows {
             let group_numbers: String = self.column_groups[r]
                 .iter()
                 .map(|g| g.num_cells.to_string() + ", ")
                 .collect::<String>();
-            write!(f, "{}", format!("{:>1}{:>10}", "|", group_numbers));
+            write!(f, "{}", format!("{:>1}{:>10}", "|", group_numbers))?;
         }
-        writeln!(f, "");
+        writeln!(f, "")?;
 
-        writeln!(f, "goals:");
+        writeln!(f, "goals:")?;
         for r in 0..self.num_rows {
             for c in 0..self.num_columns {
-                write!(f, "{:>10?} ", self.goal_state[r * self.num_rows + c]);
+                write!(f, "{:>10?} ", self.goal_state[r * self.num_rows + c])?;
             }
-            write!(f, "\n");
+            write!(f, "\n")?;
         }
         Ok(())
     }
