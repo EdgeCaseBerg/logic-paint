@@ -198,7 +198,7 @@ impl PlayState {
     pub fn number_incorrect(&self) -> usize {
         self.cells
             .iter()
-            .filter(|cell| **cell == CellState::Incorrect)
+            .filter(|&&cell| cell == CellState::Incorrect)
             .count()
     }
 
