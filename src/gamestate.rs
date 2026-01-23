@@ -223,14 +223,18 @@ impl PlayState {
     }
 
     pub fn attempt_fill(&mut self, row: usize, column: usize) {
-        // todo validate
+        if row >= self.num_rows || column >= self.num_columns {
+            return;
+        }
         let offset = row * self.num_rows + column;
         let goal = self.goal_state[offset];
         self.cells[offset] = self.cells[offset].attempt_fill(goal);
     }
 
     pub fn mark_cell(&mut self, row: usize, column: usize) {
-        // todo validate
+        if row >= self.num_rows || column >= self.num_columns {
+            return;
+        }
         let offset = row * self.num_rows + column;
         let goal = self.goal_state[offset];
         self.cells[offset] = self.cells[offset].mark_cell();
