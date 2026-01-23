@@ -214,7 +214,6 @@ impl PlayState {
 
     fn fill_in_completed_row_groups(&mut self) {
         let row_pairs = self.row_goal_pairs();
-        let mut updatedable_rows: Vec<_> = self.cells.chunks_mut(self.num_columns).collect();
 
         for (row, groups) in self.row_groups.iter().enumerate() {
             let complete = groups.iter().all(|g| g.filled);
@@ -222,7 +221,6 @@ impl PlayState {
                 continue;
             }
 
-            // let mut to_update = &mut updatedable_rows[row];
             for (column, (state, goal)) in row_pairs[row].iter().enumerate() {
                 let new_value = state.to_goal(*goal);
                 self.cells[row * self.num_rows + column] = new_value;
