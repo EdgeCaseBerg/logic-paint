@@ -42,8 +42,7 @@ impl CellState {
             (Filled, _) => Filled,
             (Incorrect, _) => Incorrect,
             (RuledOut, _) => RuledOut,
-            (UserRuledOut, Filled) => Filled,
-            (UserRuledOut, _) => Incorrect,
+            (UserRuledOut, _) => UserRuledOut,
         }
     }
 
@@ -445,9 +444,20 @@ mod pbm_tests {
         let mut state = test_play_state();
         eprintln!("BEFORE: {}", state);
         state.cells[0] = CellState::Empty;
-        state.goal_state[0] = CellState::Empty;
+        state.goal_state[0] = CellState::Filled;
         state.attempt_fill(0, 0);
         eprintln!("AFTER: {}", state);
         assert_eq!(CellState::Filled, state.cells[0]);
+    }
+
+    #[test]
+    fn cannot_fill_in_cell_that_is_marked() {
+        let mut state = test_play_state();
+        eprintln!("BEFORE: {}", state);
+        state.cells[0] = CellState::UserRuledOut;
+        state.goal_state[0] = CellState::Filled;
+        state.attempt_fill(0, 0);
+        eprintln!("AFTER: {}", state);
+        assert_eq!(CellState::UserRuledOut, state.cells[0]);
     }
 }
