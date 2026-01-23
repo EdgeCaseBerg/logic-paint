@@ -137,8 +137,8 @@ impl PlayState {
         let mut result = vec![];
 
         let pairs: Vec<(CellState, CellState)> = zip(
-            self.cells.clone().into_iter(),
-            self.goal_state.clone().into_iter(),
+            self.cells.clone(),
+            self.goal_state.clone(),
         )
         .collect();
         for chunk in pairs.chunks(self.num_columns) {
