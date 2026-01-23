@@ -133,6 +133,7 @@ impl PlayState {
         result
     }
 
+    #[rustfmt::skip]
     pub fn row_goal_pairs(&self) -> Vec<Vec<(PlayerSetState, GoalState)>> {
         let mut result = vec![];
 
