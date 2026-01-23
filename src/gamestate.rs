@@ -191,7 +191,6 @@ impl PlayState {
             return;
         }
         let offset = row * self.num_rows + column;
-        let goal = self.goal_state[offset];
         self.cells[offset] = self.cells[offset].mark_cell();
     }
 
