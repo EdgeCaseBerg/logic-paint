@@ -195,6 +195,13 @@ impl PlayState {
         self.cells[offset] = self.cells[offset].mark_cell();
     }
 
+    pub fn number_incorrect(&self) -> usize {
+        self.cells
+            .iter()
+            .filter(|cell| **cell == CellState::Incorrect)
+            .count()
+    }
+
     pub fn update_groups(&mut self) {
         self.row_groups = groups_from_goal_pairs(&self.row_goal_pairs());
         self.column_groups = groups_from_goal_pairs(&self.column_goal_pairs());
@@ -508,5 +515,21 @@ mod pbm_tests {
         state.mark_cell(evil_row, 0);
         state.mark_cell(evil_row, evil_column);
         state.mark_cell(0, evil_column);
+    }
+
+    #[test]
+    fn number_incorrect_returns_number_of_incorrect_cells() {
+        let mut state = test_play_state();
+        let mut count = 0;
+        for (i, g) in state.goal_state.iter().enumerate() {
+            match g {
+                CellState::Empty => {
+                    count += 1;
+                    state.cells[i] = CellState::Incorrect
+                }
+                _ => {}
+            }
+        }
+        assert_eq!(count, state.number_incorrect());
     }
 }
