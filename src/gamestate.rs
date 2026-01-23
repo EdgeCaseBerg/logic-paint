@@ -196,7 +196,7 @@ impl PlayState {
         }
     }
 
-    pub fn fill_incompleted_column_groups(&mut self) {
+    fn fill_incompleted_column_groups(&mut self) {
         let column_pairs = self.column_goal_pairs();
 
         for (column, groups) in self.column_groups.iter().enumerate() {
