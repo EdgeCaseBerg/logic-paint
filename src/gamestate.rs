@@ -460,4 +460,28 @@ mod pbm_tests {
         eprintln!("AFTER: {}", state);
         assert_eq!(CellState::UserRuledOut, state.cells[0]);
     }
+
+    #[test]
+    fn can_mark_a_cell_to_rule_it_out() {
+        let mut state = test_play_state();
+        eprintln!("BEFORE: {}", state);
+        state.cells[0] = CellState::Empty;
+        state.goal_state[0] = CellState::Filled;
+        state.mark_cell(0, 0);
+        eprintln!("AFTER: {}", state);
+        assert_eq!(CellState::UserRuledOut, state.cells[0]);
+    }
+
+    #[test]
+    fn can_unmark_a_cell_to_clear_back_to_empty() {
+        let mut state = test_play_state();
+        eprintln!("BEFORE: {}", state);
+        state.cells[0] = CellState::Empty;
+        state.goal_state[0] = CellState::Filled;
+        state.mark_cell(0, 0);
+        eprintln!("AFTER: {}", state);
+        assert_eq!(CellState::UserRuledOut, state.cells[0]);
+        state.mark_cell(0, 0);
+        assert_eq!(CellState::Empty, state.cells[0]);
+    }
 }
