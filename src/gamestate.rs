@@ -17,7 +17,7 @@ pub enum CellState {
 }
 
 impl CellState {
-    pub fn to_goal(&self, goal: CellState) -> CellState {
+    pub fn to_goal(self, goal: CellState) -> CellState {
         match (self, goal) {
             (CellState::Empty, _) => CellState::RuledOut,
             (CellState::Filled, CellState::Filled) => CellState::Filled,
