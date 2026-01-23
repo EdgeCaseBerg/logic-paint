@@ -484,4 +484,25 @@ mod pbm_tests {
         state.mark_cell(0, 0);
         assert_eq!(CellState::Empty, state.cells[0]);
     }
+
+    #[test]
+    fn should_do_nothing_if_asked_to_fill_oob_cell() {
+        let mut state = test_play_state();
+        let evil_row = state.num_rows + 1;
+        let evil_column = state.num_columns + 1;
+        state.attempt_fill(evil_row, 0);
+        state.attempt_fill(evil_row, evil_column);
+        state.attempt_fill(0, evil_column);
+    }
+
+    #[test]
+    fn should_do_nothing_if_asked_to_mark_oob_cell() {
+        let mut state = test_play_state();
+        let mut state = test_play_state();
+        let evil_row = state.num_rows + 1;
+        let evil_column = state.num_columns + 1;
+        state.mark_cell(evil_row, 0);
+        state.mark_cell(evil_row, evil_column);
+        state.mark_cell(0, evil_column);
+    }
 }
