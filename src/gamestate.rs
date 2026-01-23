@@ -509,7 +509,6 @@ mod pbm_tests {
     #[test]
     fn should_do_nothing_if_asked_to_mark_oob_cell() {
         let mut state = test_play_state();
-        let mut state = test_play_state();
         let evil_row = state.num_rows + 1;
         let evil_column = state.num_columns + 1;
         state.mark_cell(evil_row, 0);
