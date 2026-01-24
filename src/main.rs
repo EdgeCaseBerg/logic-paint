@@ -4,6 +4,13 @@ mod netbpm;
 use std::env;
 use std::fs::read_to_string;
 
+use egor::{
+    app::{App, FrameContext },
+    input::{KeyCode },
+    math::{Rect, Vec2, vec2},
+    render::Color,
+};
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let arguments: Vec<String> = env::args().collect();
     if arguments.is_empty() {
@@ -24,6 +31,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let state: gamestate::PlayState = (&test_pbm).into();
     println!("{:?}", state);
+
+    let mut position = Vec2::ZERO;
+
+    App::new()
+        .title("Egor Stateful Rectangle")
+        .run(move |FrameContext { gfx, input, timer, .. } | {
+            let dx = input.key_held(KeyCode::ArrowRight) as i8
+                - input.key_held(KeyCode::ArrowLeft) as i8;
+            let dy =
+                input.key_held(KeyCode::ArrowDown) as i8 - input.key_held(KeyCode::ArrowUp) as i8;
+
+            position += vec2(dx as f32, dy as f32) * 100.0 * timer.delta;
+
+            gfx.rect().at(position).color(Color::RED);
+        });
 
     Ok(())
 }
