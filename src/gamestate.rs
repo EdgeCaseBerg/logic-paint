@@ -82,7 +82,7 @@ impl std::fmt::Display for PlayState {
                 .iter()
                 .map(|g| g.num_cells.to_string() + ",")
                 .collect::<String>();
-            writeln!(f, "{:>10} {:?}",group_numbers, row)?;
+            writeln!(f, "{:>10} {:?}", group_numbers, row)?;
         }
         for r in 0..self.num_rows {
             let group_numbers: String = self.column_groups[r]
