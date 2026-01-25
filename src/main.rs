@@ -63,6 +63,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let screen_size = gfx.screen_size();
             let (mx, my) = input.mouse_position();
             let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
+            let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
+            let left_mouse_held = input.mouse_held(MouseButton::Left);
+            let left_mouse_released = input.mouse_released(MouseButton::Left);
+            let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
+            let right_mouse_held = input.mouse_held(MouseButton::Right);
+            let right_mouse_released = input.mouse_released(MouseButton::Right);
 
             gfx.rect().at(world_xy).color(Color::RED);
 
@@ -71,6 +77,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 ui.label(format!("Mouse x: {} y: {}", mx, my));
                 ui.label(format!("World x: {} y: {}", world_xy.x, world_xy.y));
                 ui.label(format!("Screensize: {}", screen_size));
+
+                ui.label(format!("Mouse state: left_mouse_pressed: {}", left_mouse_pressed));
+                ui.label(format!("Mouse state: left_mouse_held: {}", left_mouse_held));
+                ui.label(format!("Mouse state: left_mouse_released: {}", left_mouse_released));
+                ui.label(format!("Mouse state: right_mouse_pressed: {}", right_mouse_pressed));
+                ui.label(format!("Mouse state: right_mouse_held: {}", right_mouse_held));
+                ui.label(format!("Mouse state: right_mouse_released: {}", right_mouse_released));
             });
         },
     );
