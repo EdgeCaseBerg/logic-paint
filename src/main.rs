@@ -5,8 +5,8 @@ use std::env;
 use std::fs::read_to_string;
 
 use egor::{
-    app::{App, FrameContext },
-    input::{KeyCode },
+    app::{App, FrameContext, WindowEvent, egui::Window},
+    input::{KeyCode, MouseButton},
     math::{Rect, Vec2, vec2},
     render::Color,
 };
@@ -32,20 +32,48 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let state: gamestate::PlayState = (&test_pbm).into();
     println!("{:?}", state);
 
-    let mut position = Vec2::ZERO;
+    let mut game_over = false;
 
-    App::new()
-        .title("Egor Stateful Rectangle")
-        .run(move |FrameContext { gfx, input, timer, .. } | {
-            let dx = input.key_held(KeyCode::ArrowRight) as i8
-                - input.key_held(KeyCode::ArrowLeft) as i8;
-            let dy =
-                input.key_held(KeyCode::ArrowDown) as i8 - input.key_held(KeyCode::ArrowUp) as i8;
+    App::new().title("Egor Stateful Rectangle").run(
+        move |FrameContext {
+                  gfx,
+                  input,
+                  timer,
+                  egui_ctx,
+                  events,
+              }| {
+            for event in events {
+                match event {
+                    WindowEvent::CloseRequested => {
+                        println!("Shutting down");
+                        game_over = true;
+                    }
+                    _ => {}
+                }
+            }
 
-            position += vec2(dx as f32, dy as f32) * 100.0 * timer.delta;
+            if game_over {
+                return;
+            }
 
-            gfx.rect().at(position).color(Color::RED);
-        });
+            if input.key_pressed(KeyCode::Escape) {
+                game_over = true;
+            }
+
+            let screen_size = gfx.screen_size();
+            let (mx, my) = input.mouse_position();
+            let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
+
+            gfx.rect().at(world_xy).color(Color::RED);
+
+            Window::new("Debug").show(egui_ctx, |ui| {
+                ui.label(format!("FPS: {}", timer.fps));
+                ui.label(format!("Mouse x: {} y: {}", mx, my));
+                ui.label(format!("World x: {} y: {}", world_xy.x, world_xy.y));
+                ui.label(format!("Screensize: {}", screen_size));
+            });
+        },
+    );
 
     Ok(())
 }
