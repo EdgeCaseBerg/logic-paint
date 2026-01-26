@@ -29,8 +29,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let test_pbm: netbpm::Pbm = test_pbm.parse()?;
     println!("{:?}", test_pbm);
 
-    let state: gamestate::PlayState = (&test_pbm).into();
-    println!("{:?}", state);
+    let mut game_state: gamestate::PlayState = (&test_pbm).into();
+    println!("{:?}", game_state);
 
     let mut game_over = false;
     let mut bg_size = 550;
@@ -88,16 +88,45 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let halfset = box_offset / 2.;
             let anchor = bg_position + Vec2::splat(halfset as f32);
             let offset = Vec2::splat(halfset);
+            let num_boxes = game_state.rows().len();
             let box_size =
                 (bg_size as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
-            for r in (0..num_boxes).map(|i| i as f32) {
-                for c in (0..num_boxes).map(|i| i as f32) {
+            // for r in (0..num_boxes).map(|i| i as f32) {
+            //     for c in (0..num_boxes).map(|i| i as f32) {
+            //         let box_size = box_size as f32;
+            //         let position = anchor + vec2(r, c) * (Vec2::splat(box_size) + offset);
+            //         let size = Vec2::splat(box_size);
+            //         gfx.rect().at(position).size(size).color(Color::WHITE);
+            //     }
+            // }
+
+            for (r, row) in game_state.rows().into_iter().enumerate() {
+                for (c, state) in row.iter().enumerate() {
                     let box_size = box_size as f32;
-                    let position = anchor + vec2(r, c) * (Vec2::splat(box_size) + offset);
+                    let position =
+                        anchor + vec2(c as f32, r as f32) * (Vec2::splat(box_size) + offset);
                     let size = Vec2::splat(box_size);
-                    gfx.rect().at(position).size(size).color(Color::WHITE);
+                    let color = match state {
+                        gamestate::CellState::Empty => Color::WHITE,
+                        gamestate::CellState::Filled => Color::GREEN,
+                        gamestate::CellState::Incorrect => Color::RED,
+                        gamestate::CellState::RuledOut => Color::new([0.5, 0.5, 0.5, 1.0]),
+                        gamestate::CellState::UserRuledOut => Color::new([0.5, 0.5, 0.5, 1.0]),
+                        _ => Color::BLACK,
+                    };
+                    gfx.rect().at(position).size(size).color(color);
+                    if Rect::new(position, size).contains(world_xy) && left_mouse_pressed {
+                        println!("attempt file at r:{} c:{}", r, c);
+                        game_state.attempt_fill(r, c);
+                    }
                 }
             }
+
+            if right_mouse_pressed {
+                eprintln!("{}", game_state);
+            }
+
+            game_state.update_groups();
 
             Window::new("Debug").show(egui_ctx, |ui| {
                 ui.label(format!("FPS: {}", timer.fps));
@@ -126,14 +155,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "Mouse state: right_mouse_released: {}",
                     right_mouse_released
                 ));
+                ui.label(format!("Grid complete? {}", game_state.is_complete()));
 
                 ui.add(Slider::new(&mut bg_size, 1..=800).text("BG size"));
                 // ui.add(Slider::new(&mut box_size, 1..=100).text("Box size"));
-                ui.add(
-                    Slider::new(&mut num_boxes, 10..=20)
-                        .step_by(5.)
-                        .text("# boxes"),
-                );
+                // ui.add(
+                //     Slider::new(&mut num_boxes, 10..=20)
+                //         .step_by(5.)
+                //         .text("# boxes"),
+                // );
                 ui.add(Slider::new(&mut box_offset, 2.0..=20.0).text("Box Offset"));
             });
         },
