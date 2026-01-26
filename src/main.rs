@@ -5,7 +5,7 @@ use std::env;
 use std::fs::read_to_string;
 
 use egor::{
-    app::{App, FrameContext, WindowEvent, egui::Window, egui::Slider},
+    app::{App, FrameContext, WindowEvent, egui::Slider, egui::Window},
     input::{KeyCode, MouseButton},
     math::{Rect, Vec2, vec2},
     render::Color,
@@ -35,9 +35,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut game_over = false;
     let mut bg_size = 550;
     let mut bg_position = vec2(-163., -229.);
-    let mut grid_step = 10;
+    // let mut box_size = 50;
     let mut num_boxes = 10;
-    let mut box_offset = 10.0;
+    let mut box_offset = 8.0;
 
     App::new().window_size(1280, 720).title("Logic Brush").run(
         move |FrameContext {
@@ -80,13 +80,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!("{:?}", bg_position);
             }
 
-            gfx.rect().at(bg_position).size(Vec2::splat(bg_size as f32)).color(Color::BLUE);
+            gfx.rect()
+                .at(bg_position)
+                .size(Vec2::splat(bg_size as f32))
+                .color(Color::BLUE);
 
-            
-            for r_step in (0..bg_size).step_by(bg_size / num_boxes) {
-                for c_step in (0..bg_size).step_by(bg_size / num_boxes) {
-                    let position = bg_position + Vec2::splat(box_offset/2.) + vec2(r_step as f32, c_step as f32);
-                    gfx.rect().at(position).size(Vec2::splat((bg_size / num_boxes) as f32) - box_offset/2.).color(Color::WHITE);
+            let halfset = box_offset / 2.;
+            let anchor = bg_position + Vec2::splat(halfset as f32);
+            let offset = Vec2::splat(halfset);
+            let box_size =
+                (bg_size as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
+            for r in (0..num_boxes).map(|i| i as f32) {
+                for c in (0..num_boxes).map(|i| i as f32) {
+                    let box_size = box_size as f32;
+                    let position = anchor + vec2(r, c) * (Vec2::splat(box_size) + offset);
+                    let size = Vec2::splat(box_size);
+                    gfx.rect().at(position).size(size).color(Color::WHITE);
                 }
             }
 
@@ -96,23 +105,39 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 ui.label(format!("World x: {} y: {}", world_xy.x, world_xy.y));
                 ui.label(format!("Screensize: {}", screen_size));
 
-                ui.label(format!("Mouse state: left_mouse_pressed: {}", left_mouse_pressed));
+                ui.label(format!(
+                    "Mouse state: left_mouse_pressed: {}",
+                    left_mouse_pressed
+                ));
                 ui.label(format!("Mouse state: left_mouse_held: {}", left_mouse_held));
-                ui.label(format!("Mouse state: left_mouse_released: {}", left_mouse_released));
-                ui.label(format!("Mouse state: right_mouse_pressed: {}", right_mouse_pressed));
-                ui.label(format!("Mouse state: right_mouse_held: {}", right_mouse_held));
-                ui.label(format!("Mouse state: right_mouse_released: {}", right_mouse_released));
+                ui.label(format!(
+                    "Mouse state: left_mouse_released: {}",
+                    left_mouse_released
+                ));
+                ui.label(format!(
+                    "Mouse state: right_mouse_pressed: {}",
+                    right_mouse_pressed
+                ));
+                ui.label(format!(
+                    "Mouse state: right_mouse_held: {}",
+                    right_mouse_held
+                ));
+                ui.label(format!(
+                    "Mouse state: right_mouse_released: {}",
+                    right_mouse_released
+                ));
 
                 ui.add(Slider::new(&mut bg_size, 1..=800).text("BG size"));
-                ui.add(Slider::new(&mut grid_step, 1..=100).text("Grid step"));
-                ui.add(Slider::new(&mut num_boxes, 10..=20).step_by(5.).text("Grid step"));
+                // ui.add(Slider::new(&mut box_size, 1..=100).text("Box size"));
+                ui.add(
+                    Slider::new(&mut num_boxes, 10..=20)
+                        .step_by(5.)
+                        .text("# boxes"),
+                );
                 ui.add(Slider::new(&mut box_offset, 2.0..=20.0).text("Box Offset"));
-                
-                
             });
         },
     );
 
     Ok(())
 }
-
