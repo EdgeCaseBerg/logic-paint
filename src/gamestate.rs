@@ -32,10 +32,10 @@ impl CellState {
     }
 
     pub fn attempt_fill(&self, goal: CellState) -> CellState {
-        if *self == goal {
-            return goal;
-        }
         use CellState::*;
+        if *self == Filled {
+            return Filled;
+        }
         match (self, goal) {
             (Empty, Filled) => goal,
             (Empty, _) => Incorrect,
@@ -457,6 +457,17 @@ mod pbm_tests {
         state.attempt_fill(0, 0);
         eprintln!("AFTER: {}", state);
         assert_eq!(CellState::Filled, state.cells[0]);
+    }
+
+    #[test]
+    fn can_incorreclty_fill_in_cell_that_is_empty() {
+        let mut state = test_play_state();
+        eprintln!("BEFORE: {}", state);
+        state.cells[0] = CellState::Empty;
+        state.goal_state[0] = CellState::Empty;
+        state.attempt_fill(0, 0);
+        eprintln!("AFTER: {}", state);
+        assert_eq!(CellState::Incorrect, state.cells[0]);
     }
 
     #[test]
