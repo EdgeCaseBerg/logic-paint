@@ -65,8 +65,8 @@ type GoalState = CellState;
 #[derive(Debug)]
 pub struct PlayState {
     cells: Vec<CellState>,
-    column_groups: Vec<Vec<Group>>,
-    row_groups: Vec<Vec<Group>>,
+    pub column_groups: Vec<Vec<Group>>,
+    pub row_groups: Vec<Vec<Group>>,
     goal_state: Vec<CellState>,
     num_rows: usize,
     num_columns: usize,

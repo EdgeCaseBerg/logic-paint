@@ -38,6 +38,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // let mut box_size = 50;
     let mut num_boxes = 10;
     let mut box_offset = 8.0;
+    let mut draw_text_at = vec2(-160., -300.);
 
     App::new().window_size(1280, 720).title("Logic Brush").run(
         move |FrameContext {
@@ -57,7 +58,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
 
+            let screen_size = gfx.screen_size();
+
             if game_over {
+                gfx.text("GAME OVER")
+                    .size(50.)
+                    .color(Color::RED)
+                    .at(vec2(screen_size.x / 2. - 40., screen_size.y / 2.));
                 return;
             }
 
@@ -65,7 +72,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 game_over = true;
             }
 
-            let screen_size = gfx.screen_size();
             let (mx, my) = input.mouse_position();
             let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
             let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
@@ -76,8 +82,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let right_mouse_released = input.mouse_released(MouseButton::Right);
 
             if right_mouse_pressed {
-                bg_position = world_xy;
-                println!("{:?}", bg_position);
+                draw_text_at = world_xy;
+                eprintln!("{:?}", draw_text_at);
             }
 
             gfx.rect()
@@ -101,6 +107,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // }
 
             for (r, row) in game_state.rows().into_iter().enumerate() {
+                
+
                 for (c, state) in row.iter().enumerate() {
                     let box_size = box_size as f32;
                     let position =
@@ -120,11 +128,34 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         game_state.attempt_fill(r, c);
                     }
                 }
+
+                // TODO: color the groups in based on if they are full or not.
+                let group_numbers = game_state.row_groups[r].iter().map(|g| g.num_cells.to_string()).collect::<String>();
+                let tp = anchor + offset + vec2( -1. * group_numbers.len() as f32 * box_size, box_size * r as f32 );
+                if right_mouse_pressed {
+                    eprintln!("? {:?} {:?}", group_numbers, tp);
+                }
+                let tp = gfx.camera().world_to_screen(tp, screen_size);
+                gfx.text(&group_numbers)
+                    .size(box_size as f32)
+                    .color(Color::RED)
+                    .at(tp);
             }
 
             if right_mouse_pressed {
-                eprintln!("{}", game_state);
+                eprintln!("{} -> {}", draw_text_at, gfx.camera().world_to_screen(draw_text_at, screen_size));
             }
+            //Vec2(416.1604, 291.32635)
+            gfx.text("?")
+                .size(box_size as f32)
+                .color(Color::RED)
+                .at(draw_text_at);
+
+            let foo = gfx.camera().world_to_screen(draw_text_at, screen_size);
+            gfx.text("?")   
+                .size(box_size as f32)
+                .color(Color::WHITE)
+                .at(foo);
 
             game_state.update_groups();
 
