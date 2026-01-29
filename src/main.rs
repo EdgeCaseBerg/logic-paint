@@ -107,8 +107,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // }
 
             for (r, row) in game_state.rows().into_iter().enumerate() {
-                
-
                 for (c, state) in row.iter().enumerate() {
                     let box_size = box_size as f32;
                     let position =
@@ -130,20 +128,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
 
                 // TODO: color the groups in based on if they are full or not.
-                let group_numbers = game_state.row_groups[r].iter().map(|g| g.num_cells.to_string()).collect::<String>();
-                let tp = anchor + offset + vec2( -1. * group_numbers.len() as f32 * box_size, box_size * r as f32 );
-                if right_mouse_pressed {
-                    eprintln!("? {:?} {:?}", group_numbers, tp);
+                let number_of_groups = game_state.row_groups[r].iter().len();
+                let groups = &game_state.row_groups[r];
+                for i in 0..number_of_groups {
+                    let tp = anchor - vec2(box_size, 0. - offset.y / 2. - box_size / 2.)
+                        + (vec2(1., r as f32) * Vec2::splat(box_size) + offset)
+                            * vec2(0., (i as f32 + 1.));
+                    let tp = gfx.camera().world_to_screen(tp, screen_size);
+                    gfx.text(&format!(" {} ", groups[i].num_cells))
+                        .size(box_size as f32)
+                        .color(match groups[i].filled {
+                            true => Color::new([0.5, 0.5, 0.5, 1.0]),
+                            false => Color::WHITE,
+                        })
+                        .at(tp);
                 }
-                let tp = gfx.camera().world_to_screen(tp, screen_size);
-                gfx.text(&group_numbers)
-                    .size(box_size as f32)
-                    .color(Color::RED)
-                    .at(tp);
             }
 
             if right_mouse_pressed {
-                eprintln!("{} -> {}", draw_text_at, gfx.camera().world_to_screen(draw_text_at, screen_size));
+                eprintln!(
+                    "{} -> {}",
+                    draw_text_at,
+                    gfx.camera().world_to_screen(draw_text_at, screen_size)
+                );
             }
             //Vec2(416.1604, 291.32635)
             gfx.text("?")
@@ -152,7 +159,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .at(draw_text_at);
 
             let foo = gfx.camera().world_to_screen(draw_text_at, screen_size);
-            gfx.text("?")   
+            gfx.text("?")
                 .size(box_size as f32)
                 .color(Color::WHITE)
                 .at(foo);
