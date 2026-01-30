@@ -125,14 +125,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let anchor = anchor - padding;
             for (r, groups) in game_state.row_groups.iter().enumerate() {
                 let number_of_groups = groups.iter().len();
-                let anchor = anchor - vec2((box_size + offset.x) * number_of_groups as f32, 0.);
+                // let anchor = anchor - vec2((box_size + offset.x) * number_of_groups as f32, 0.);
                 for i in 0..number_of_groups {
                     let position =
-                        anchor + vec2(i as f32, r as f32) * (Vec2::splat(box_size) + offset / 2.) * scaler;
+                        anchor + vec2(-(i as f32) - 2., r as f32) * (Vec2::splat(box_size) + offset) * scaler;
                     let tp = gfx.camera().world_to_screen(position, screen_size);
-                    gfx.text(&format!("{}", groups[i].num_cells))
+                    let g = number_of_groups - i - 1; // right aligned.
+                    gfx.text(&format!("{}", groups[g].num_cells))
                         .size(0.5 * box_size as f32)
-                        .color(match groups[i].filled {
+                        .color(match groups[g].filled {
                             true => Color::GREEN,
                             false => Color::WHITE,
                         })
