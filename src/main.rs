@@ -118,19 +118,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         game_state.attempt_fill(r, c);
                     }
                 }
+            }
 
-                // TODO: color the groups in based on if they are full or not.
-                let number_of_groups = game_state.row_groups[r].iter().len();
-                let groups = &game_state.row_groups[r];
+            let padding = offset.y / 2. - box_size / 2.;
+            let scaler = vec2(0.5, 1.);
+            let anchor = anchor - padding;
+            for (r, groups) in game_state.row_groups.iter().enumerate() {
+                let number_of_groups = groups.iter().len();
+                let anchor = anchor - vec2((box_size + offset.x) * number_of_groups as f32, 0.);
                 for i in 0..number_of_groups {
-                    let tp = anchor - vec2(box_size, 0. - offset.y / 2. - box_size / 2.)
-                        + (vec2(1., r as f32) * Vec2::splat(box_size) + offset)
-                            * vec2(0., (i as f32 + 1.));
-                    let tp = gfx.camera().world_to_screen(tp, screen_size);
-                    gfx.text(&format!(" {} ", groups[i].num_cells))
-                        .size(box_size as f32)
+                    let position =
+                        anchor + vec2(i as f32, r as f32) * (Vec2::splat(box_size) + offset / 2.) * scaler;
+                    let tp = gfx.camera().world_to_screen(position, screen_size);
+                    gfx.text(&format!("{}", groups[i].num_cells))
+                        .size(0.5 * box_size as f32)
                         .color(match groups[i].filled {
-                            true => Color::new([0.5, 0.5, 0.5, 1.0]),
+                            true => Color::GREEN,
                             false => Color::WHITE,
                         })
                         .at(tp);
