@@ -126,8 +126,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for (r, groups) in game_state.row_groups.iter().enumerate() {
                 let number_of_groups = groups.iter().len();
                 for i in 0..number_of_groups {
-                    let position =
-                        anchor + vec2(-(i as f32) - 2., r as f32) * (Vec2::splat(box_size) + offset) * scaler;
+                    let position = anchor
+                        + vec2(-(i as f32) - 2., r as f32)
+                            * (Vec2::splat(box_size) + offset)
+                            * scaler;
                     let tp = gfx.camera().world_to_screen(position, screen_size);
                     let g = number_of_groups - i - 1; // right aligned.
                     gfx.text(&format!("{}", groups[g].num_cells))
@@ -145,8 +147,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for (c, groups) in game_state.column_groups.iter().enumerate() {
                 let number_of_groups = groups.iter().len();
                 for i in 0..number_of_groups {
-                    let position =
-                        anchor + vec2(c as f32, -(i as f32) - 2.) * (Vec2::splat(box_size) + offset) * scaler;
+                    let position = anchor
+                        + vec2(c as f32, -(i as f32) - 2.)
+                            * (Vec2::splat(box_size) + offset)
+                            * scaler;
                     let tp = gfx.camera().world_to_screen(position, screen_size);
                     let g = number_of_groups - i - 1; // bottom aligned.
                     gfx.text(&format!("{}", groups[g].num_cells))
