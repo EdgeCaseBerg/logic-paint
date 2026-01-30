@@ -126,19 +126,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for (r, groups) in game_state.row_groups.iter().enumerate() {
                 let number_of_groups = groups.iter().len();
                 for i in 0..number_of_groups {
-                    let position = anchor
-                        + vec2(-(i as f32) - 2., r as f32)
-                            * (Vec2::splat(box_size) + offset)
-                            * scaler;
-                    let tp = gfx.camera().world_to_screen(position, screen_size);
-                    let g = number_of_groups - i - 1; // right aligned.
+                    let grid_offset = vec2(-(i as f32) - 2., r as f32);
+                    let grid_cell_size = (Vec2::splat(box_size) + offset);
+                    let position = anchor + grid_offset * grid_cell_size * scaler;
+                    let screen_position = gfx.camera().world_to_screen(position, screen_size);
+                    // write out the numbers from the right outward for alignment
+                    let g = number_of_groups - i - 1;
                     gfx.text(&format!("{}", groups[g].num_cells))
-                        .size(0.5 * box_size as f32)
+                        .size(box_size as f32)
                         .color(match groups[g].filled {
                             true => Color::GREEN,
                             false => Color::WHITE,
                         })
-                        .at(tp);
+                        .at(screen_position);
                 }
             }
 
@@ -147,19 +147,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for (c, groups) in game_state.column_groups.iter().enumerate() {
                 let number_of_groups = groups.iter().len();
                 for i in 0..number_of_groups {
-                    let position = anchor
-                        + vec2(c as f32, -(i as f32) - 2.)
-                            * (Vec2::splat(box_size) + offset)
-                            * scaler;
-                    let tp = gfx.camera().world_to_screen(position, screen_size);
-                    let g = number_of_groups - i - 1; // bottom aligned.
+                    let grid_offset = vec2(c as f32, -(i as f32) - 2.);
+                    let grid_cell_size = (Vec2::splat(box_size) + offset);
+                    let position = anchor + grid_offset * grid_cell_size * scaler;
+                    let screen_position = gfx.camera().world_to_screen(position, screen_size);
+                    // render the bottom number closest to the top of the grid, then go up for alignment
+                    let g = number_of_groups - i - 1;
                     gfx.text(&format!("{}", groups[g].num_cells))
                         .size(0.5 * box_size as f32)
                         .color(match groups[g].filled {
                             true => Color::GREEN,
                             false => Color::WHITE,
                         })
-                        .at(tp);
+                        .at(screen_position);
                 }
             }
 
