@@ -33,8 +33,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("{:?}", game_state);
 
     let mut game_over = false;
-    let mut bg_size = 550;
-    let mut bg_position = vec2(-163., -229.);
+    let mut bg_size = 525;
+    let mut bg_position = vec2(-163., -209.);
     // let mut box_size = 50;
     let mut num_boxes = 10;
     let mut box_offset = 8.0;
@@ -125,12 +125,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let anchor = anchor - padding;
             for (r, groups) in game_state.row_groups.iter().enumerate() {
                 let number_of_groups = groups.iter().len();
-                // let anchor = anchor - vec2((box_size + offset.x) * number_of_groups as f32, 0.);
                 for i in 0..number_of_groups {
                     let position =
                         anchor + vec2(-(i as f32) - 2., r as f32) * (Vec2::splat(box_size) + offset) * scaler;
                     let tp = gfx.camera().world_to_screen(position, screen_size);
                     let g = number_of_groups - i - 1; // right aligned.
+                    gfx.text(&format!("{}", groups[g].num_cells))
+                        .size(0.5 * box_size as f32)
+                        .color(match groups[g].filled {
+                            true => Color::GREEN,
+                            false => Color::WHITE,
+                        })
+                        .at(tp);
+                }
+            }
+
+            let scaler = vec2(1., 0.5);
+            let anchor = anchor - offset;
+            for (c, groups) in game_state.column_groups.iter().enumerate() {
+                let number_of_groups = groups.iter().len();
+                for i in 0..number_of_groups {
+                    let position =
+                        anchor + vec2(c as f32, -(i as f32) - 2.) * (Vec2::splat(box_size) + offset) * scaler;
+                    let tp = gfx.camera().world_to_screen(position, screen_size);
+                    let g = number_of_groups - i - 1; // bottom aligned.
                     gfx.text(&format!("{}", groups[g].num_cells))
                         .size(0.5 * box_size as f32)
                         .color(match groups[g].filled {
@@ -148,17 +166,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     gfx.camera().world_to_screen(draw_text_at, screen_size)
                 );
             }
-            //Vec2(416.1604, 291.32635)
-            gfx.text("?")
-                .size(box_size as f32)
-                .color(Color::RED)
-                .at(draw_text_at);
-
-            let foo = gfx.camera().world_to_screen(draw_text_at, screen_size);
-            gfx.text("?")
-                .size(box_size as f32)
-                .color(Color::WHITE)
-                .at(foo);
 
             game_state.update_groups();
 
