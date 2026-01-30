@@ -97,14 +97,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let num_boxes = game_state.rows().len();
             let box_size =
                 (bg_size as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
-            // for r in (0..num_boxes).map(|i| i as f32) {
-            //     for c in (0..num_boxes).map(|i| i as f32) {
-            //         let box_size = box_size as f32;
-            //         let position = anchor + vec2(r, c) * (Vec2::splat(box_size) + offset);
-            //         let size = Vec2::splat(box_size);
-            //         gfx.rect().at(position).size(size).color(Color::WHITE);
-            //     }
-            // }
 
             for (r, row) in game_state.rows().into_iter().enumerate() {
                 for (c, state) in row.iter().enumerate() {
