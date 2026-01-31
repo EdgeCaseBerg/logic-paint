@@ -213,7 +213,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // );
                 ui.add(Slider::new(&mut box_offset, 2.0..=20.0).text("Box Offset"));
                 let before_level = selected_level;
-                ComboBox::from_label("Select one!").show_index(
+                ComboBox::from_label("Load level").show_index(
                     ui,
                     &mut selected_level,
                     levels.len(),
