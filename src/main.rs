@@ -135,7 +135,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     // write out the numbers from the right outward for alignment
                     let g = number_of_groups - i - 1;
                     gfx.text(&format!("{}", groups[g].num_cells))
-                        .size(box_size as f32)
+                        .size(0.5 * box_size as f32)
                         .color(match groups[g].filled {
                             true => Color::GREEN,
                             false => Color::WHITE,
