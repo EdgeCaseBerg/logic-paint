@@ -5,7 +5,7 @@ use std::env;
 use std::fs::read_to_string;
 
 use egor::{
-    app::{App, FrameContext, WindowEvent, egui::Slider, egui::Window},
+    app::{App, FrameContext, WindowEvent, egui::Slider, egui::Window, egui::ComboBox},
     input::{KeyCode, MouseButton},
     math::{Rect, Vec2, vec2},
     render::Color,
@@ -39,6 +39,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut num_boxes = 10;
     let mut box_offset = 8.0;
     let mut draw_text_at = vec2(-160., -300.);
+    let levels = ["./assets/P1.pbm", "./assets/P1-10x10.pbm"];
+    let mut selected_level = 0;
 
     App::new().window_size(1280, 720).title("Logic Brush").run(
         move |FrameContext {
@@ -210,6 +212,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 //         .text("# boxes"),
                 // );
                 ui.add(Slider::new(&mut box_offset, 2.0..=20.0).text("Box Offset"));
+                let before_level = selected_level;
+                ComboBox::from_label("Select one!").show_index(
+                    ui,
+                    &mut selected_level,
+                    levels.len(),
+                    |i| levels[i]
+                );
+                if before_level != selected_level {
+                    let pbm = read_to_string(levels[selected_level]).expect("Could not load level");
+                    let pbm: netbpm::Pbm = pbm.parse().expect("level not in expected format");
+                    game_state = (&pbm).into();
+                }
             });
         },
     );
