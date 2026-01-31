@@ -1,11 +1,14 @@
 mod gamestate;
 mod netbpm;
+mod ui;
 
 use std::env;
 use std::fs::read_to_string;
 
+use ui::UiComponent;
+
 use egor::{
-    app::{App, FrameContext, WindowEvent, egui::Slider, egui::Window, egui::ComboBox},
+    app::{App, FrameContext, WindowEvent, egui::ComboBox, egui::Slider, egui::Window},
     input::{KeyCode, MouseButton},
     math::{Rect, Vec2, vec2},
     render::Color,
@@ -30,7 +33,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("{:?}", test_pbm);
 
     let mut game_state: gamestate::PlayState = (&test_pbm).into();
-    println!("{:?}", game_state);
 
     let mut game_over = false;
     let mut bg_size = 525;
@@ -49,6 +51,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                   egui_ctx,
                   events,
               }| {
+            // this compiles, but at what cost
+            let play_area = ui::PlayArea::new(&mut game_state, bg_position);
             for event in events {
                 match event {
                     WindowEvent::CloseRequested => {
@@ -87,10 +91,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 eprintln!("{:?}", draw_text_at);
             }
 
-            gfx.rect()
-                .at(bg_position)
-                .size(Vec2::splat(bg_size as f32))
-                .color(Color::BLUE);
+            play_area.draw(timer, gfx);
 
             let halfset = box_offset / 2.;
             let anchor = bg_position + Vec2::splat(halfset as f32);
@@ -209,7 +210,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     ui,
                     &mut selected_level,
                     levels.len(),
-                    |i| levels[i]
+                    |i| levels[i],
                 );
                 if before_level != selected_level {
                     let pbm = read_to_string(levels[selected_level]).expect("Could not load level");
