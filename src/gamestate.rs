@@ -148,6 +148,7 @@ impl PlayState {
         result
     }
 
+    #[allow(dead_code)]
     pub fn cols(&self) -> Vec<Vec<CellState>> {
         let mut cols = vec![vec![]; self.num_columns];
         for c in 0..self.num_columns {
@@ -338,7 +339,7 @@ mod pbm_tests {
     #[test]
     #[rustfmt::skip]
     fn constructs_row_groups_correctly() {
-        let mut state = test_play_state();
+        let state = test_play_state();
 
         assert_eq!(
             true,

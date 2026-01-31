@@ -34,9 +34,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut game_over = false;
     let mut bg_size = 525;
-    let mut bg_position = vec2(-163., -209.);
+    let bg_position = vec2(-163., -209.);
     // let mut box_size = 50;
-    let mut num_boxes = 10;
     let mut box_offset = 8.0;
     let mut draw_text_at = vec2(-160., -300.);
     let levels = ["./assets/P1.pbm", "./assets/P1-10x10.pbm"];
@@ -112,7 +111,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         gamestate::CellState::Incorrect => Color::RED,
                         gamestate::CellState::RuledOut => Color::new([0.5, 0.5, 0.5, 1.0]),
                         gamestate::CellState::UserRuledOut => Color::new([0.5, 0.5, 0.5, 1.0]),
-                        _ => Color::BLACK,
                     };
                     gfx.rect().at(position).size(size).color(color);
                     if Rect::new(position, size).contains(world_xy) && left_mouse_pressed {
@@ -129,7 +127,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let number_of_groups = groups.iter().len();
                 for i in 0..number_of_groups {
                     let grid_offset = vec2(-(i as f32) - 2., r as f32);
-                    let grid_cell_size = (Vec2::splat(box_size) + offset);
+                    let grid_cell_size = Vec2::splat(box_size) + offset;
                     let position = anchor + grid_offset * grid_cell_size * scaler;
                     let screen_position = gfx.camera().world_to_screen(position, screen_size);
                     // write out the numbers from the right outward for alignment
@@ -150,7 +148,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let number_of_groups = groups.iter().len();
                 for i in 0..number_of_groups {
                     let grid_offset = vec2(c as f32, -(i as f32) - 2.);
-                    let grid_cell_size = (Vec2::splat(box_size) + offset);
+                    let grid_cell_size = Vec2::splat(box_size) + offset;
                     let position = anchor + grid_offset * grid_cell_size * scaler;
                     let screen_position = gfx.camera().world_to_screen(position, screen_size);
                     // render the bottom number closest to the top of the grid, then go up for alignment
@@ -205,12 +203,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 ui.label(format!("Grid complete? {}", game_state.is_complete()));
 
                 ui.add(Slider::new(&mut bg_size, 1..=800).text("BG size"));
-                // ui.add(Slider::new(&mut box_size, 1..=100).text("Box size"));
-                // ui.add(
-                //     Slider::new(&mut num_boxes, 10..=20)
-                //         .step_by(5.)
-                //         .text("# boxes"),
-                // );
                 ui.add(Slider::new(&mut box_offset, 2.0..=20.0).text("Box Offset"));
                 let before_level = selected_level;
                 ComboBox::from_label("Load level").show_index(
