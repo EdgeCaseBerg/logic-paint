@@ -107,6 +107,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             play_area.draw_gridarea_background(&game_state, gfx);
             play_area.draw_grid(&mut game_state, &player_input, gfx);
+            play_area.draw_row_groups(&game_state, &player_input, gfx);
 
             let halfset = box_offset / 2.;
             let anchor = bg_position + Vec2::splat(halfset as f32);
@@ -116,26 +117,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 (bg_size as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
 
             let padding = offset.y / 2. - box_size / 2.;
-            let scaler = vec2(0.5, 1.);
             let anchor = anchor - padding;
-            for (r, groups) in game_state.row_groups.iter().enumerate() {
-                let number_of_groups = groups.iter().len();
-                for i in 0..number_of_groups {
-                    let grid_offset = vec2(-(i as f32) - 2., r as f32);
-                    let grid_cell_size = Vec2::splat(box_size) + offset;
-                    let position = anchor + grid_offset * grid_cell_size * scaler;
-                    let screen_position = gfx.camera().world_to_screen(position, screen_size);
-                    // write out the numbers from the right outward for alignment
-                    let g = number_of_groups - i - 1;
-                    gfx.text(&format!("{}", groups[g].num_cells))
-                        .size(0.5 * box_size as f32)
-                        .color(match groups[g].filled {
-                            true => Color::GREEN,
-                            false => Color::WHITE,
-                        })
-                        .at(screen_position);
-                }
-            }
 
             let scaler = vec2(1., 0.5);
             let anchor = anchor - offset;

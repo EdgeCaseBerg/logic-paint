@@ -70,4 +70,41 @@ impl PlayArea {
             }
         }
     }
+
+    pub fn draw_row_groups(
+        &self,
+        play_state: &PlayState,
+        _input: &PlayerInput,
+        gfx: &mut Graphics,
+    ) {
+        // _input for background
+        let halfset = self.grid_gutter / 2.;
+        let num_boxes = play_state.rows().len();
+        let box_size =
+            (self.size.x as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
+        let padding = self.grid_gutter / 2. - box_size / 2.;
+        let offset = Vec2::splat(halfset);
+        let scaler = vec2(0.5, 1.);
+        let anchor = self.top_left + Vec2::splat(halfset);
+        let anchor = anchor - padding;
+        for (r, groups) in play_state.row_groups.iter().enumerate() {
+            let number_of_groups = groups.iter().len();
+            for i in 0..number_of_groups {
+                let grid_offset = vec2(-(i as f32) - 2., r as f32);
+                let grid_cell_size = Vec2::splat(box_size) + offset;
+                let position = anchor + grid_offset * grid_cell_size * scaler;
+                let screen_size = gfx.screen_size();
+                let screen_position = gfx.camera().world_to_screen(position, screen_size);
+                // write out the numbers from the right outward for alignment
+                let g = number_of_groups - i - 1;
+                gfx.text(&format!("{}", groups[g].num_cells))
+                    .size(0.5 * box_size as f32)
+                    .color(match groups[g].filled {
+                        true => Color::GREEN,
+                        false => Color::WHITE,
+                    })
+                    .at(screen_position);
+            }
+        }
+    }
 }
