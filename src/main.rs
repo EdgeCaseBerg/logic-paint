@@ -1,11 +1,12 @@
 mod gamestate;
 mod netbpm;
+mod ui;
 
 use std::env;
 use std::fs::read_to_string;
 
 use egor::{
-    app::{App, FrameContext, WindowEvent, egui::Slider, egui::Window, egui::ComboBox},
+    app::{App, FrameContext, WindowEvent, egui::ComboBox, egui::Slider, egui::Window},
     input::{KeyCode, MouseButton},
     math::{Rect, Vec2, vec2},
     render::Color,
@@ -87,10 +88,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 eprintln!("{:?}", draw_text_at);
             }
 
-            gfx.rect()
-                .at(bg_position)
-                .size(Vec2::splat(bg_size as f32))
-                .color(Color::BLUE);
+            let play_area = ui::PlayArea {
+                top_left: bg_position,
+                size: Vec2::splat(bg_size as f32),
+            };
+
+            play_area.draw(&game_state, timer, gfx);
 
             let halfset = box_offset / 2.;
             let anchor = bg_position + Vec2::splat(halfset as f32);
@@ -209,7 +212,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     ui,
                     &mut selected_level,
                     levels.len(),
-                    |i| levels[i]
+                    |i| levels[i],
                 );
                 if before_level != selected_level {
                     let pbm = read_to_string(levels[selected_level]).expect("Could not load level");
