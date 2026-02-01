@@ -8,7 +8,7 @@ use std::fs::read_to_string;
 use egor::{
     app::{App, FrameContext, WindowEvent, egui::ComboBox, egui::Slider, egui::Window},
     input::{KeyCode, MouseButton},
-    math::{Rect, Vec2, vec2},
+    math::{Vec2, vec2},
     render::Color,
 };
 
@@ -91,9 +91,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let play_area = ui::PlayArea {
                 top_left: bg_position,
                 size: Vec2::splat(bg_size as f32),
+                grid_gutter: box_offset,
             };
 
-            play_area.draw(&game_state, timer, gfx);
+            let player_input = ui::PlayerInput {
+                position: world_xy,
+                action: {
+                    match (left_mouse_pressed, right_mouse_pressed) {
+                        (false, false) => None,
+                        (true, false) => Some(ui::Action::FillCell),
+                        (_, true) => Some(ui::Action::MarkCell),
+                    }
+                },
+            };
+
+            play_area.draw_gridarea_background(&game_state, gfx);
+            play_area.draw_grid(&mut game_state, &player_input, gfx);
 
             let halfset = box_offset / 2.;
             let anchor = bg_position + Vec2::splat(halfset as f32);
@@ -101,27 +114,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let num_boxes = game_state.rows().len();
             let box_size =
                 (bg_size as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
-
-            for (r, row) in game_state.rows().into_iter().enumerate() {
-                for (c, state) in row.iter().enumerate() {
-                    let box_size = box_size as f32;
-                    let position =
-                        anchor + vec2(c as f32, r as f32) * (Vec2::splat(box_size) + offset);
-                    let size = Vec2::splat(box_size);
-                    let color = match state {
-                        gamestate::CellState::Empty => Color::WHITE,
-                        gamestate::CellState::Filled => Color::GREEN,
-                        gamestate::CellState::Incorrect => Color::RED,
-                        gamestate::CellState::RuledOut => Color::new([0.5, 0.5, 0.5, 1.0]),
-                        gamestate::CellState::UserRuledOut => Color::new([0.5, 0.5, 0.5, 1.0]),
-                    };
-                    gfx.rect().at(position).size(size).color(color);
-                    if Rect::new(position, size).contains(world_xy) && left_mouse_pressed {
-                        println!("attempt file at r:{} c:{}", r, c);
-                        game_state.attempt_fill(r, c);
-                    }
-                }
-            }
 
             let padding = offset.y / 2. - box_size / 2.;
             let scaler = vec2(0.5, 1.);
