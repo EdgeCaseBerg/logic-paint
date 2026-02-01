@@ -108,37 +108,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             play_area.draw_gridarea_background(&game_state, gfx);
             play_area.draw_grid(&mut game_state, &player_input, gfx);
             play_area.draw_row_groups(&game_state, &player_input, gfx);
-
-            let halfset = box_offset / 2.;
-            let anchor = bg_position + Vec2::splat(halfset as f32);
-            let offset = Vec2::splat(halfset);
-            let num_boxes = game_state.rows().len();
-            let box_size =
-                (bg_size as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
-
-            let padding = offset.y / 2. - box_size / 2.;
-            let anchor = anchor - padding;
-
-            let scaler = vec2(1., 0.5);
-            let anchor = anchor - offset;
-            for (c, groups) in game_state.column_groups.iter().enumerate() {
-                let number_of_groups = groups.iter().len();
-                for i in 0..number_of_groups {
-                    let grid_offset = vec2(c as f32, -(i as f32) - 2.);
-                    let grid_cell_size = Vec2::splat(box_size) + offset;
-                    let position = anchor + grid_offset * grid_cell_size * scaler;
-                    let screen_position = gfx.camera().world_to_screen(position, screen_size);
-                    // render the bottom number closest to the top of the grid, then go up for alignment
-                    let g = number_of_groups - i - 1;
-                    gfx.text(&format!("{}", groups[g].num_cells))
-                        .size(0.5 * box_size as f32)
-                        .color(match groups[g].filled {
-                            true => Color::GREEN,
-                            false => Color::WHITE,
-                        })
-                        .at(screen_position);
-                }
-            }
+            play_area.draw_column_groups(&game_state, &player_input, gfx);
 
             if right_mouse_pressed {
                 eprintln!(

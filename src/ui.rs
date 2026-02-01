@@ -107,4 +107,43 @@ impl PlayArea {
             }
         }
     }
+
+    pub fn draw_column_groups(
+        &self,
+        play_state: &PlayState,
+        _input: &PlayerInput,
+        gfx: &mut Graphics,
+    ) {
+        let halfset = self.grid_gutter / 2.;
+        let anchor = self.top_left + Vec2::splat(halfset as f32);
+        let offset = Vec2::splat(halfset);
+        let num_boxes = play_state.cols().len();
+        let box_size =
+            (self.size.x as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
+
+        let padding = offset.y / 2. - box_size / 2.;
+        let anchor = anchor - padding;
+
+        let scaler = vec2(1., 0.5);
+        let anchor = anchor - offset;
+        for (c, groups) in play_state.column_groups.iter().enumerate() {
+            let number_of_groups = groups.iter().len();
+            for i in 0..number_of_groups {
+                let grid_offset = vec2(c as f32, -(i as f32) - 2.);
+                let grid_cell_size = Vec2::splat(box_size) + offset;
+                let position = anchor + grid_offset * grid_cell_size * scaler;
+                let screen_size = gfx.screen_size();
+                let screen_position = gfx.camera().world_to_screen(position, screen_size);
+                // render the bottom number closest to the top of the grid, then go up for alignment
+                let g = number_of_groups - i - 1;
+                gfx.text(&format!("{}", groups[g].num_cells))
+                    .size(0.5 * box_size as f32)
+                    .color(match groups[g].filled {
+                        true => Color::GREEN,
+                        false => Color::WHITE,
+                    })
+                    .at(screen_position);
+            }
+        }
+    }
 }
