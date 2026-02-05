@@ -33,10 +33,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut game_state: gamestate::PlayState = (&test_pbm).into();
     println!("{:?}", game_state);
 
-    let mut game_over = false;
     let mut bg_size = 525;
     let bg_position = vec2(-163., -209.);
-    // let mut box_size = 50;
     let mut box_offset = 8.0;
     let mut draw_text_at = vec2(-160., -300.);
     let levels = ["./assets/P1.pbm", "./assets/P1-10x10.pbm"];
@@ -53,40 +51,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for event in events {
                 match event {
                     WindowEvent::CloseRequested => {
-                        println!("Shutting down");
-                        game_over = true;
+                        std::process::exit(0);
                     }
                     _ => {}
                 }
             }
+            if input.key_pressed(KeyCode::Escape) {
+                std::process::exit(0);
+            }
 
             let screen_size = gfx.screen_size();
-
-            if game_over {
-                gfx.text("GAME OVER")
-                    .size(50.)
-                    .color(Color::RED)
-                    .at(vec2(screen_size.x / 2. - 40., screen_size.y / 2.));
-                return;
-            }
-
-            if input.key_pressed(KeyCode::Escape) {
-                game_over = true;
-            }
-
             let (mx, my) = input.mouse_position();
             let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
             let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
-            let left_mouse_held = input.mouse_held(MouseButton::Left);
-            let left_mouse_released = input.mouse_released(MouseButton::Left);
             let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
-            let right_mouse_held = input.mouse_held(MouseButton::Right);
-            let right_mouse_released = input.mouse_released(MouseButton::Right);
-
-            if right_mouse_pressed {
-                draw_text_at = world_xy;
-                eprintln!("{:?}", draw_text_at);
-            }
 
             let play_area = ui::PlayArea {
                 top_left: bg_position,
@@ -110,15 +88,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             play_area.draw_row_groups(&game_state, &player_input, gfx);
             play_area.draw_column_groups(&game_state, &player_input, gfx);
 
-            if right_mouse_pressed {
-                eprintln!(
-                    "{} -> {}",
-                    draw_text_at,
-                    gfx.camera().world_to_screen(draw_text_at, screen_size)
-                );
-            }
-
             game_state.update_groups();
+
+            let left_mouse_held = input.mouse_held(MouseButton::Left);
+            let left_mouse_released = input.mouse_released(MouseButton::Left);
+            let right_mouse_held = input.mouse_held(MouseButton::Right);
+            let right_mouse_released = input.mouse_released(MouseButton::Right);
 
             Window::new("Debug").show(egui_ctx, |ui| {
                 ui.label(format!("FPS: {}", timer.fps));

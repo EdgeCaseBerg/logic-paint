@@ -20,7 +20,7 @@ pub struct PlayerInput {
 }
 
 impl PlayerInput {
-    fn is_fill_at(&self, cell: Rect) -> bool {
+    fn can_fill_at(&self, cell: Rect) -> bool {
         match self.action {
             Some(Action::FillCell) => cell.contains(self.position),
             _ => false,
@@ -40,7 +40,6 @@ impl PlayArea {
             .at(self.top_left)
             .size(self.size)
             .color(Color::BLUE);
-        // I suppose the background for the row/group highlights should be here?
     }
 
     pub fn draw_grid(&self, play_state: &mut PlayState, input: &PlayerInput, gfx: &mut Graphics) {
@@ -64,7 +63,7 @@ impl PlayArea {
                     CellState::UserRuledOut => Color::new([0.5, 0.5, 0.5, 1.0]),
                 };
                 gfx.rect().at(position).size(size).color(color);
-                if input.is_fill_at(Rect::new(position, size)) {
+                if input.can_fill_at(Rect::new(position, size)) {
                     play_state.attempt_fill(r, c);
                 }
             }
