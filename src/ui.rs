@@ -26,6 +26,13 @@ impl PlayerInput {
             _ => false,
         }
     }
+
+    fn can_mark_at(&self, cell: Rect) -> bool {
+        match self.action {
+            Some(Action::MarkCell) => cell.contains(self.position),
+            _ => false
+        }
+    }
 }
 
 pub struct PlayArea {
@@ -65,6 +72,9 @@ impl PlayArea {
                 gfx.rect().at(position).size(size).color(color);
                 if input.can_fill_at(Rect::new(position, size)) {
                     play_state.attempt_fill(r, c);
+                }
+                if input.can_mark_at(Rect::new(position, size)) {
+                    play_state.mark_cell(r, c);
                 }
             }
         }
