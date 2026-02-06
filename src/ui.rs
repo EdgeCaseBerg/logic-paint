@@ -20,18 +20,22 @@ pub struct PlayerInput {
 }
 
 impl PlayerInput {
-    fn can_fill_at(&self, cell: Rect) -> bool {
+    fn can_fill_at(&self, cell: &Rect) -> bool {
         match self.action {
             Some(Action::FillCell) => cell.contains(self.position),
             _ => false,
         }
     }
 
-    fn can_mark_at(&self, cell: Rect) -> bool {
+    fn can_mark_at(&self, cell: &Rect) -> bool {
         match self.action {
             Some(Action::MarkCell) => cell.contains(self.position),
             _ => false
         }
+    }
+
+    fn can_highlight_at(&self, cell: &Rect) -> bool {
+        cell.contains(self.position)
     }
 }
 
@@ -69,11 +73,16 @@ impl PlayArea {
                     CellState::RuledOut => Color::new([0.3, 0.3, 0.3, 1.0]),
                     CellState::UserRuledOut => Color::new([0.5, 0.5, 0.5, 1.0]),
                 };
+                let cell_rect = Rect::new(position, size);
+                if input.can_highlight_at(&cell_rect) {
+                    gfx.rect().at(position - offset).size(size + offset * 2.).color(Color::new([1.0, 0.75, 0.0, 1.0]));
+                }
+
                 gfx.rect().at(position).size(size).color(color);
-                if input.can_fill_at(Rect::new(position, size)) {
+                if input.can_fill_at(&cell_rect) {
                     play_state.attempt_fill(r, c);
                 }
-                if input.can_mark_at(Rect::new(position, size)) {
+                if input.can_mark_at(&cell_rect) {
                     play_state.mark_cell(r, c);
                 }
             }
