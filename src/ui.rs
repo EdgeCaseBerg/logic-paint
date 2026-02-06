@@ -66,7 +66,7 @@ impl PlayArea {
                     CellState::Empty => Color::WHITE,
                     CellState::Filled => Color::GREEN,
                     CellState::Incorrect => Color::RED,
-                    CellState::RuledOut => Color::new([0.5, 0.5, 0.5, 1.0]),
+                    CellState::RuledOut => Color::new([0.3, 0.3, 0.3, 1.0]),
                     CellState::UserRuledOut => Color::new([0.5, 0.5, 0.5, 1.0]),
                 };
                 gfx.rect().at(position).size(size).color(color);
