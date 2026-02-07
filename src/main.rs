@@ -156,6 +156,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 ui.color_edit_button_rgba_unmultiplied(&mut palette.cell_highlight);
                 ui.label("cell_incorrect: ");
                 ui.color_edit_button_rgba_unmultiplied(&mut palette.cell_incorrect);
+                ui.label("palette.group_highlight: ");
+                ui.color_edit_button_rgba_unmultiplied(&mut palette.group_highlight);
             });
         },
     );
