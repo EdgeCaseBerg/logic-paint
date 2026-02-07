@@ -57,7 +57,7 @@ impl PlayerInput {
     fn can_mark_at(&self, cell: &Rect) -> bool {
         match self.action {
             Some(Action::MarkCell) => cell.contains(self.position),
-            _ => false
+            _ => false,
         }
     }
 
@@ -70,6 +70,7 @@ pub struct PlayArea {
     pub top_left: Vec2,
     pub size: Vec2,
     pub grid_gutter: f32,
+    pub palette: ColorPalette,
 }
 
 impl PlayArea {
@@ -77,7 +78,7 @@ impl PlayArea {
         gfx.rect()
             .at(self.top_left)
             .size(self.size)
-            .color(Color::BLUE);
+            .color(Color::new(self.palette.background));
     }
 
     pub fn draw_grid(&self, play_state: &mut PlayState, input: &PlayerInput, gfx: &mut Graphics) {
@@ -94,15 +95,25 @@ impl PlayArea {
                 let position = anchor + vec2(c as f32, r as f32) * (Vec2::splat(box_size) + offset);
                 let size = Vec2::splat(box_size);
                 let color = match state {
-                    CellState::Empty => Color::WHITE,
-                    CellState::Filled => Color::GREEN,
-                    CellState::Incorrect => Color::RED,
-                    CellState::RuledOut => Color::new([0.3, 0.3, 0.3, 1.0]),
-                    CellState::UserRuledOut => Color::new([0.5, 0.5, 0.5, 1.0]),
+                    CellState::Empty => {
+                        let c = if r % 2 == 0 {
+                            self.palette.grid_even
+                        } else {
+                            self.palette.grid_odd
+                        };
+                        Color::new(c)
+                    }
+                    CellState::Filled => Color::new(self.palette.cell_filled_in),
+                    CellState::Incorrect => Color::new(self.palette.cell_incorrect),
+                    CellState::RuledOut => Color::new(self.palette.cell_marked_game),
+                    CellState::UserRuledOut => Color::new(self.palette.cell_marked_user),
                 };
                 let cell_rect = Rect::new(position, size);
                 if input.can_highlight_at(&cell_rect) {
-                    gfx.rect().at(position - offset).size(size + offset * 2.).color(Color::new([1.0, 0.75, 0.0, 1.0]));
+                    gfx.rect()
+                        .at(position - offset)
+                        .size(size + offset * 2.)
+                        .color(Color::new([1.0, 0.75, 0.0, 1.0]));
                 }
 
                 gfx.rect().at(position).size(size).color(color);
@@ -145,8 +156,8 @@ impl PlayArea {
                 gfx.text(&format!("{}", groups[g].num_cells))
                     .size(0.5 * box_size as f32)
                     .color(match groups[g].filled {
-                        true => Color::GREEN,
-                        false => Color::WHITE,
+                        true => Color::new(self.palette.cell_highlight),
+                        false => Color::new(self.palette.background),
                     })
                     .at(screen_position);
             }
@@ -184,8 +195,8 @@ impl PlayArea {
                 gfx.text(&format!("{}", groups[g].num_cells))
                     .size(0.5 * box_size as f32)
                     .color(match groups[g].filled {
-                        true => Color::GREEN,
-                        false => Color::WHITE,
+                        true => Color::new(self.palette.cell_highlight),
+                        false => Color::new(self.palette.background),
                     })
                     .at(screen_position);
             }

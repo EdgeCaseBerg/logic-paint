@@ -70,6 +70,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 top_left: bg_position,
                 size: Vec2::splat(bg_size as f32),
                 grid_gutter: box_offset,
+                palette: ui::ColorPalette::meeks(),
             };
 
             let player_input = ui::PlayerInput {
