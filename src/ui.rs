@@ -22,20 +22,32 @@ pub struct ColorPalette {
     pub cell_marked_game: [f32; 4],
     pub cell_highlight: [f32; 4],
     pub cell_incorrect: [f32; 4],
+    pub group_highlight: [f32; 4],
+}
+
+fn rgba(r: u8, g: u8, b: u8, a: f32) -> [f32; 4] {
+    [
+        r as f32 / 255.0,
+        g as f32 / 255.0,
+        b as f32 / 255.0,
+        a,
+    ]
 }
 
 impl ColorPalette {
     pub fn meeks() -> Self {
         Self {
-            background: [61. / 255., 123. / 255., 123. / 255., 1.0],
-            grid_even: [1.0, 227. / 255., 212. / 223., 1.0],
-            grid_odd: [1.0, 1.0, 1.0, 1.0],
-            cell_filled_in: [46. / 255., 220. / 255., 206. / 255., 1.0],
-            cell_marked_user: [129. / 255., 231. / 255., 223. / 255., 0.8],
-            cell_marked_game: [129. / 255., 231. / 255., 223. / 255., 1.0],
-            cell_highlight: [252. / 255., 255. / 255., 172. / 255., 1.0],
-            cell_incorrect: [1.0, 0., 0., 1.0],
+            background: rgba(61, 123, 123, 1.0),
+            grid_even: rgba(255, 227, 212, 1.0),
+            grid_odd: rgba(255, 255, 255, 1.0),
+            cell_filled_in: rgba(46, 220, 255, 1.0),
+            cell_marked_user: rgba(129, 231, 223, 0.8),
+            cell_marked_game: rgba(129, 231, 223, 1.0),
+            cell_highlight: rgba(252, 255, 172, 1.0),
+            cell_incorrect: rgba(255, 0, 0, 1.0),
+            group_highlight: rgba(251, 212, 207, 1.0),
         }
+
     }
 }
 
