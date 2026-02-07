@@ -14,26 +14,26 @@ pub enum Action {
 
 #[derive(Debug, Copy, Clone)]
 pub struct ColorPalette {
-    background: [f32; 4],
-    grid_even: [f32; 4],
-    grid_odd: [f32; 4],
-    cell_filled_in: [f32; 4],
-    cell_marked_user: [f32; 4],
-    cell_marked_game: [f32; 4],
-    cell_highlight: [f32; 4],
-    cell_incorrect: [f32; 4],
+    pub background: [f32; 4],
+    pub grid_even: [f32; 4],
+    pub grid_odd: [f32; 4],
+    pub cell_filled_in: [f32; 4],
+    pub cell_marked_user: [f32; 4],
+    pub cell_marked_game: [f32; 4],
+    pub cell_highlight: [f32; 4],
+    pub cell_incorrect: [f32; 4],
 }
 
 impl ColorPalette {
     pub fn meeks() -> Self {
         Self {
             background: [61. / 255., 123. / 255., 123. / 255., 1.0],
-            grid_even: [1.0, 217. / 255., 212. / 255., 1.0],
+            grid_even: [1.0, 227. / 255., 212. / 223., 1.0],
             grid_odd: [1.0, 1.0, 1.0, 1.0],
             cell_filled_in: [46. / 255., 220. / 255., 206. / 255., 1.0],
             cell_marked_user: [129. / 255., 231. / 255., 223. / 255., 0.8],
             cell_marked_game: [129. / 255., 231. / 255., 223. / 255., 1.0],
-            cell_highlight: [1.0, 171. / 255., 179. / 255., 1.0],
+            cell_highlight: [252. / 255., 255. / 255., 172. / 255., 1.0],
             cell_incorrect: [1.0, 0., 0., 1.0],
         }
     }
@@ -94,15 +94,13 @@ impl PlayArea {
                 let box_size = box_size as f32;
                 let position = anchor + vec2(c as f32, r as f32) * (Vec2::splat(box_size) + offset);
                 let size = Vec2::splat(box_size);
+                let even_odd_bg_color = if r % 2 == 0 {
+                    self.palette.grid_even
+                } else {
+                    self.palette.grid_odd
+                };
                 let color = match state {
-                    CellState::Empty => {
-                        let c = if r % 2 == 0 {
-                            self.palette.grid_even
-                        } else {
-                            self.palette.grid_odd
-                        };
-                        Color::new(c)
-                    }
+                    CellState::Empty => Color::new(even_odd_bg_color),
                     CellState::Filled => Color::new(self.palette.cell_filled_in),
                     CellState::Incorrect => Color::new(self.palette.cell_incorrect),
                     CellState::RuledOut => Color::new(self.palette.cell_marked_game),
@@ -113,10 +111,42 @@ impl PlayArea {
                     gfx.rect()
                         .at(position - offset)
                         .size(size + offset * 2.)
-                        .color(Color::new([1.0, 0.75, 0.0, 1.0]));
+                        .color(Color::new(self.palette.cell_highlight));
                 }
 
-                gfx.rect().at(position).size(size).color(color);
+                match state {
+                    CellState::Empty | CellState::Filled => {
+                        gfx.rect().at(position).size(size).color(color);
+                    }
+                    _ => {
+                        gfx.rect()
+                            .at(position)
+                            .size(size)
+                            .color(Color::new(even_odd_bg_color));
+                        let thickness = size * 0.2;
+                        gfx.polygon()
+                            .at(position + vec2(0., thickness.y))
+                            .points(&[
+                                vec2(thickness.x, 0.),
+                                vec2(thickness.x, size.y),
+                                vec2(0., size.y),
+                                vec2(0., 0.),
+                            ])
+                            .rotate(-3.145 / 4.)
+                            .color(color);
+                        gfx.polygon()
+                            .at(position + vec2(box_size - thickness.x, thickness.y))
+                            .points(&[
+                                vec2(thickness.x, 0.),
+                                vec2(thickness.x, size.y),
+                                vec2(0., size.y),
+                                vec2(0., 0.),
+                            ])
+                            .rotate(-7. * 3.145 / 4.)
+                            .color(color);
+                    }
+                };
+
                 if input.can_fill_at(&cell_rect) {
                     play_state.attempt_fill(r, c);
                 }
