@@ -39,6 +39,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut draw_text_at = vec2(-160., -300.);
     let levels = ["./assets/P1.pbm", "./assets/P1-10x10.pbm"];
     let mut selected_level = 0;
+    let mut palette = ui::ColorPalette::meeks();
 
     App::new().window_size(1280, 720).title("Logic Brush").run(
         move |FrameContext {
@@ -70,7 +71,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 top_left: bg_position,
                 size: Vec2::splat(bg_size as f32),
                 grid_gutter: box_offset,
-                palette: ui::ColorPalette::meeks(),
+                palette,
             };
 
             let player_input = ui::PlayerInput {
@@ -139,6 +140,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let pbm: netbpm::Pbm = pbm.parse().expect("level not in expected format");
                     game_state = (&pbm).into();
                 }
+                ui.label("grid even: ");
+                ui.color_edit_button_rgba_unmultiplied(&mut palette.grid_even);
+                ui.label("grid odd: ");
+                ui.color_edit_button_rgba_unmultiplied(&mut palette.grid_odd);
+                ui.label("background: ");
+                ui.color_edit_button_rgba_unmultiplied(&mut palette.background);
+                ui.label("cell_filled_in: ");
+                ui.color_edit_button_rgba_unmultiplied(&mut palette.cell_filled_in);
+                ui.label("cell_marked_user: ");
+                ui.color_edit_button_rgba_unmultiplied(&mut palette.cell_marked_user);
+                ui.label("cell_marked_game: ");
+                ui.color_edit_button_rgba_unmultiplied(&mut palette.cell_marked_game);
+                ui.label("cell_highlight: ");
+                ui.color_edit_button_rgba_unmultiplied(&mut palette.cell_highlight);
+                ui.label("cell_incorrect: ");
+                ui.color_edit_button_rgba_unmultiplied(&mut palette.cell_incorrect);
             });
         },
     );
