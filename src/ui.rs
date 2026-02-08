@@ -26,12 +26,7 @@ pub struct ColorPalette {
 }
 
 fn rgba(r: u8, g: u8, b: u8, a: f32) -> [f32; 4] {
-    [
-        r as f32 / 255.0,
-        g as f32 / 255.0,
-        b as f32 / 255.0,
-        a,
-    ]
+    [r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, a]
 }
 
 impl ColorPalette {
@@ -47,7 +42,6 @@ impl ColorPalette {
             cell_incorrect: rgba(255, 0, 0, 1.0),
             group_highlight: rgba(251, 212, 207, 1.0),
         }
-
     }
 }
 
@@ -86,7 +80,11 @@ pub struct PlayArea {
 }
 
 impl PlayArea {
-    pub fn draw_gridarea_background(&self, _play_state: &PlayState, gfx: &mut Graphics) {
+    fn play_area_gutter(&self) -> Vec2 {
+        self.size * 0.4
+    }
+
+    pub fn draw_gridarea_background(&self, play_state: &PlayState, gfx: &mut Graphics) {
         gfx.rect()
             .at(self.top_left)
             .size(self.size)
@@ -101,11 +99,17 @@ impl PlayArea {
         let box_size =
             (self.size.x as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
 
+        let side_areas_size = self.play_area_gutter();
         for (r, row) in play_state.rows().into_iter().enumerate() {
+            let cell_size = Vec2::splat(box_size);
+            let y_offset = r as f32 * (halfset + box_size);
+            gfx.rect()
+                .at(anchor - vec2(side_areas_size.x, -y_offset))
+                .color(Color::new(self.palette.group_highlight))
+                .size(vec2(side_areas_size.x, box_size));
+
             for (c, state) in row.iter().enumerate() {
-                let box_size = box_size as f32;
                 let position = anchor + vec2(c as f32, r as f32) * (Vec2::splat(box_size) + offset);
-                let size = Vec2::splat(box_size);
                 let even_odd_bg_color = if r % 2 == 0 {
                     self.palette.grid_even
                 } else {
@@ -118,30 +122,30 @@ impl PlayArea {
                     CellState::RuledOut => Color::new(self.palette.cell_marked_game),
                     CellState::UserRuledOut => Color::new(self.palette.cell_marked_user),
                 };
-                let cell_rect = Rect::new(position, size);
+                let cell_rect = Rect::new(position, cell_size);
                 if input.can_highlight_at(&cell_rect) {
                     gfx.rect()
                         .at(position - offset)
-                        .size(size + offset * 2.)
+                        .size(cell_size + offset * 2.)
                         .color(Color::new(self.palette.cell_highlight));
                 }
 
                 match state {
                     CellState::Empty | CellState::Filled => {
-                        gfx.rect().at(position).size(size).color(color);
+                        gfx.rect().at(position).size(cell_size).color(color);
                     }
                     _ => {
                         gfx.rect()
                             .at(position)
-                            .size(size)
+                            .size(cell_size)
                             .color(Color::new(even_odd_bg_color));
-                        let thickness = size * 0.2;
+                        let thickness = cell_size * 0.2;
                         gfx.polygon()
                             .at(position + vec2(0., thickness.y))
                             .points(&[
                                 vec2(thickness.x, 0.),
-                                vec2(thickness.x, size.y),
-                                vec2(0., size.y),
+                                vec2(thickness.x, cell_size.y),
+                                vec2(0., cell_size.y),
                                 vec2(0., 0.),
                             ])
                             .rotate(-3.145 / 4.)
@@ -150,8 +154,8 @@ impl PlayArea {
                             .at(position + vec2(box_size - thickness.x, thickness.y))
                             .points(&[
                                 vec2(thickness.x, 0.),
-                                vec2(thickness.x, size.y),
-                                vec2(0., size.y),
+                                vec2(thickness.x, cell_size.y),
+                                vec2(0., cell_size.y),
                                 vec2(0., 0.),
                             ])
                             .rotate(-7. * 3.145 / 4.)
@@ -198,7 +202,7 @@ impl PlayArea {
                 gfx.text(&format!("{}", groups[g].num_cells))
                     .size(0.5 * box_size as f32)
                     .color(match groups[g].filled {
-                        true => Color::new(self.palette.cell_highlight),
+                        true => Color::new(self.palette.cell_filled_in),
                         false => Color::new(self.palette.background),
                     })
                     .at(screen_position);
@@ -237,7 +241,7 @@ impl PlayArea {
                 gfx.text(&format!("{}", groups[g].num_cells))
                     .size(0.5 * box_size as f32)
                     .color(match groups[g].filled {
-                        true => Color::new(self.palette.cell_highlight),
+                        true => Color::new(self.palette.cell_filled_in),
                         false => Color::new(self.palette.background),
                     })
                     .at(screen_position);
