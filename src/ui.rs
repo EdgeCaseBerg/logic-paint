@@ -127,9 +127,9 @@ impl PlayArea {
         input: &PlayerInput,
         gfx: &mut Graphics,
     ) {
+        let num_boxes = play_state.rows().len();
         let halfset = self.halfset();
         let anchor = self.anchor();
-        let num_boxes = play_state.rows().len();
         let box_size = self.box_size(num_boxes);
         let side_areas_size = self.play_area_gutter();
 
@@ -191,8 +191,8 @@ impl PlayArea {
         let offset = Vec2::splat(halfset);
         let num_boxes = play_state.rows().len();
         let box_size = self.box_size(num_boxes);
-
         let side_areas_size = self.play_area_gutter();
+
         for (r, row) in play_state.rows().into_iter().enumerate() {
             let (even_odd_bg_color, odd_even_bg_color) = if r % 2 == 0 {
                 (self.palette.grid_even, self.palette.grid_odd)
@@ -255,13 +255,7 @@ impl PlayArea {
         }
     }
 
-    pub fn draw_row_groups(
-        &self,
-        play_state: &PlayState,
-        _input: &PlayerInput,
-        gfx: &mut Graphics,
-    ) {
-        // _input for background
+    pub fn draw_row_groups(&self, play_state: &PlayState, gfx: &mut Graphics) {
         let halfset = self.halfset();
         let num_boxes = play_state.rows().len();
         let box_size = self.box_size(num_boxes);
@@ -291,12 +285,7 @@ impl PlayArea {
         }
     }
 
-    pub fn draw_column_groups(
-        &self,
-        play_state: &PlayState,
-        _input: &PlayerInput,
-        gfx: &mut Graphics,
-    ) {
+    pub fn draw_column_groups(&self, play_state: &PlayState, gfx: &mut Graphics) {
         let halfset = self.halfset();
         let anchor = self.anchor();
         let offset = Vec2::splat(halfset);
