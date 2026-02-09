@@ -190,8 +190,7 @@ impl PlayArea {
         let anchor = self.anchor();
         let offset = Vec2::splat(halfset);
         let num_boxes = play_state.rows().len();
-        let box_size =
-            (self.size.x as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
+        let box_size = self.box_size(num_boxes);
 
         let side_areas_size = self.play_area_gutter();
         for (r, row) in play_state.rows().into_iter().enumerate() {
@@ -265,8 +264,7 @@ impl PlayArea {
         // _input for background
         let halfset = self.halfset();
         let num_boxes = play_state.rows().len();
-        let box_size =
-            (self.size.x as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
+        let box_size = self.box_size(num_boxes);
         let padding = self.grid_gutter / 2. - box_size / 2.;
         let offset = Vec2::splat(halfset);
         let scaler = vec2(0.5, 1.);
@@ -303,8 +301,7 @@ impl PlayArea {
         let anchor = self.anchor();
         let offset = Vec2::splat(halfset);
         let num_boxes = play_state.cols().len();
-        let box_size =
-            (self.size.x as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
+        let box_size = self.box_size(num_boxes);
 
         let padding = offset.y / 2. - box_size / 2.;
         let anchor = anchor - padding;
