@@ -108,7 +108,73 @@ impl PlayArea {
         self.size * 0.4
     }
 
-    pub fn draw_gridarea_background(&self, play_state: &PlayState, gfx: &mut Graphics) {
+    fn halfset(&self) -> f32 {
+        self.grid_gutter / 2.
+    }
+
+    fn box_size(&self, number_of_boxes: usize) -> f32 {
+        let halfset = self.halfset();
+        (self.size.x as f32 - (halfset + halfset * number_of_boxes as f32)) / number_of_boxes as f32
+    }
+
+    pub fn draw_gridarea_background(
+        &self,
+        play_state: &PlayState,
+        input: &PlayerInput,
+        gfx: &mut Graphics,
+    ) {
+        let halfset = self.halfset();
+        let anchor = self.top_left + Vec2::splat(halfset);
+        let num_boxes = play_state.rows().len();
+        let box_size = self.box_size(num_boxes);
+        let side_areas_size = self.play_area_gutter();
+
+        for (r, row) in play_state.rows().into_iter().enumerate() {
+            let (even_odd_bg_color, odd_even_bg_color) = if r % 2 == 0 {
+                (self.palette.grid_even, self.palette.grid_odd)
+            } else {
+                (self.palette.grid_odd, self.palette.grid_even)
+            };
+
+            let cell_size = Vec2::splat(box_size);
+            let y_offset = r as f32 * (halfset + box_size);
+            let row_group_bg_position = anchor - vec2(side_areas_size.x, -y_offset);
+            let row_group_bg = if row_group_bg_position.y <= input.position.y
+                && input.position.y <= row_group_bg_position.y + box_size
+            {
+                self.palette.group_highlight
+            } else {
+                odd_even_bg_color
+            };
+            gfx.rect()
+                .at(row_group_bg_position)
+                .color(Color::new(row_group_bg))
+                .size(vec2(side_areas_size.x, box_size));
+
+            if r != 0 {
+                continue;
+            }
+
+            let color = [even_odd_bg_color, odd_even_bg_color];
+            for (c, _) in row.iter().enumerate() {
+                let position = anchor
+                    + vec2(c as f32, r as f32) * (Vec2::splat(box_size) + Vec2::splat(halfset));
+                let column_group_position = position + vec2(0., -side_areas_size.y);
+                let column_group_size = vec2(box_size, side_areas_size.y);
+                let column_group_bg_color = if column_group_position.x <= input.position.x
+                    && input.position.x <= column_group_position.x + column_group_size.x
+                {
+                    self.palette.group_highlight
+                } else {
+                    color[c % 2]
+                };
+                gfx.rect()
+                    .at(column_group_position)
+                    .color(Color::new(column_group_bg_color))
+                    .size(column_group_size);
+            }
+        }
+
         gfx.rect()
             .at(self.top_left)
             .size(self.size)
