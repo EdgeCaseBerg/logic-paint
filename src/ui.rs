@@ -112,6 +112,10 @@ impl PlayArea {
         self.grid_gutter / 2.
     }
 
+    fn anchor(&self) -> Vec2 {
+        self.top_left + Vec2::splat(self.halfset())
+    }
+
     fn box_size(&self, number_of_boxes: usize) -> f32 {
         let halfset = self.halfset();
         (self.size.x as f32 - (halfset + halfset * number_of_boxes as f32)) / number_of_boxes as f32
@@ -124,7 +128,7 @@ impl PlayArea {
         gfx: &mut Graphics,
     ) {
         let halfset = self.halfset();
-        let anchor = self.top_left + Vec2::splat(halfset);
+        let anchor = self.anchor();
         let num_boxes = play_state.rows().len();
         let box_size = self.box_size(num_boxes);
         let side_areas_size = self.play_area_gutter();
@@ -183,7 +187,7 @@ impl PlayArea {
 
     pub fn draw_grid(&self, play_state: &mut PlayState, input: &PlayerInput, gfx: &mut Graphics) {
         let halfset = self.halfset();
-        let anchor = self.top_left + Vec2::splat(halfset as f32);
+        let anchor = self.anchor();
         let offset = Vec2::splat(halfset);
         let num_boxes = play_state.rows().len();
         let box_size =
@@ -266,7 +270,7 @@ impl PlayArea {
         let padding = self.grid_gutter / 2. - box_size / 2.;
         let offset = Vec2::splat(halfset);
         let scaler = vec2(0.5, 1.);
-        let anchor = self.top_left + Vec2::splat(halfset);
+        let anchor = self.anchor();
         let anchor = anchor - padding;
         for (r, groups) in play_state.row_groups.iter().enumerate() {
             let number_of_groups = groups.iter().len();
@@ -296,7 +300,7 @@ impl PlayArea {
         gfx: &mut Graphics,
     ) {
         let halfset = self.halfset();
-        let anchor = self.top_left + Vec2::splat(halfset as f32);
+        let anchor = self.anchor();
         let offset = Vec2::splat(halfset);
         let num_boxes = play_state.cols().len();
         let box_size =
