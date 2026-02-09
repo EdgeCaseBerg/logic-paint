@@ -256,11 +256,11 @@ impl PlayArea {
     }
 
     pub fn draw_row_groups(&self, play_state: &PlayState, gfx: &mut Graphics) {
-        let halfset = self.halfset();
+        let offset = self.halfset();
         let num_boxes = play_state.rows().len();
         let box_size = self.box_size(num_boxes);
         let padding = self.grid_gutter / 2. - box_size / 2.;
-        let offset = Vec2::splat(halfset);
+        let offset = Vec2::splat(offset);
         let scaler = vec2(0.5, 1.);
         let anchor = self.anchor();
         let anchor = anchor - padding;
