@@ -79,6 +79,30 @@ pub struct PlayArea {
     pub palette: ColorPalette,
 }
 
+fn draw_x_at(position: Vec2, cell_size: Vec2, color: Color, gfx: &mut Graphics) {
+    let thickness = cell_size * 0.2;
+    gfx.polygon()
+        .at(position + vec2(0., thickness.y))
+        .points(&[
+            vec2(thickness.x, 0.),
+            vec2(thickness.x, cell_size.y),
+            vec2(0., cell_size.y),
+            vec2(0., 0.),
+        ])
+        .rotate(-3.145 / 4.)
+        .color(color);
+    gfx.polygon()
+        .at(position + vec2(cell_size.x - thickness.x, thickness.y))
+        .points(&[
+            vec2(thickness.x, 0.),
+            vec2(thickness.x, cell_size.y),
+            vec2(0., cell_size.y),
+            vec2(0., 0.),
+        ])
+        .rotate(-7. * 3.145 / 4.)
+        .color(color);
+}
+
 impl PlayArea {
     fn play_area_gutter(&self) -> Vec2 {
         self.size * 0.4
@@ -139,27 +163,7 @@ impl PlayArea {
                             .at(position)
                             .size(cell_size)
                             .color(Color::new(even_odd_bg_color));
-                        let thickness = cell_size * 0.2;
-                        gfx.polygon()
-                            .at(position + vec2(0., thickness.y))
-                            .points(&[
-                                vec2(thickness.x, 0.),
-                                vec2(thickness.x, cell_size.y),
-                                vec2(0., cell_size.y),
-                                vec2(0., 0.),
-                            ])
-                            .rotate(-3.145 / 4.)
-                            .color(color);
-                        gfx.polygon()
-                            .at(position + vec2(box_size - thickness.x, thickness.y))
-                            .points(&[
-                                vec2(thickness.x, 0.),
-                                vec2(thickness.x, cell_size.y),
-                                vec2(0., cell_size.y),
-                                vec2(0., 0.),
-                            ])
-                            .rotate(-7. * 3.145 / 4.)
-                            .color(color);
+                        draw_x_at(position, cell_size, color, gfx);
                     }
                 };
 
