@@ -117,7 +117,7 @@ impl PlayArea {
         (self.size.x as f32 - (halfset + halfset * number_of_boxes as f32)) / number_of_boxes as f32
     }
 
-    pub fn draw_gridarea_background(
+    pub fn draw_backgrounds(
         &self,
         play_state: &PlayState,
         input: &PlayerInput,

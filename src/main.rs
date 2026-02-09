@@ -85,7 +85,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 },
             };
 
-            play_area.draw_gridarea_background(&game_state, &player_input, gfx);
+            play_area.draw_backgrounds(&game_state, &player_input, gfx);
             play_area.draw_grid(&mut game_state, &player_input, gfx);
             play_area.draw_row_groups(&game_state, &player_input, gfx);
             play_area.draw_column_groups(&game_state, &player_input, gfx);
