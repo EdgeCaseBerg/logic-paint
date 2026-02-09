@@ -125,20 +125,22 @@ impl PlayArea {
 
         let side_areas_size = self.play_area_gutter();
         for (r, row) in play_state.rows().into_iter().enumerate() {
+            let (even_odd_bg_color, odd_even_bg_color) = if r % 2 == 0 {
+                (self.palette.grid_even, self.palette.grid_odd)
+            } else {
+                (self.palette.grid_odd, self.palette.grid_even)
+            };
+
             let cell_size = Vec2::splat(box_size);
             let y_offset = r as f32 * (halfset + box_size);
             gfx.rect()
                 .at(anchor - vec2(side_areas_size.x, -y_offset))
-                .color(Color::new(self.palette.group_highlight))
+                // .color(Color::new(self.palette.group_highlight))
+                .color(Color::new(odd_even_bg_color))
                 .size(vec2(side_areas_size.x, box_size));
 
             for (c, state) in row.iter().enumerate() {
                 let position = anchor + vec2(c as f32, r as f32) * (Vec2::splat(box_size) + offset);
-                let even_odd_bg_color = if r % 2 == 0 {
-                    self.palette.grid_even
-                } else {
-                    self.palette.grid_odd
-                };
                 let color = match state {
                     CellState::Empty => Color::new(even_odd_bg_color),
                     CellState::Filled => Color::new(self.palette.cell_filled_in),
