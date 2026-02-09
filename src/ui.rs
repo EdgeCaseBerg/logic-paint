@@ -133,10 +133,17 @@ impl PlayArea {
 
             let cell_size = Vec2::splat(box_size);
             let y_offset = r as f32 * (halfset + box_size);
+            let row_group_bg_position = anchor - vec2(side_areas_size.x, -y_offset);
+            let row_group_bg = if row_group_bg_position.y <= input.position.y
+                && input.position.y <= row_group_bg_position.y + box_size
+            {
+                self.palette.group_highlight
+            } else {
+                odd_even_bg_color
+            };
             gfx.rect()
-                .at(anchor - vec2(side_areas_size.x, -y_offset))
-                // .color(Color::new(self.palette.group_highlight))
-                .color(Color::new(odd_even_bg_color))
+                .at(row_group_bg_position)
+                .color(Color::new(row_group_bg))
                 .size(vec2(side_areas_size.x, box_size));
 
             for (c, state) in row.iter().enumerate() {
