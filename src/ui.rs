@@ -286,9 +286,9 @@ impl PlayArea {
     }
 
     pub fn draw_column_groups(&self, play_state: &PlayState, gfx: &mut Graphics) {
-        let halfset = self.halfset();
+        let offset = self.halfset();
         let anchor = self.anchor();
-        let offset = Vec2::splat(halfset);
+        let offset = Vec2::splat(offset);
         let num_boxes = play_state.cols().len();
         let box_size = self.box_size(num_boxes);
 
