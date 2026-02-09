@@ -182,7 +182,7 @@ impl PlayArea {
     }
 
     pub fn draw_grid(&self, play_state: &mut PlayState, input: &PlayerInput, gfx: &mut Graphics) {
-        let halfset = self.grid_gutter / 2.;
+        let halfset = self.halfset();
         let anchor = self.top_left + Vec2::splat(halfset as f32);
         let offset = Vec2::splat(halfset);
         let num_boxes = play_state.rows().len();
@@ -259,7 +259,7 @@ impl PlayArea {
         gfx: &mut Graphics,
     ) {
         // _input for background
-        let halfset = self.grid_gutter / 2.;
+        let halfset = self.halfset();
         let num_boxes = play_state.rows().len();
         let box_size =
             (self.size.x as f32 - (halfset + halfset * num_boxes as f32)) / num_boxes as f32;
@@ -295,7 +295,7 @@ impl PlayArea {
         _input: &PlayerInput,
         gfx: &mut Graphics,
     ) {
-        let halfset = self.grid_gutter / 2.;
+        let halfset = self.halfset();
         let anchor = self.top_left + Vec2::splat(halfset as f32);
         let offset = Vec2::splat(halfset);
         let num_boxes = play_state.cols().len();
