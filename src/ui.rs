@@ -133,7 +133,9 @@ impl PlayArea {
         let box_size = self.box_size(num_boxes);
         let cell_size = Vec2::splat(box_size);
         let cell_and_gutter_size = halfset + box_size;
+        let cell_and_gutter_size_v = Vec2::splat(cell_and_gutter_size);
         let side_areas_size = self.play_area_gutter();
+        let row_group_bg_size = vec2(side_areas_size.x, box_size);
 
         for (r, row) in play_state.rows().into_iter().enumerate() {
             let (even_odd_bg_color, odd_even_bg_color) = if r % 2 == 0 {
@@ -144,34 +146,40 @@ impl PlayArea {
 
             let y_offset = r as f32 * (cell_and_gutter_size);
             let row_group_bg_position = anchor - vec2(side_areas_size.x, -y_offset);
-            let row_group_bg = if row_group_bg_position.y <= input.position.y
-                && input.position.y <= row_group_bg_position.y + box_size
-            {
+
+            let mouse_within_row_range = true
+                && row_group_bg_position.y <= input.position.y
+                && input.position.y <= row_group_bg_position.y + box_size;
+
+            let row_group_bg = if mouse_within_row_range {
                 self.palette.group_highlight
             } else {
                 odd_even_bg_color
             };
+
+            // backgrounds behind the row numbers
             gfx.rect()
                 .at(row_group_bg_position)
                 .color(Color::new(row_group_bg))
-                .size(vec2(side_areas_size.x, box_size));
+                .size(row_group_bg_size);
 
             if r != 0 {
                 continue;
             }
 
-            let color = [even_odd_bg_color, odd_even_bg_color];
+            // backgrounds behind the column numbers
+            let colors = [even_odd_bg_color, odd_even_bg_color];
             for (c, _) in row.iter().enumerate() {
-                let position =
-                    anchor + vec2(c as f32, r as f32) * Vec2::splat(cell_and_gutter_size);
+                let position = anchor + vec2(c as f32, r as f32) * cell_and_gutter_size_v;
                 let column_group_position = position + vec2(0., -side_areas_size.y);
                 let column_group_size = vec2(box_size, side_areas_size.y);
-                let column_group_bg_color = if column_group_position.x <= input.position.x
-                    && input.position.x <= column_group_position.x + column_group_size.x
-                {
+                let mouse_within_column_range = true
+                    && column_group_position.x <= input.position.x
+                    && input.position.x <= column_group_position.x + column_group_size.x;
+                let column_group_bg_color = if mouse_within_column_range {
                     self.palette.group_highlight
                 } else {
-                    color[c % 2]
+                    colors[c % 2]
                 };
                 gfx.rect()
                     .at(column_group_position)
@@ -180,6 +188,7 @@ impl PlayArea {
             }
         }
 
+        //The play area behind the grid
         gfx.rect()
             .at(self.top_left)
             .size(self.size)
