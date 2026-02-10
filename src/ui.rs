@@ -6,12 +6,6 @@ use egor::{
     render::{Color, Graphics},
 };
 
-#[derive(Debug)]
-pub enum Action {
-    FillCell,
-    MarkCell,
-}
-
 #[derive(Debug, Copy, Clone)]
 pub struct ColorPalette {
     pub background: [f32; 4],
@@ -51,6 +45,12 @@ impl ColorPalette {
             (self.grid_odd, self.grid_even)
         }
     }
+}
+
+#[derive(Debug)]
+pub enum Action {
+    FillCell,
+    MarkCell,
 }
 
 #[derive(Debug)]
