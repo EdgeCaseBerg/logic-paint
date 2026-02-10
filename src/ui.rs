@@ -271,14 +271,15 @@ impl PlayArea {
         let box_size = self.box_size(num_boxes);
         let padding = self.grid_gutter / 2. - box_size / 2.;
         let offset = Vec2::splat(offset);
+        let grid_cell_size = Vec2::splat(box_size) + offset;
         let scaler = vec2(0.5, 1.);
         let anchor = self.anchor();
         let anchor = anchor - padding;
+
         for (r, groups) in play_state.row_groups.iter().enumerate() {
             let number_of_groups = groups.iter().len();
             for i in 0..number_of_groups {
                 let grid_offset = vec2(-(i as f32) - 2., r as f32);
-                let grid_cell_size = Vec2::splat(box_size) + offset;
                 let position = anchor + grid_offset * grid_cell_size * scaler;
                 let screen_size = gfx.screen_size();
                 let screen_position = gfx.camera().world_to_screen(position, screen_size);
