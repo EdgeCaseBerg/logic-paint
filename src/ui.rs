@@ -208,11 +208,7 @@ impl PlayArea {
         let side_areas_size = self.play_area_gutter();
 
         for (r, row) in play_state.rows().into_iter().enumerate() {
-            let (even_odd_bg_color, odd_even_bg_color) = if r % 2 == 0 {
-                (self.palette.grid_even, self.palette.grid_odd)
-            } else {
-                (self.palette.grid_odd, self.palette.grid_even)
-            };
+            let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
 
             let y_offset = r as f32 * (halfset + box_size);
             let row_group_bg_position = anchor - vec2(side_areas_size.x, -y_offset);
