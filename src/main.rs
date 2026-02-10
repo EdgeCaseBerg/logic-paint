@@ -27,11 +27,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let test_pbm = read_to_string(filename)?;
     let test_pbm: netbpm::Pbm = test_pbm.parse()?;
-    println!("{:?}", test_pbm);
 
     let mut game_state: gamestate::PlayState = (&test_pbm).into();
-    println!("{:?}", game_state);
-
     let mut bg_size = 525;
     let bg_position = vec2(-163., -209.);
     let mut box_offset = 8.0;
