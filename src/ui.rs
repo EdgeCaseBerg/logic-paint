@@ -275,13 +275,13 @@ impl PlayArea {
         let scaler = vec2(0.5, 1.);
         let anchor = self.anchor();
         let anchor = anchor - padding;
+        let screen_size = gfx.screen_size();
 
         for (r, groups) in play_state.row_groups.iter().enumerate() {
             let number_of_groups = groups.iter().len();
             for i in 0..number_of_groups {
                 let grid_offset = vec2(-(i as f32) - 2., r as f32);
                 let position = anchor + grid_offset * grid_cell_size * scaler;
-                let screen_size = gfx.screen_size();
                 let screen_position = gfx.camera().world_to_screen(position, screen_size);
                 // write out the numbers from the right outward for alignment
                 let g = number_of_groups - i - 1;
@@ -302,6 +302,8 @@ impl PlayArea {
         let offset = Vec2::splat(offset);
         let num_boxes = play_state.cols().len();
         let box_size = self.box_size(num_boxes);
+        let grid_cell_size = Vec2::splat(box_size) + offset;
+        let screen_size = gfx.screen_size();
 
         let padding = offset.y / 2. - box_size / 2.;
         let anchor = anchor - padding;
@@ -312,9 +314,7 @@ impl PlayArea {
             let number_of_groups = groups.iter().len();
             for i in 0..number_of_groups {
                 let grid_offset = vec2(c as f32, -(i as f32) - 2.);
-                let grid_cell_size = Vec2::splat(box_size) + offset;
                 let position = anchor + grid_offset * grid_cell_size * scaler;
-                let screen_size = gfx.screen_size();
                 let screen_position = gfx.camera().world_to_screen(position, screen_size);
                 // render the bottom number closest to the top of the grid, then go up for alignment
                 let g = number_of_groups - i - 1;
