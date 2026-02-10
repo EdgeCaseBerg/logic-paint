@@ -9,7 +9,6 @@ use egor::{
     app::{App, FrameContext, WindowEvent, egui::ComboBox, egui::Slider, egui::Window},
     input::{KeyCode, MouseButton},
     math::{Vec2, vec2},
-    render::Color,
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

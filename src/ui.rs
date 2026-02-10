@@ -118,7 +118,7 @@ impl PlayArea {
 
     fn box_size(&self, number_of_boxes: usize) -> f32 {
         let halfset = self.halfset();
-        (self.size.x as f32 - (halfset + halfset * number_of_boxes as f32)) / number_of_boxes as f32
+        (self.size.x - (halfset + halfset * number_of_boxes as f32)) / number_of_boxes as f32
     }
 
     pub fn draw_backgrounds(
@@ -131,7 +131,6 @@ impl PlayArea {
         let halfset = self.halfset();
         let anchor = self.anchor();
         let box_size = self.box_size(num_boxes);
-        let cell_size = Vec2::splat(box_size);
         let cell_and_gutter_size = halfset + box_size;
         let cell_and_gutter_size_v = Vec2::splat(cell_and_gutter_size);
         let side_areas_size = self.play_area_gutter();
@@ -286,7 +285,7 @@ impl PlayArea {
                 // write out the numbers from the right outward for alignment
                 let g = number_of_groups - i - 1;
                 gfx.text(&format!("{}", groups[g].num_cells))
-                    .size(0.5 * box_size as f32)
+                    .size(0.5 * box_size)
                     .color(match groups[g].filled {
                         true => Color::new(self.palette.cell_filled_in),
                         false => Color::new(self.palette.background),
@@ -319,7 +318,7 @@ impl PlayArea {
                 // render the bottom number closest to the top of the grid, then go up for alignment
                 let g = number_of_groups - i - 1;
                 gfx.text(&format!("{}", groups[g].num_cells))
-                    .size(0.5 * box_size as f32)
+                    .size(0.5 * box_size)
                     .color(match groups[g].filled {
                         true => Color::new(self.palette.cell_filled_in),
                         false => Color::new(self.palette.background),
