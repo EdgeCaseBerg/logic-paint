@@ -143,7 +143,7 @@ impl PlayArea {
                 (self.palette.grid_odd, self.palette.grid_even)
             };
 
-            let y_offset = r as f32 * (cell_and_gutter_size);
+            let y_offset = r as f32 * cell_and_gutter_size;
             let row_group_bg_position = anchor - vec2(side_areas_size.x, -y_offset);
 
             let mouse_within_row_range = true
