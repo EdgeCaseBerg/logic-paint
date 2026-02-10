@@ -143,13 +143,12 @@ impl PlayArea {
         let cell_and_gutter_size_v = Vec2::splat(cell_and_gutter_size);
         let side_areas_size = self.play_area_gutter();
         let row_group_bg_size = vec2(side_areas_size.x, box_size);
+        let column_group_size = vec2(box_size, side_areas_size.y);
 
         for (r, row) in play_state.rows().into_iter().enumerate() {
-            let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
-
             let y_offset = r as f32 * cell_and_gutter_size;
             let row_group_bg_position = anchor - vec2(side_areas_size.x, -y_offset);
-
+            let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
             let mouse_within_row_range = true
                 && row_group_bg_position.y <= input.position.y
                 && input.position.y <= row_group_bg_position.y + box_size;
@@ -175,7 +174,6 @@ impl PlayArea {
             for (c, _) in row.iter().enumerate() {
                 let position = anchor + vec2(c as f32, r as f32) * cell_and_gutter_size_v;
                 let column_group_position = position + vec2(0., -side_areas_size.y);
-                let column_group_size = vec2(box_size, side_areas_size.y);
                 let mouse_within_column_range = true
                     && column_group_position.x <= input.position.x
                     && input.position.x <= column_group_position.x + column_group_size.x;
