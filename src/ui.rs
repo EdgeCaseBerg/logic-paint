@@ -67,7 +67,7 @@ impl PlayerInput {
         }
     }
 
-    fn can_highlight_at(&self, cell: &Rect) -> bool {
+    fn overlaps(&self, cell: &Rect) -> bool {
         cell.contains(self.position)
     }
 }
@@ -235,7 +235,7 @@ impl PlayArea {
                     CellState::UserRuledOut => Color::new(self.palette.cell_marked_user),
                 };
                 let cell_rect = Rect::new(position, cell_size);
-                if input.can_highlight_at(&cell_rect) {
+                if input.overlaps(&cell_rect) {
                     gfx.rect()
                         .at(position - offset)
                         .size(cell_size + offset * 2.)
