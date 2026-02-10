@@ -201,6 +201,7 @@ impl PlayArea {
         let offset = Vec2::splat(halfset);
         let num_boxes = play_state.rows().len();
         let box_size = self.box_size(num_boxes);
+        let cell_size = Vec2::splat(box_size);
         let side_areas_size = self.play_area_gutter();
 
         for (r, row) in play_state.rows().into_iter().enumerate() {
@@ -210,7 +211,6 @@ impl PlayArea {
                 (self.palette.grid_odd, self.palette.grid_even)
             };
 
-            let cell_size = Vec2::splat(box_size);
             let y_offset = r as f32 * (halfset + box_size);
             let row_group_bg_position = anchor - vec2(side_areas_size.x, -y_offset);
             let row_group_bg = if row_group_bg_position.y <= input.position.y
