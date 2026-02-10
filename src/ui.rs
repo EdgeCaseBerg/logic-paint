@@ -43,6 +43,14 @@ impl ColorPalette {
             group_highlight: rgba(251, 212, 207, 1.0),
         }
     }
+
+    pub fn even_odd_color(&self, i: usize) -> ([f32; 4], [f32; 4]) {
+        if i % 2 == 0 {
+            (self.grid_even, self.grid_odd)
+        } else {
+            (self.grid_odd, self.grid_even)
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -137,11 +145,7 @@ impl PlayArea {
         let row_group_bg_size = vec2(side_areas_size.x, box_size);
 
         for (r, row) in play_state.rows().into_iter().enumerate() {
-            let (even_odd_bg_color, odd_even_bg_color) = if r % 2 == 0 {
-                (self.palette.grid_even, self.palette.grid_odd)
-            } else {
-                (self.palette.grid_odd, self.palette.grid_even)
-            };
+            let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
 
             let y_offset = r as f32 * cell_and_gutter_size;
             let row_group_bg_position = anchor - vec2(side_areas_size.x, -y_offset);
