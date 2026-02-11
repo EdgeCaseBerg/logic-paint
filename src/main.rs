@@ -34,15 +34,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut game_state: gamestate::PlayState = (&test_pbm).into();
 
-    App::new().window_size(1280, 720).title("Logic Brush").run(
-        move |FrameContext {
-                  gfx,
-                  input,
-                  timer,
-                  egui_ctx,
-                  events,
-              }| {
-            for event in events {
+    App::new()
+        .window_size(1280, 720)
+        .title("Logic Brush")
+        .run(move |frame_context| {
+            for event in &frame_context.events {
                 match event {
                     WindowEvent::CloseRequested => {
                         std::process::exit(0);
@@ -50,24 +46,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     _ => {}
                 }
             }
-            if input.key_pressed(KeyCode::Escape) {
+            if frame_context.input.key_pressed(KeyCode::Escape) {
                 std::process::exit(0);
             }
 
-            play_game_screen(&mut game_state, gfx, input, egui_ctx, timer);
-        },
-    );
+            play_game_screen(&mut game_state, frame_context);
+        });
 
     Ok(())
 }
 
-fn play_game_screen(
-    game_state: &mut gamestate::PlayState,
-    gfx: &mut Graphics,
-    input: &Input,
-    egui_ctx: &Context,
-    timer: &FrameTimer,
-) {
+fn play_game_screen(game_state: &mut gamestate::PlayState, frame_context: &mut FrameContext) {
+    let gfx = &mut (frame_context.gfx);
+    let input = &mut (frame_context.input);
+    let egui_ctx = frame_context.egui_ctx;
+    let timer = frame_context.timer;
     let bg_position = vec2(-163., -209.);
     let mut bg_size = 525;
     let mut box_offset = 8.0;
