@@ -8,6 +8,7 @@ use egor::{
     app::{FrameContext, egui::ComboBox, egui::Slider, egui::Window},
     input::MouseButton,
     math::{Vec2, vec2},
+    render::Color,
 };
 
 pub fn play_game_screen(game_state: &mut PlayState, frame_context: &mut FrameContext) {
@@ -117,4 +118,37 @@ pub fn play_game_screen(game_state: &mut PlayState, frame_context: &mut FrameCon
         ui.label("palette.group_highlight: ");
         ui.color_edit_button_rgba_unmultiplied(&mut palette.group_highlight);
     });
+}
+
+
+pub fn win_screen(game_state: &mut PlayState, frame_context: &mut FrameContext) {
+    let gfx = &mut (frame_context.gfx);
+    let input = &mut (frame_context.input);
+    let egui_ctx = frame_context.egui_ctx;
+    let timer = frame_context.timer;
+    let mut palette = ColorPalette::meeks();
+    let mut size_x = 200;
+    let mut size_y = 200;
+
+    let screen_size = gfx.screen_size();
+    let (mx, my) = input.mouse_position();
+    let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
+    let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
+    let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
+
+    gfx.rect()
+        .at(world_xy)
+        .color(Color::new(palette.background))
+        .size(vec2(size_x as f32, size_y as f32));
+
+
+    Window::new("Debug").show(egui_ctx, |ui| {
+        ui.label(format!("FPS: {}", timer.fps));
+        ui.label(format!("Mouse x: {} y: {}", mx, my));
+        ui.label(format!("World x: {} y: {}", world_xy.x, world_xy.y));
+        ui.label(format!("Screensize: {}", screen_size));
+        ui.add(Slider::new(&mut size_x, 1..=800).text("BG width"));
+        ui.add(Slider::new(&mut size_y, 1..=800).text("BG height"));
+    });
+
 }
