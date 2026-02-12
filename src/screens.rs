@@ -52,7 +52,7 @@ pub fn play_game_screen(
 }
 
 pub fn win_screen(
-    _game_state: &mut PlayState,
+    game_state: &mut PlayState,
     frame_context: &mut FrameContext,
     palette: &ColorPalette,
     debuggable_stuff: &DebugStuff,
@@ -61,10 +61,13 @@ pub fn win_screen(
     let input = &mut (frame_context.input);
 
     let screen_size = gfx.screen_size();
+    gfx.camera().target(screen_size / 2.);
+    
     let (mx, my) = input.mouse_position();
     let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
     // let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
     // let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
+
 
     gfx.rect()
         .at(world_xy)
@@ -73,4 +76,17 @@ pub fn win_screen(
             debuggable_stuff.size_x as f32,
             debuggable_stuff.size_y as f32,
         ));
+
+    let num_incorrect = game_state.number_incorrect();
+    if num_incorrect == 0 {
+        gfx.text(&format!("Perfect!"))
+            .size(16.)
+            .color(Color::new(palette.group_highlight))
+            .at(screen_size / 2.);
+    } else {
+        gfx.text(&format!("Incorrect {}", num_incorrect))
+            .size(16.)
+            .color(Color::new(palette.group_highlight))
+            .at(screen_size / 2.);
+    }
 }
