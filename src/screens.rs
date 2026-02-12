@@ -62,18 +62,21 @@ pub fn win_screen(
 
     let screen_size = gfx.screen_size();
     gfx.camera().target(screen_size / 2.);
-    
+
     let (mx, my) = input.mouse_position();
-    let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
+    // let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
     // let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
     // let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
 
 
     gfx.rect()
-        .at(world_xy)
+        .at(vec2(
+            75.,
+            75.,
+        ))
         .color(Color::new(palette.background))
         .size(vec2(
-            debuggable_stuff.size_x as f32,
+            debuggable_stuff.size_x as f32, //480 is pretty good
             debuggable_stuff.size_y as f32,
         ));
 
@@ -89,4 +92,14 @@ pub fn win_screen(
             .color(Color::new(palette.group_highlight))
             .at(screen_size / 2.);
     }
+
+    gfx.rect()
+        .at(screen_size /2. + vec2(-50., 100.))
+        .color(Color::new(palette.background)) // use cellhighlight for hover color
+        .size(vec2(200., 100.));
+    gfx.text(&format!("Return to Menu"))
+            .size(16.)
+            .color(Color::new(palette.group_highlight))  // use bg color for hover color
+            .at(screen_size / 2. + vec2(-25., 150.));
+    // TODO: interact wit the button
 }
