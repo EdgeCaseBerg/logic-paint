@@ -64,7 +64,7 @@ pub fn win_screen(
     gfx.camera().target(screen_size / 2.);
 
     let (mx, my) = input.mouse_position();
-    // let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
+    let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
     // let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
     // let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
 
@@ -90,24 +90,34 @@ pub fn win_screen(
     }
 
     let button_bg_pos = screen_size / 2. + vec2(-50., 100.);
+    let button_size = vec2(200., 100.);
+    let rect = egor::math::Rect::new(button_bg_pos, button_size);
+    let should_highlight = rect.contains(world_xy);
+    let (btn_color, font_color) = if should_highlight {
+        (
+            Color::new(palette.group_highlight),
+            Color::new(palette.background),
+        )
+    } else {
+        (
+            Color::new(palette.background),
+            Color::new(palette.group_highlight),
+        )
+    };
     gfx.rect()
         .at(button_bg_pos)
-        .color(Color::new(palette.background)) // use cellhighlight for hover color
-        .size(vec2(200., 100.));
+        .color(btn_color)
+        .size(button_size);
     draw_centered_text(
         gfx,
         &format!("Return to Menu"),
-        button_bg_pos + vec2(100., 50.),
+        button_bg_pos + button_size * 0.5,
         16.,
-        Color::new(palette.group_highlight),
+        font_color,
     );
-    // gfx.text()
-    //         .size(16.)
-    //         .color(Color::new(palette.group_highlight))  // use bg color for hover color
-    //         .at(screen_size / 2. + vec2(-25., 150.));
-    // TODO: interact wit the button
 }
 
+// TODO move to ui module
 fn draw_centered_text(
     gfx: &mut egor::render::Graphics,
     text: &str,
