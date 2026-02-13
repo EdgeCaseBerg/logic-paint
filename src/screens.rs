@@ -9,6 +9,15 @@ use egor::{
     render::Color,
 };
 
+enum Screens {
+    GameScreen,
+    WinScreen,
+}
+enum ScreenAction {
+    ChangeScreen { to: Screens },
+    NoAction,
+}
+
 pub fn play_game_screen(
     game_state: &mut PlayState,
     frame_context: &mut FrameContext,
