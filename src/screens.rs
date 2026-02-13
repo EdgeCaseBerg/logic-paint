@@ -68,12 +68,8 @@ pub fn win_screen(
     // let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
     // let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
 
-
     gfx.rect()
-        .at(vec2(
-            75.,
-            75.,
-        ))
+        .at(vec2(75., 75.))
         .color(Color::new(palette.background))
         .size(vec2(
             debuggable_stuff.size_x as f32, //480 is pretty good
@@ -83,7 +79,7 @@ pub fn win_screen(
     let num_incorrect = game_state.number_incorrect();
     if num_incorrect == 0 {
         gfx.text(&format!("Perfect!"))
-            .size(16.)
+            .size(78.)
             .color(Color::new(palette.group_highlight))
             .at(screen_size / 2.);
     } else {
@@ -93,13 +89,37 @@ pub fn win_screen(
             .at(screen_size / 2.);
     }
 
+    let button_bg_pos = screen_size / 2. + vec2(-50., 100.);
     gfx.rect()
-        .at(screen_size /2. + vec2(-50., 100.))
+        .at(button_bg_pos)
         .color(Color::new(palette.background)) // use cellhighlight for hover color
         .size(vec2(200., 100.));
-    gfx.text(&format!("Return to Menu"))
-            .size(16.)
-            .color(Color::new(palette.group_highlight))  // use bg color for hover color
-            .at(screen_size / 2. + vec2(-25., 150.));
+    draw_centered_text(
+        gfx,
+        &format!("Return to Menu"),
+        button_bg_pos + vec2(100., 50.),
+        16.,
+        Color::new(palette.group_highlight),
+    );
+    // gfx.text()
+    //         .size(16.)
+    //         .color(Color::new(palette.group_highlight))  // use bg color for hover color
+    //         .at(screen_size / 2. + vec2(-25., 150.));
     // TODO: interact wit the button
+}
+
+fn draw_centered_text(
+    gfx: &mut egor::render::Graphics,
+    text: &str,
+    center: Vec2,
+    size: f32,
+    color: Color,
+) {
+    // average font width is 0.53
+    let w = text.len() as f32 * size * 0.53;
+    let h = size;
+
+    let pos = center - vec2(w * 0.5, h * 0.5 - size / 2.);
+
+    gfx.text(text).size(size).color(color).at(pos);
 }
