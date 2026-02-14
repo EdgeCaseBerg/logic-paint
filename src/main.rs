@@ -39,6 +39,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut debuggable_stuff = DebugStuff::new();
     let mut palette = ColorPalette::meeks();
     let mut current_screen = Screens::GameScreen;
+    let mut wipe_progress = 0.0;
 
     App::new()
         .window_size(1280, 720)
@@ -56,7 +57,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 std::process::exit(0);
             }
 
-            let action = match current_screen {
+            let action = match &current_screen {
                 Screens::GameScreen => {
                     screens::play_game_screen(&mut game_state, frame_context, &mut palette)
                 }
@@ -66,12 +67,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &palette,
                     &mut debuggable_stuff,
                 ),
+                Screens::WipeScreen { from, to, duration } => {
+                    screens::wipe_screen(&mut wipe_progress, *duration, frame_context, &palette)
+                }
             };
             match action {
                 ScreenAction::NoAction => {}
                 ScreenAction::ChangeScreen { to } => {
-                    // TODO handle transitions
-                    current_screen = to;
+                    wipe_progress = 0.0;
+                    current_screen = Screens::WipeScreen {
+                        from: Box::new(current_screen.clone()),
+                        to: Box::new(to),
+                        duration: 2.0,
+                    };
+                }
+                ScreenAction::WipeLeft => {}
+                ScreenAction::WipeRight => {}
+                ScreenAction::WipeDone => {
+                    let Screens::WipeScreen {
+                        ref from,
+                        ref to,
+                        duration,
+                    } = current_screen
+                    else {
+                        panic!("screen was not wipe!{:?}", current_screen)
+                    };
+                    current_screen = *to.clone();
                 }
             };
 

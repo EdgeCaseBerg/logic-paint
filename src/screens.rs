@@ -9,13 +9,24 @@ use egor::{
     render::Color,
 };
 
+#[derive(Debug, Clone)]
 pub enum Screens {
     GameScreen,
     WinScreen,
+    WipeScreen {
+        from: Box<Screens>,
+        to: Box<Screens>,
+        duration: f32,
+    },
 }
+
+#[derive(Debug, Clone)]
 pub enum ScreenAction {
     ChangeScreen { to: Screens },
     NoAction,
+    WipeLeft,
+    WipeRight,
+    WipeDone,
 }
 
 pub fn play_game_screen(
@@ -157,4 +168,35 @@ fn draw_centered_text(
     let pos = center - vec2(w * 0.5, h * 0.5 - size / 2.);
 
     gfx.text(text).size(size).color(color).at(pos);
+}
+
+pub fn wipe_screen(
+    wipe_progress: &mut f32,
+    duration: f32,
+    frame_context: &mut FrameContext,
+    palette: &ColorPalette,
+) -> ScreenAction {
+    *wipe_progress += frame_context.timer.delta;
+
+    let gfx = &mut (frame_context.gfx);
+    let screen_size = gfx.screen_size();
+    let pos = screen_size / 2.;
+
+    gfx.camera().target(screen_size / 2.);
+
+    draw_centered_text(
+        gfx,
+        &format!("{}%", *wipe_progress / duration),
+        pos,
+        20.,
+        Color::new(palette.group_highlight),
+    );
+
+    if *wipe_progress < duration * 0.5 {
+        ScreenAction::WipeLeft
+    } else if *wipe_progress > duration {
+        ScreenAction::WipeDone
+    } else {
+        ScreenAction::WipeRight
+    }
 }
