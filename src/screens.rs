@@ -9,11 +9,11 @@ use egor::{
     render::Color,
 };
 
-enum Screens {
+pub enum Screens {
     GameScreen,
     WinScreen,
 }
-enum ScreenAction {
+pub enum ScreenAction {
     ChangeScreen { to: Screens },
     NoAction,
 }
@@ -22,7 +22,7 @@ pub fn play_game_screen(
     game_state: &mut PlayState,
     frame_context: &mut FrameContext,
     palette: &mut ColorPalette,
-) {
+) -> ScreenAction {
     let gfx = &mut (frame_context.gfx);
     let input = &mut (frame_context.input);
     let bg_position = vec2(-163., -209.);
@@ -58,6 +58,14 @@ pub fn play_game_screen(
     play_area.draw_row_groups(&game_state, gfx);
     play_area.draw_column_groups(&game_state, gfx);
     game_state.update_groups();
+
+    if game_state.is_complete() {
+        ScreenAction::ChangeScreen {
+            to: Screens::WinScreen,
+        }
+    } else {
+        ScreenAction::NoAction
+    }
 }
 
 pub fn win_screen(
@@ -65,7 +73,7 @@ pub fn win_screen(
     frame_context: &mut FrameContext,
     palette: &ColorPalette,
     debuggable_stuff: &DebugStuff,
-) {
+) -> ScreenAction {
     let gfx = &mut (frame_context.gfx);
     let input = &mut (frame_context.input);
 
@@ -74,7 +82,7 @@ pub fn win_screen(
 
     let (mx, my) = input.mouse_position();
     let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
-    // let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
+    let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
     // let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
 
     gfx.rect()
@@ -124,6 +132,14 @@ pub fn win_screen(
         16.,
         font_color,
     );
+    if left_mouse_pressed && should_highlight {
+        // Tmp go back to game screen for now
+        ScreenAction::ChangeScreen {
+            to: Screens::GameScreen,
+        }
+    } else {
+        ScreenAction::NoAction
+    }
 }
 
 // TODO move to ui module
