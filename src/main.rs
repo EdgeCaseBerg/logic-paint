@@ -9,6 +9,7 @@ use egor::{
     app::{FrameContext, egui::ComboBox, egui::Slider, egui::Window},
     math::Vec2,
 };
+use screens::{ScreenAction, Screens};
 use std::env;
 use std::fs::read_to_string;
 use ui::ColorPalette;
@@ -37,6 +38,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut game_state: gamestate::PlayState = (&test_pbm).into();
     let mut debuggable_stuff = DebugStuff::new();
     let mut palette = ColorPalette::meeks();
+    let mut current_screen = Screens::GameScreen;
 
     App::new()
         .window_size(1280, 720)
@@ -54,13 +56,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 std::process::exit(0);
             }
 
-            screens::win_screen(
-                &mut game_state,
-                frame_context,
-                &palette,
-                &mut debuggable_stuff,
-            );
-            // screens::play_game_screen(&mut game_state, frame_context, &mut palette);
+            let action = match current_screen {
+                Screens::GameScreen => {
+                    screens::play_game_screen(&mut game_state, frame_context, &mut palette)
+                }
+                Screens::WinScreen => screens::win_screen(
+                    &mut game_state,
+                    frame_context,
+                    &palette,
+                    &mut debuggable_stuff,
+                ),
+            };
+            match action {
+                ScreenAction::NoAction => {}
+                ScreenAction::ChangeScreen { to } => {
+                    // TODO handle transitions
+                    current_screen = to;
+                }
+            };
+
             debug_window(
                 frame_context,
                 &mut debuggable_stuff,
