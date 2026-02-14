@@ -67,9 +67,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &palette,
                     &mut debuggable_stuff,
                 ),
-                Screens::WipeScreen { from, to, duration } => {
-                    screens::wipe_screen(&mut wipe_progress, *duration, frame_context, &palette)
-                }
+                Screens::WipeScreen {
+                    from: _,
+                    to: _,
+                    duration,
+                } => screens::wipe_screen(&mut wipe_progress, *duration, frame_context, &palette),
             };
             match action {
                 ScreenAction::NoAction => {}
@@ -81,13 +83,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         duration: 2.0,
                     };
                 }
-                ScreenAction::WipeLeft => {}
-                ScreenAction::WipeRight => {}
+                ScreenAction::WipeLeft => {
+                    // TODO
+                }
+                ScreenAction::WipeRight => {
+                    // TODO
+                }
                 ScreenAction::WipeDone => {
                     let Screens::WipeScreen {
-                        ref from,
+                        from: _,
                         ref to,
-                        duration,
+                        duration: _,
                     } = current_screen
                     else {
                         panic!("screen was not wipe!{:?}", current_screen)
