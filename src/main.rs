@@ -40,6 +40,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut palette = ColorPalette::meeks();
     let mut current_screen = Screens::GameScreen;
     let mut wipe_progress = 0.0;
+    let mut show_wipe = false;
+    let mut last_action = ScreenAction::NoAction;
 
     App::new()
         .window_size(1280, 720)
@@ -57,7 +59,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 std::process::exit(0);
             }
 
-            let action = match &current_screen {
+            let screen_to_draw = if show_wipe {
+                let Screens::WipeScreen {
+                    ref from,
+                    ref to,
+                    duration: _,
+                } = current_screen
+                else {
+                    panic!("screen was not wipe!{:?}", current_screen)
+                };
+                match last_action {
+                    ScreenAction::WipeLeft => from,
+                    ScreenAction::WipeRight | ScreenAction::WipeDone => to,
+                    _ => &current_screen,
+                }
+            } else {
+                &current_screen
+            };
+
+            let mut action = match screen_to_draw {
                 Screens::GameScreen => {
                     screens::play_game_screen(&mut game_state, frame_context, &mut palette)
                 }
@@ -67,27 +87,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &palette,
                     &mut debuggable_stuff,
                 ),
-                Screens::WipeScreen {
-                    from: _,
-                    to: _,
-                    duration,
-                } => screens::wipe_screen(&mut wipe_progress, *duration, frame_context, &palette),
+                _ => ScreenAction::NoAction,
             };
+            if show_wipe {
+                action = screens::wipe_screen(
+                    &mut wipe_progress,
+                    debuggable_stuff.transition_duration,
+                    frame_context,
+                    &palette,
+                );
+            }
             match action {
                 ScreenAction::NoAction => {}
-                ScreenAction::ChangeScreen { to } => {
+                ScreenAction::ChangeScreen { ref to } => {
                     wipe_progress = 0.0;
+                    show_wipe = true;
                     current_screen = Screens::WipeScreen {
                         from: Box::new(current_screen.clone()),
-                        to: Box::new(to),
+                        to: Box::new(to.clone()),
                         duration: debuggable_stuff.transition_duration,
                     };
-                }
-                ScreenAction::WipeLeft => {
-                    // TODO
-                }
-                ScreenAction::WipeRight => {
-                    // TODO
                 }
                 ScreenAction::WipeDone => {
                     let Screens::WipeScreen {
@@ -98,9 +117,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     else {
                         panic!("screen was not wipe!{:?}", current_screen)
                     };
+                    show_wipe = false;
                     current_screen = *to.clone();
                 }
+                _ => {}
             };
+            last_action = action;
 
             debug_window(
                 frame_context,
@@ -126,7 +148,7 @@ impl DebugStuff {
             size_x: 200,
             size_y: 200,
             selected_level: 0,
-            transition_duration: 2.0,
+            transition_duration: 0.8,
         }
     }
 }

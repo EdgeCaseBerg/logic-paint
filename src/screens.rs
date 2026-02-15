@@ -37,11 +37,12 @@ pub fn play_game_screen(
 ) -> ScreenAction {
     let gfx = &mut (frame_context.gfx);
     let input = &mut (frame_context.input);
-    let bg_position = vec2(-163., -209.);
+    let bg_position = vec2(1280. / 2. - 163., 720. / 2. - 209.);
     let bg_size = 525;
     let box_offset = 8.0;
 
     let screen_size = gfx.screen_size();
+    gfx.camera().target(screen_size / 2.);
     let (mx, my) = input.mouse_position();
     let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
     let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
