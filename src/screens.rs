@@ -4,6 +4,7 @@ use crate::ui::{Action, ColorPalette, PlayArea, PlayerInput};
 
 use egor::{
     app::FrameContext,
+    app::egui::lerp,
     input::MouseButton,
     math::{Vec2, vec2},
     render::Color,
@@ -192,7 +193,32 @@ pub fn wipe_screen(
         Color::new(palette.group_highlight),
     );
 
-    if *wipe_progress < duration * 0.5 {
+    let box_size = 60.0;
+    let num_boxes = screen_size / box_size;
+    let box_progress = *wipe_progress / duration;
+    let sin = lerp(0.0..=std::f32::consts::PI, box_progress);
+    let max_boxes_to_draw_x = 1 + lerp(0.0..=num_boxes.x, sin.sin()) as usize;
+    let max_boxes_to_draw_y = 1 + lerp(0.0..=num_boxes.y, sin.sin()) as usize;
+    let (even, odd) = palette.even_odd_color(0);
+    let in_first_half_of_animation = *wipe_progress < duration * 0.5;
+
+    for x in 0..max_boxes_to_draw_x {
+        for y in 0..max_boxes_to_draw_y {
+            let offset = if in_first_half_of_animation {
+                vec2(x as f32, y as f32)
+            } else {
+                vec2(num_boxes.x - x as f32, num_boxes.y - y as f32)
+            };
+            let pos = offset * box_size;
+            let color = if x % 2 == 0 { even } else { odd };
+            gfx.rect()
+                .color(Color::new(color))
+                .size(vec2(box_size, box_size))
+                .at(pos);
+        }
+    }
+
+    if in_first_half_of_animation {
         ScreenAction::WipeLeft
     } else if *wipe_progress > duration {
         ScreenAction::WipeDone

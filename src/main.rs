@@ -192,6 +192,8 @@ fn debug_window(
             *game_state = (&pbm).into();
         }
         ui.separator();
-        ui.add(Slider::new(&mut debuggable_stuff.transition_duration, 0.5..=5.0).text("Wipe duration"));
+        ui.add(
+            Slider::new(&mut debuggable_stuff.transition_duration, 0.5..=5.0).text("Wipe duration"),
+        );
     });
 }
