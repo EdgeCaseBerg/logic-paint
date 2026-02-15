@@ -80,7 +80,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     current_screen = Screens::WipeScreen {
                         from: Box::new(current_screen.clone()),
                         to: Box::new(to),
-                        duration: 2.0,
+                        duration: debuggable_stuff.transition_duration,
                     };
                 }
                 ScreenAction::WipeLeft => {
@@ -117,6 +117,7 @@ struct DebugStuff {
     size_x: usize,
     size_y: usize,
     selected_level: usize,
+    transition_duration: f32,
 }
 
 impl DebugStuff {
@@ -125,6 +126,7 @@ impl DebugStuff {
             size_x: 200,
             size_y: 200,
             selected_level: 0,
+            transition_duration: 2.0,
         }
     }
 }
@@ -189,5 +191,7 @@ fn debug_window(
             let pbm: Pbm = pbm.parse().expect("level not in expected format");
             *game_state = (&pbm).into();
         }
+        ui.separator();
+        ui.add(Slider::new(&mut debuggable_stuff.transition_duration, 0.5..=5.0).text("Wipe duration"));
     });
 }
