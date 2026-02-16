@@ -1,6 +1,7 @@
 use crate::DebugStuff;
 use crate::gamestate::PlayState;
-use crate::ui::{Action, ColorPalette, PlayArea, PlayerInput};
+use crate::ui::{Action, ColorPalette, PlayArea, PlayerInput, draw_ppm_at};
+use crate::netppm::Ppm;
 
 use egor::{
     app::FrameContext,
@@ -83,6 +84,7 @@ pub fn play_game_screen(
 
 pub fn win_screen(
     game_state: &mut PlayState,
+    ppm: &Ppm,
     frame_context: &mut FrameContext,
     palette: &ColorPalette,
     debuggable_stuff: &DebugStuff,
@@ -98,13 +100,7 @@ pub fn win_screen(
     let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
     // let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
 
-    gfx.rect()
-        .at(vec2(75., 75.))
-        .color(Color::new(palette.background))
-        .size(vec2(
-            debuggable_stuff.size_x as f32, //480 is pretty good
-            debuggable_stuff.size_y as f32,
-        ));
+    draw_ppm_at(ppm, vec2(75., 75.), vec2(450., 450.), gfx);
 
     let num_incorrect = game_state.number_incorrect();
     if num_incorrect == 0 {

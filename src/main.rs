@@ -23,19 +23,28 @@ use egor::{
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let arguments: Vec<String> = env::args().collect();
     if arguments.is_empty() {
-        eprintln!("{:?}", "pass the input data as the first argument.");
+        eprintln!("{:?}", "pass the pbm data as the first argument.");
+        eprintln!("{:?}", "pass the ppm data as the second argument.");
         return Err("Could not load file".into());
     }
 
     let mut arguments = arguments.iter();
     arguments.next(); // skip the name of the program being ran
-    let filename = match arguments.next() {
+    let filename_pbm = match arguments.next() {
         Some(arg) => arg,
         _ => "./assets/P1.pbm",
     };
 
-    let test_pbm = read_to_string(filename)?;
+    arguments.next(); // skip the name of the program being ran
+    let filename_ppm = match arguments.next() {
+        Some(arg) => arg,
+        _ => "./assets/P3.ppm",
+    };    
+
+    let test_pbm = read_to_string(filename_pbm)?;
     let test_pbm: netbpm::Pbm = test_pbm.parse()?;
+    let test_ppm = read_to_string(filename_ppm)?;
+    let test_ppm: netppm::Ppm = test_ppm.parse()?;
     let mut game_state: gamestate::PlayState = (&test_pbm).into();
     let mut debuggable_stuff = DebugStuff::new();
     let mut palette = ColorPalette::meeks();
@@ -84,6 +93,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 Screens::WinScreen => screens::win_screen(
                     &mut game_state,
+                    &test_ppm,
                     frame_context,
                     &palette,
                     &mut debuggable_stuff,
