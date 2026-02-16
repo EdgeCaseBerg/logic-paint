@@ -127,7 +127,7 @@ impl FromStr for Ppm {
         let cells: Vec<u16> = characters
             .map(|c| match u16::from_str_radix(c, 10) {
                 Ok(parsed_number) => {
-                    if parsed_number < 0 || parsed_number > max_value {
+                    if parsed_number > max_value {
                         Err(LoadPpmErr::InvalidColorRangeError {
                             found: c.to_string(),
                             reason: format!(
@@ -231,6 +231,18 @@ mod ppm_tests {
     }
 
     #[test]
+    fn fails_to_load_missing_color_range() {
+        let data = "P3\n1\n1\n";
+        let result: PpmResult<Ppm> = data.parse();
+        match result {
+            Err(LoadPpmErr::MissingColorRangeError) => {}
+            weird => {
+                panic!("Should not have parsed: {:?}", weird);
+            }
+        }
+    }
+
+    #[test]
     fn fails_to_load_invalid_width() {
         let data = "P3\nw 1\n";
         let result: PpmResult<Ppm> = data.parse();
@@ -261,8 +273,23 @@ mod ppm_tests {
     }
 
     #[test]
+    fn fails_to_load_invalid_color_range() {
+        let data = "P3\n1 1\nr";
+        let result: PpmResult<Ppm> = data.parse();
+        match result {
+            Err(LoadPpmErr::InvalidColorRangeError { found, reason }) => {
+                assert_eq!(reason, "invalid digit found in string");
+                assert_eq!(found, "r");
+            }
+            weird => {
+                panic!("Should not have parsed: {:?}", weird);
+            }
+        }
+    }
+
+    #[test]
     fn fails_to_load_invalid_matrix() {
-        let data = "P3\n2 2\n1";
+        let data = "P3\n2 2\n1\n1";
         let result: PpmResult<Ppm> = data.parse();
         match result {
             Err(LoadPpmErr::InvalidMatrixSize { expected, got }) => {
@@ -277,7 +304,7 @@ mod ppm_tests {
 
     #[test]
     fn fails_to_load_invalid_matrix_cell() {
-        let data = "P3\n1 1\na";
+        let data = "P3\n1 1\n1\na";
         let result: PpmResult<Ppm> = data.parse();
         match result {
             Err(LoadPpmErr::UnexpectedCellValue { found }) => {
@@ -290,64 +317,117 @@ mod ppm_tests {
     }
 
     #[test]
+    fn fails_to_load_invalid_matrix_cell_oob() {
+        let data = "P3\n1 1\n1\n3";
+        let result: PpmResult<Ppm> = data.parse();
+        match result {
+            Err(LoadPpmErr::InvalidColorRangeError { found, reason }) => {
+                assert_eq!(found, "3");
+                assert_eq!(
+                    reason,
+                    "parsed number was out of range defined by ppm file min:0 max:1"
+                );
+            }
+            weird => {
+                panic!("Should not have parsed: {:?}", weird);
+            }
+        }
+    }
+
+    #[test]
     #[rustfmt::skip]
     fn returns_rows_as_expected() {
         let ppm = Ppm {
             width: 3,
-            height: 4,
+            height: 2,
+            max_value: 255,
             cells: vec![
-                false, false, false,
-                true , true , true ,
-                false, true , false,
-                true,  false, false,
+                [255, 0, 0],
+                [0, 255, 0],
+                [0, 0, 255],
+                [255, 255, 0],
+                [255, 255, 255],
+                [0, 0, 0],
             ],
         };
         let mut rows = ppm.rows().into_iter();
-        let [false, false, false] = rows.next().expect("bad iter 1st row")[..] else {
+        let [
+            [255, 0, 0], [0, 255, 0], [0, 0, 255]
+        ] = rows.next().expect("bad iter 1st row")[..]
+        else {
             eprintln!("{:?}", ppm.rows());
             panic!("failed 1st row")
         };
-        let [true, true, true] = rows.next().expect("bad iter 2nd row")[..] else {
+        let [
+            [255, 255, 0], [255, 255, 255], [0, 0, 0]
+        ] = rows.next().expect("bad iter 2nd row")[..]
+        else {
             eprintln!("{:?}", ppm.rows());
             panic!("failed 2nd row")
-        };
-        let [false, true, false] = rows.next().expect("bad iter 3rd row")[..] else {
-            eprintln!("{:?}", ppm.rows());
-            panic!("failed 3rd row")
-        };
-        let [true, false, false] = rows.next().expect("bad iter 4th row")[..] else {
-            eprintln!("{:?}", ppm.rows());
-            panic!("failed 4th row")
         };
         assert!(rows.next().is_none());
     }
 
-    #[rustfmt::skip]
     #[test]
+    #[rustfmt::skip]
     fn returns_cols_as_expected() {
         let ppm = Ppm {
             width: 3,
-            height: 4,
+            height: 2,
+            max_value: 255,
             cells: vec![
-                false, false, false,
-                true , true , true ,
-                false, true , false,
-                true,  false, false,
+                [255, 0, 0],
+                [0, 255, 0],
+                [0, 0, 255],
+                [255, 255, 0],
+                [255, 255, 255],
+                [0, 0, 0],
             ],
         };
         let mut cols = ppm.cols().into_iter();
-        let [false, true, false, true] = cols.next().expect("bad iter 1st col")[..] else {
+        let [
+            [255, 0, 0],
+            [255, 255, 0]
+        ] = cols.next().expect("bad iter 1st col")[..] else {
             eprintln!("{:?}", ppm.cols());
             panic!("failed 1st col")
         };
-        let [false, true, true, false] = cols.next().expect("bad iter 2nd col")[..] else {
+        let [
+            [0, 255, 0],
+            [255, 255, 255]
+        ] = cols.next().expect("bad iter 2nd col")[..] else {
             eprintln!("{:?}", ppm.cols());
             panic!("failed 2nd col")
         };
-        let [false, true, false, false] = cols.next().expect("bad iter 3rd col")[..] else {
+        let [
+            [0, 0, 255],
+            [0, 0, 0]
+        ] = cols.next().expect("bad iter 3rd col")[..] else {
             eprintln!("{:?}", ppm.cols());
             panic!("failed 3rd col")
         };
         assert!(cols.next().is_none());
+    }
+
+    #[test]
+    fn to_rgba() {
+        let ppm = Ppm {
+            width: 3,
+            height: 2,
+            max_value: 255,
+            cells: vec![
+                [255, 0, 0],
+                [0, 255, 0],
+                [0, 0, 255],
+                [255, 255, 0],
+                [255, 255, 255],
+                [0, 0, 0],
+            ],
+        };
+        let rgba = ppm.to_rgba([255, 255, 255]);
+        assert_eq!(rgba[0], 1.0);
+        assert_eq!(rgba[1], 1.0);
+        assert_eq!(rgba[2], 1.0);
+        assert_eq!(rgba[3], 1.0);
     }
 }

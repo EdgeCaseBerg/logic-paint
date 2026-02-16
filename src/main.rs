@@ -113,11 +113,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let Screens::WipeScreen {
                         from: _,
                         ref to,
-                        duration: _,
+                        duration,
                     } = current_screen
                     else {
                         panic!("screen was not wipe!{:?}", current_screen)
                     };
+                    debuggable_stuff.transition_duration = duration;
                     show_wipe = false;
                     current_screen = *to.clone();
                 }
