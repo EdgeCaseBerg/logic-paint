@@ -155,6 +155,14 @@ impl FromStr for Ppm {
         };
         let cells = cells.to_vec();
 
+        // If we had triplets, but not the right width x height then raise
+        if cells.len() != expected_count {
+            return Err(LoadPpmErr::InvalidMatrixSize {
+                expected: expected_count,
+                got: cells.len(),
+            });
+        }
+
         Ok(Ppm {
             width,
             height,
@@ -327,6 +335,21 @@ mod ppm_tests {
                     reason,
                     "parsed number was out of range defined by ppm file min:0 max:1"
                 );
+            }
+            weird => {
+                panic!("Should not have parsed: {:?}", weird);
+            }
+        }
+    }
+
+    #[test]
+    fn fails_to_load_invalid_matrix_cell_total_count() {
+        let data = "P3\n1 1\n1\n0 0 0\n0 0 0";
+        let result: PpmResult<Ppm> = data.parse();
+        match result {
+            Err(LoadPpmErr::InvalidMatrixSize { expected, got }) => {
+                assert_eq!(expected, 1);
+                assert_eq!(got, 2);
             }
             weird => {
                 panic!("Should not have parsed: {:?}", weird);
