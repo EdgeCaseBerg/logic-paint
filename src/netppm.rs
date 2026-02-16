@@ -47,6 +47,7 @@ pub enum LoadPpmErr {
     InvalidWidthError { found: String, reason: String },
     InvalidHeightError { found: String, reason: String },
     InvalidMatrixSize { expected: usize, got: usize },
+    IncorrectCellTripletCount { expected: usize, got: usize },
     UnexpectedCellValue { found: String },
     MissingColorRangeError,
     InvalidColorRangeError { found: String, reason: String },
@@ -70,6 +71,9 @@ impl std::fmt::Display for LoadPpmErr {
             }
             InvalidMatrixSize { expected, got } => {
                 format!("invalid matrix cell, expected: {} got {}", expected, got)
+            },
+            IncorrectCellTripletCount { expected, got } => {
+                format!("invalid matrix triplet count, expected: {} got {}", expected, got)
             }
             MissingColorRangeError => "missing color range in ppm file".to_owned(),
             UnexpectedCellValue { found } => format!("invalid ppm cell value: {}", found),
@@ -148,8 +152,8 @@ impl FromStr for Ppm {
 
         let expected_count = width * height;
         let (cells, []) = cells.as_chunks::<3>() else {
-            return Err(LoadPpmErr::InvalidMatrixSize {
-                expected: expected_count,
+            return Err(LoadPpmErr::IncorrectCellTripletCount {
+                expected: expected_count * 3,
                 got: cells.len(),
             });
         };
@@ -300,8 +304,8 @@ mod ppm_tests {
         let data = "P3\n2 2\n1\n1";
         let result: PpmResult<Ppm> = data.parse();
         match result {
-            Err(LoadPpmErr::InvalidMatrixSize { expected, got }) => {
-                assert_eq!(expected, 4);
+            Err(LoadPpmErr::IncorrectCellTripletCount { expected, got }) => {
+                assert_eq!(expected, 12);
                 assert_eq!(got, 1);
             }
             weird => {
