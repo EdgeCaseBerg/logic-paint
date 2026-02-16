@@ -1,5 +1,6 @@
 use crate::gamestate::CellState;
 use crate::gamestate::PlayState;
+use crate::netppm::Ppm;
 
 use egor::{
     math::{Rect, Vec2, vec2},
@@ -323,6 +324,22 @@ impl PlayArea {
                     })
                     .at(screen_position);
             }
+        }
+    }
+}
+
+pub fn draw_ppm_at(ppm: &Ppm, top_left: Vec2, size: Vec2, gfx: &mut Graphics) {
+    let num_boxes = ppm.rows().len();
+    let gutter = 2.;
+    let cell_size = (size.x - (gutter + gutter * num_boxes as f32)) / num_boxes as f32;
+
+    for (r, row) in ppm.rows().into_iter().enumerate() {
+        for (c, rgb) in row.iter().enumerate() {
+            let position = top_left + vec2(c as f32, r as f32) * (Vec2::splat(cell_size) + gutter);
+            gfx.rect()
+                .at(position - gutter)
+                .size(Vec2::splat(cell_size + gutter * 2.))
+                .color(Color::new(ppm.to_rgba(*rgb)));
         }
     }
 }
