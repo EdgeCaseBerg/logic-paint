@@ -104,6 +104,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &palette,
                     &mut debuggable_stuff,
                 ),
+                Screens::ChooseLevelScreen => {
+                    screens::level_select_screen(&[], frame_context, &mut game_state)
+                }
                 _ => ScreenAction::NoAction,
             };
             if show_wipe {
