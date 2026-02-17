@@ -89,7 +89,7 @@ pub fn win_screen(
     ppm: &Ppm,
     frame_context: &mut FrameContext,
     palette: &ColorPalette,
-    debuggable_stuff: &DebugStuff,
+    _debuggable_stuff: &DebugStuff,
 ) -> ScreenAction {
     let gfx = &mut (frame_context.gfx);
     let input = &mut (frame_context.input);
@@ -100,7 +100,7 @@ pub fn win_screen(
     let (mx, my) = input.mouse_position();
     let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
     let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
-    // let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
+    // TODO: add in held so that one can drag easily.
 
     draw_ppm_at(ppm, vec2(75., 75.), vec2(450., 450.), gfx);
 
