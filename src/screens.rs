@@ -234,5 +234,53 @@ pub fn level_select_screen(
     frame_context: &mut FrameContext,
     current_level: &mut PlayState,
 ) -> ScreenAction {
+    let levels_per_page = 15;
+    let levels_per_row = 5;
+    let rows = levels_per_page / levels_per_row;
+    let levels_to_show: Vec<&Level> = levels
+        .iter()
+        .skip(levels_per_page * page)
+        .take(levels_per_page)
+        .collect();
+
+    let gfx = &mut (frame_context.gfx);
+    let screen_size = gfx.screen_size();
+    let center = screen_size / 2.;
+    let title_text_position = center - vec2(0., screen_size.y / 4.);
+    let level_bg_position = title_text_position + vec2(screen_size.x / -4., 72.);
+    let level_bg_size = vec2(screen_size.x / 2., screen_size.y / 2.);
+
+
+    gfx.camera().target(center);
+
+    draw_centered_text(
+        gfx,
+        "Level Select",
+        title_text_position,
+        36.,
+        Color::WHITE, // TODO: bring in the palette
+    );
+
+    gfx.rect()
+        .at(level_bg_position)
+        .size(level_bg_size)
+        .color(Color::BLUE);
+
+    // TODO: move to ui method
+    let padding = vec2(10., 10.);
+    let level_tile_height = (level_bg_size.y - padding.y * 2.) / rows as f32 - padding.y * 2.;
+    let level_tile_size = vec2(level_tile_height, level_tile_height);
+    let centering_x_offset =
+        (level_bg_size.x - (level_tile_height + padding.x) * levels_per_row as f32) / 2.;
+    let centering_y_offset = (level_bg_size.y - (level_tile_height + padding.y) * rows as f32) / 2.;
+
+    let anchor = level_bg_position + padding + vec2(centering_x_offset, centering_y_offset);
+    for (r, levels_in_row) in levels_to_show.chunks(levels_per_row).enumerate() {
+        for (c, level) in levels_in_row.into_iter().enumerate() {
+            let pos = anchor + vec2(c as f32, r as f32) * (level_tile_size + padding);
+            gfx.rect().at(pos).size(level_tile_size).color(Color::GREEN);
+        }
+    }
+
     ScreenAction::NoAction
 }
