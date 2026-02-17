@@ -23,6 +23,24 @@ pub enum LevelLoadError {
     InvalidDirectory,
 }
 
+impl From<std::io::Error> for LevelLoadError {
+    fn from(e: std::io::Error) -> Self {
+        LevelLoadError::Io(e)
+    }
+}
+
+impl From<LoadPbmErr> for LevelLoadError {
+    fn from(e: LoadPbmErr) -> Self {
+        LevelLoadError::Pbm(e)
+    }
+}
+
+impl From<LoadPpmErr> for LevelLoadError {
+    fn from(e: LoadPpmErr) -> Self {
+        LevelLoadError::Ppm(e)
+    }
+}
+
 pub fn load_levels_from_dir(dir: &Path) -> Vec<Level> {
     if !dir.is_dir() {
         return vec![];
