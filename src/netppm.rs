@@ -61,9 +61,12 @@ impl std::fmt::Display for LoadPpmErr {
             }
             InvalidMatrixSize { expected, got } => {
                 format!("invalid matrix cell, expected: {} got {}", expected, got)
-            },
+            }
             IncorrectCellTripletCount { expected, got } => {
-                format!("invalid matrix triplet count, expected: {} got {}", expected, got)
+                format!(
+                    "invalid matrix triplet count, expected: {} got {}",
+                    expected, got
+                )
             }
             MissingColorRangeError => "missing color range in ppm file".to_owned(),
             UnexpectedCellValue { found } => format!("invalid ppm cell value: {}", found),
