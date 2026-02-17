@@ -50,6 +50,17 @@ impl std::fmt::Display for LevelLoadError {
     }
 }
 
+impl std::error::Error for LevelLoadError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            LevelLoadError::Io { source, .. } => Some(source),
+            LevelLoadError::ParsePbm { source, .. } => Some(source),
+            LevelLoadError::ParsePpm { source, .. } => Some(source),
+            LevelLoadError::InvalidDirectory(_) => None,
+        }
+    }
+}
+
 pub fn load_levels_from_dir(dir: &Path) -> LevelsLoadResult<Vec<Level>> {
     if !dir.is_dir() {
         return Err(LevelLoadError::InvalidDirectory(dir.to_path_buf()));
