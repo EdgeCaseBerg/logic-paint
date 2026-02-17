@@ -103,7 +103,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &palette,
                     &mut debuggable_stuff,
                 ),
-                Screens::ChooseLevelScreen { page }  => {
+                Screens::ChooseLevelScreen { page } => {
                     screens::level_select_screen(&levels, *page, frame_context, &mut game_state)
                 }
                 _ => ScreenAction::NoAction,
