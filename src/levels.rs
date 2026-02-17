@@ -7,6 +7,7 @@ use crate::netppm::{LoadPpmErr, Ppm};
 use std::ffi::OsStr;
 use std::fs::{read_dir, read_to_string};
 use std::path::Path;
+use std::path::PathBuf;
 
 #[derive(Debug)]
 pub struct Level {
@@ -17,10 +18,19 @@ pub struct Level {
 
 #[derive(Debug)]
 pub enum LevelLoadError {
-    Io(std::io::Error),
-    Pbm(LoadPbmErr),
-    Ppm(LoadPpmErr),
-    InvalidDirectory,
+    Io {
+        path: PathBuf,
+        source: std::io::Error,
+    },
+    ParsePbm {
+        path: PathBuf,
+        source: LoadPbmErr,
+    },
+    ParsePpm {
+        path: PathBuf,
+        source: LoadPpmErr,
+    },
+    InvalidDirectory(PathBuf),
 }
 
 impl From<std::io::Error> for LevelLoadError {
