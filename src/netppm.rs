@@ -17,16 +17,6 @@ impl Ppm {
         result
     }
 
-    pub fn cols(&self) -> Vec<Vec<[u16; 3]>> {
-        let mut cols = vec![vec![]; self.width];
-        for c in 0..self.width {
-            for row in self.rows() {
-                cols[c].push(row[c]);
-            }
-        }
-        cols
-    }
-
     pub fn to_rgba(&self, cell: [u16; 3]) -> [f32; 4] {
         let max = self.max_value;
         let r = cell[0] as f32 / max as f32;
