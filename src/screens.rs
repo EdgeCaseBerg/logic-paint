@@ -278,7 +278,11 @@ pub fn level_select_screen(
     for (r, levels_in_row) in levels_to_show.chunks(levels_per_row).enumerate() {
         for (c, level) in levels_in_row.into_iter().enumerate() {
             let pos = anchor + vec2(c as f32, r as f32) * (level_tile_size + padding);
-            gfx.rect().at(pos).size(level_tile_size).color(Color::GREEN);
+            if level.completed {
+                draw_ppm_at(&level.image, pos, level_tile_size, gfx);
+            } else {
+                gfx.rect().at(pos).size(level_tile_size).color(Color::GREEN);
+            }
         }
     }
 
