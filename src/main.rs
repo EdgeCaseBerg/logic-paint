@@ -231,7 +231,7 @@ fn debug_window(
         if before_level != debuggable_stuff.selected_level {
             let pbm = read_to_string(levels[debuggable_stuff.selected_level])
                 .expect("Could not load level");
-            let pbm: Pbm = pbm.parse().expect("level not in expected format");
+            let pbm: netbpm::Pbm = pbm.parse().expect("level not in expected format");
             *game_state = (&pbm).into();
         }
         ui.separator();
