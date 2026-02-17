@@ -1,10 +1,6 @@
-use crate::netbpm;
-use crate::netppm;
-
 use crate::netbpm::{LoadPbmErr, Pbm};
 use crate::netppm::{LoadPpmErr, Ppm};
 
-use std::ffi::OsStr;
 use std::fs::{read_dir, read_to_string};
 use std::path::Path;
 use std::path::PathBuf;
@@ -33,11 +29,7 @@ pub enum LevelLoadError {
     InvalidDirectory(PathBuf),
 }
 
-impl From<std::io::Error> for LevelLoadError {
-    fn from(e: std::io::Error) -> Self {
-        LevelLoadError::Io(e)
-    }
-}
+pub type LevelsLoadResult<T> = Result<T, LevelLoadError>;
 
 impl From<LoadPbmErr> for LevelLoadError {
     fn from(e: LoadPbmErr) -> Self {
