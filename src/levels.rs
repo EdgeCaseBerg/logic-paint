@@ -1,11 +1,11 @@
 use crate::netbpm;
 use crate::netppm;
 
-use crate::netbpm::Pbm;
-use crate::netppm::Ppm;
+use crate::netbpm::{LoadPbmErr, Pbm};
+use crate::netppm::{LoadPpmErr, Ppm};
 
 use std::ffi::OsStr;
-use std::fs::{self, read_dir, read_to_string};
+use std::fs::{read_dir, read_to_string};
 use std::path::Path;
 
 #[derive(Debug)]
@@ -13,6 +13,14 @@ pub struct Level {
     pub info: Pbm,
     pub image: Ppm,
     pub completed: bool,
+}
+
+#[derive(Debug)]
+pub enum LevelLoadError {
+    Io(std::io::Error),
+    Pbm(LoadPbmErr),
+    Ppm(LoadPpmErr),
+    InvalidDirectory,
 }
 
 pub fn load_levels_from_dir(dir: &Path) -> Vec<Level> {
