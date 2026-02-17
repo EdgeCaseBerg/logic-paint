@@ -31,77 +31,85 @@ pub enum LevelLoadError {
 
 pub type LevelsLoadResult<T> = Result<T, LevelLoadError>;
 
-impl From<LoadPbmErr> for LevelLoadError {
-    fn from(e: LoadPbmErr) -> Self {
-        LevelLoadError::Pbm(e)
-    }
-}
-
-impl From<LoadPpmErr> for LevelLoadError {
-    fn from(e: LoadPpmErr) -> Self {
-        LevelLoadError::Ppm(e)
-    }
-}
-
-pub fn load_levels_from_dir(dir: &Path) -> Vec<Level> {
-    if !dir.is_dir() {
-        return vec![];
-    }
-
-    let dir_iter = read_dir(dir);
-    if let Err(problem) = dir_iter {
-        panic!("could not load levels {}", problem);
-    }
-    let dir_iter = dir_iter.unwrap();
-    let mut level_files = Vec::new();
-    for entry in dir_iter {
-        if let Ok(entry) = entry {
-            let path = entry.path();
-            match path.extension() {
-                Some(os_string) => {
-                    if os_string.to_string_lossy() == "level" {
-                        level_files.push(path);
-                    }
-                }
-                _ => {}
-            };
+impl std::fmt::Display for LevelLoadError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LevelLoadError::Io { path, source } => {
+                write!(f, "could not read {:?}: {}", path, source)
+            }
+            LevelLoadError::ParsePbm { path, source } => {
+                write!(f, "could not parse PBM {:?}: {}", path, source)
+            }
+            LevelLoadError::ParsePpm { path, source } => {
+                write!(f, "could not parse PPM {:?}: {}", path, source)
+            }
+            LevelLoadError::InvalidDirectory(path) => {
+                write!(f, "{:?} is not a directory", path)
+            }
         }
     }
+}
+
+pub fn load_levels_from_dir(dir: &Path) -> LevelsLoadResult<Vec<Level>> {
+    if !dir.is_dir() {
+        return Err(LevelLoadError::InvalidDirectory(dir.to_path_buf()));
+    }
+
+    let mut level_files: Vec<_> = read_dir(dir)
+        .map_err(|e| LevelLoadError::Io {
+            path: dir.to_path_buf(),
+            source: e,
+        })?
+        .filter_map(|entry| {
+            let path = entry.ok()?.path();
+            path.extension()
+                .is_some_and(|ext| ext == "level")
+                .then_some(path)
+        })
+        .collect();
+
     level_files.sort();
 
-    let mut levels = Vec::new();
-    for level_file in level_files {
-        match read_to_string(&level_file) {
-            Err(problem) => {
-                panic!("could not load level {:?} {:?}", &level_file, problem);
-            }
-            Ok(contents) => {
-                // contents are completed 0 or 1, expected to be paired with pbm and ppm file of same name
-                let ppm_file_path = level_file.with_extension("ppm");
-                let pbm_file_path = level_file.with_extension("pbm");
+    level_files
+        .into_iter()
+        .map(|level_file| -> LevelsLoadResult<Level> {
+            let contents = read_to_string(&level_file).map_err(|e| LevelLoadError::Io {
+                path: level_file.clone(),
+                source: e,
+            })?;
 
-                let completed = contents.trim() == "1";
+            let completed = contents.trim() == "1";
 
-                let pbm = read_to_string(&pbm_file_path)
-                    .expect(&format!("could not read level file {:?}", &pbm_file_path));
-                let pbm: Pbm = pbm
-                    .parse()
-                    .expect(&format!("could not parse level file {:?}", &pbm_file_path));
+            let pbm_path = level_file.with_extension("pbm");
+            let ppm_path = level_file.with_extension("ppm");
 
-                let ppm = read_to_string(&ppm_file_path)
-                    .expect(&format!("could not read level file {:?}", &ppm_file_path));
-                let ppm: Ppm = ppm
-                    .parse()
-                    .expect(&format!("could not parse level file {:?}", &ppm_file_path));
+            let pbm: Pbm = read_to_string(&pbm_path)
+                .map_err(|e| LevelLoadError::Io {
+                    path: pbm_path.clone(),
+                    source: e,
+                })?
+                .parse()
+                .map_err(|e| LevelLoadError::ParsePbm {
+                    path: pbm_path.clone(),
+                    source: e,
+                })?;
 
-                levels.push(Level {
-                    info: pbm,
-                    image: ppm,
-                    completed: completed,
-                });
-            }
-        }
-    }
+            let ppm: Ppm = read_to_string(&ppm_path)
+                .map_err(|e| LevelLoadError::Io {
+                    path: ppm_path.clone(),
+                    source: e,
+                })?
+                .parse()
+                .map_err(|e| LevelLoadError::ParsePpm {
+                    path: ppm_path.clone(),
+                    source: e,
+                })?;
 
-    levels
+            Ok(Level {
+                info: pbm,
+                image: ppm,
+                completed,
+            })
+        })
+        .collect()
 }
