@@ -50,11 +50,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let test_ppm: netppm::Ppm = test_ppm.parse()?;
     let mut game_state: gamestate::PlayState = (&test_pbm).into();
     let level_dir_path = Path::new("./levels");
-    let levels = levels::load_levels_from_dir(level_dir_path);
-    println!("{:?}", levels);
+    let levels = levels::load_levels_from_dir(level_dir_path)?;
     let mut debuggable_stuff = DebugStuff::new();
     let mut palette = ColorPalette::meeks();
-    let mut current_screen = Screens::ChooseLevelScreen;
+    let mut current_screen = Screens::ChooseLevelScreen { page: 0 };
     let mut wipe_progress = 0.0;
     let mut show_wipe = false;
     let mut last_action = ScreenAction::NoAction;
@@ -104,8 +103,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &palette,
                     &mut debuggable_stuff,
                 ),
-                Screens::ChooseLevelScreen => {
-                    screens::level_select_screen(&[], frame_context, &mut game_state)
+                Screens::ChooseLevelScreen { page }  => {
+                    screens::level_select_screen(&levels, *page, frame_context, &mut game_state)
                 }
                 _ => ScreenAction::NoAction,
             };

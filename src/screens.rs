@@ -21,7 +21,9 @@ pub enum Screens {
         to: Box<Screens>,
         duration: f32,
     },
-    ChooseLevelScreen,
+    ChooseLevelScreen {
+        page: usize,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -227,9 +229,10 @@ pub fn wipe_screen(
 }
 
 pub fn level_select_screen(
-    _levels: &[Level],
-    _frame_context: &mut FrameContext,
-    _current_level: &mut PlayState,
+    levels: &[Level],
+    page: usize,
+    frame_context: &mut FrameContext,
+    current_level: &mut PlayState,
 ) -> ScreenAction {
     ScreenAction::NoAction
 }
