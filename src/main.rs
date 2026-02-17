@@ -6,20 +6,22 @@ mod screens;
 mod ui;
 
 use crate::gamestate::PlayState;
-use crate::netbpm::Pbm;
-use egor::{
-    app::{FrameContext, egui::ComboBox, egui::Slider, egui::Window},
-    math::Vec2,
-};
-use screens::{ScreenAction, Screens};
-use std::env;
-use std::fs::read_to_string;
-use ui::ColorPalette;
 
 use egor::{
     app::{App, WindowEvent},
     input::KeyCode,
 };
+use egor::{
+    app::{FrameContext, egui::ComboBox, egui::Slider, egui::Window},
+    math::Vec2,
+};
+
+use crate::screens::{ScreenAction, Screens};
+use crate::ui::ColorPalette;
+
+use std::env;
+use std::fs::read_to_string;
+use std::path::Path;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let arguments: Vec<String> = env::args().collect();
@@ -40,16 +42,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let filename_ppm = match arguments.next() {
         Some(arg) => arg,
         _ => "./assets/P3.ppm",
-    };    
+    };
 
     let test_pbm = read_to_string(filename_pbm)?;
     let test_pbm: netbpm::Pbm = test_pbm.parse()?;
     let test_ppm = read_to_string(filename_ppm)?;
     let test_ppm: netppm::Ppm = test_ppm.parse()?;
     let mut game_state: gamestate::PlayState = (&test_pbm).into();
+    let level_dir_path = Path::new("./levels");
+    let levels = levels::load_levels_from_dir(level_dir_path);
+    println!("{:?}", levels);
     let mut debuggable_stuff = DebugStuff::new();
     let mut palette = ColorPalette::meeks();
-    let mut current_screen = Screens::GameScreen;
+    let mut current_screen = Screens::ChooseLevelScreen;
     let mut wipe_progress = 0.0;
     let mut show_wipe = false;
     let mut last_action = ScreenAction::NoAction;

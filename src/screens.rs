@@ -1,7 +1,8 @@
 use crate::DebugStuff;
 use crate::gamestate::PlayState;
-use crate::ui::{Action, ColorPalette, PlayArea, PlayerInput, draw_ppm_at};
+use crate::levels::Level;
 use crate::netppm::Ppm;
+use crate::ui::{Action, ColorPalette, PlayArea, PlayerInput, draw_ppm_at};
 
 use egor::{
     app::FrameContext,
@@ -20,6 +21,7 @@ pub enum Screens {
         to: Box<Screens>,
         duration: f32,
     },
+    ChooseLevelScreen,
 }
 
 #[derive(Debug, Clone)]
@@ -222,4 +224,12 @@ pub fn wipe_screen(
     } else {
         ScreenAction::WipeRight
     }
+}
+
+pub fn level_select_screen(
+    _levels: &[Level],
+    _frame_context: &mut FrameContext,
+    _current_level: &mut PlayState,
+) -> ScreenAction {
+    ScreenAction::NoAction
 }
