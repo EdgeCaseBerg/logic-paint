@@ -1,4 +1,5 @@
 mod gamestate;
+mod levels;
 mod netbpm;
 mod netppm;
 mod screens;
