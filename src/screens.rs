@@ -280,6 +280,8 @@ pub fn level_select_screen(
         (level_bg_size.x - (level_tile_height + padding.x) * levels_per_row as f32) / 2.;
     let centering_y_offset = (level_bg_size.y - (level_tile_height + padding.y) * rows as f32) / 2.;
 
+    let mut action = ScreenAction::NoAction;
+
     let anchor = level_bg_position + padding + vec2(centering_x_offset, centering_y_offset);
     for (r, levels_in_row) in levels_to_show.chunks(levels_per_row).enumerate() {
         for (c, level) in levels_in_row.into_iter().enumerate() {
@@ -299,8 +301,27 @@ pub fn level_select_screen(
             } else {
                 draw_ppm_at(&unknown_ppm, pos, level_tile_size, gfx);
             }
+            // TODO: set action if level is clicked
         }
     }
 
-    ScreenAction::NoAction
+    // draw a long tall < and > for the page buttons.
+    let btn_width = 30.;
+    let previous_btn_position = level_bg_position - vec2(btn_width, 0.) - vec2(padding.x, 0.);
+    let next_btn_position = level_bg_position + vec2(level_bg_size.x, 0.) + vec2(padding.x, 0.);
+
+    gfx.rect()
+        .color(Color::WHITE)
+        .size(vec2(btn_width, level_bg_size.y))
+        .at(previous_btn_position);
+
+    gfx.rect()
+        .color(Color::WHITE)
+        .size(vec2(btn_width, level_bg_size.y))
+        .at(next_btn_position);
+
+    // PreviousPage
+    //         NextPage
+
+    action
 }
