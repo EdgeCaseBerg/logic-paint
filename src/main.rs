@@ -48,8 +48,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let unknown_ppm: netppm::Ppm = unknown_ppm.parse()?;
     let test_pbm = read_to_string(filename_pbm)?;
     let test_pbm: netbpm::Pbm = test_pbm.parse()?;
-    let test_ppm = read_to_string(filename_ppm)?;
-    let test_ppm: netppm::Ppm = test_ppm.parse()?;
+    let win_image = read_to_string(filename_ppm)?;
+    let mut win_image: netppm::Ppm =  win_image.parse()?;
     let mut game_state: gamestate::PlayState = (&test_pbm).into();
     let level_dir_path = Path::new("./levels");
     let levels = levels::load_levels_from_dir(level_dir_path)?;
@@ -100,7 +100,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 Screens::WinScreen => screens::win_screen(
                     &mut game_state,
-                    &test_ppm,
+                    &mut win_image,
                     frame_context,
                     &palette,
                     &mut debuggable_stuff,
@@ -110,6 +110,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     *page,
                     frame_context,
                     &mut game_state,
+                    &mut win_image,
                     &unknown_ppm,
                 ),
                 _ => ScreenAction::NoAction,

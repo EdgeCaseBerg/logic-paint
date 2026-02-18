@@ -236,6 +236,7 @@ pub fn level_select_screen(
     page: usize,
     frame_context: &mut FrameContext,
     current_level: &mut PlayState,
+    current_win_image: &mut Ppm,
     unknown_ppm: &Ppm,
 ) -> ScreenAction {
     let levels_per_page = 15;
@@ -303,7 +304,12 @@ pub fn level_select_screen(
             } else {
                 draw_ppm_at(&unknown_ppm, pos, level_tile_size, gfx);
             }
-            // TODO: set action if level is clicked
+            if rect.contains(world_xy) && left_mouse_pressed {
+                action =  ScreenAction::ChangeScreen { to: Screens::GameScreen };
+                let to_load: PlayState = (&level.info).into();
+                *current_level = to_load;
+                *current_win_image = level.image.clone();
+            }
         }
     }
 
