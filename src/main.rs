@@ -145,13 +145,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     debuggable_stuff.transition_duration = duration;
                     show_wipe = false;
                     current_screen = *to.clone();
-                },
+                }
                 ScreenAction::NextPage => {
-                    let Screens::ChooseLevelScreen { page } = current_screen else { panic!("screen was not level select {:?}", current_screen);};
+                    let Screens::ChooseLevelScreen { page } = current_screen else {
+                        panic!("screen was not level select {:?}", current_screen);
+                    };
                     current_screen = Screens::ChooseLevelScreen { page: page + 1 };
-                },
+                }
                 ScreenAction::PreviousPage => {
-                    let Screens::ChooseLevelScreen { page } = current_screen else { panic!("screen was not level select {:?}", current_screen);};
+                    let Screens::ChooseLevelScreen { page } = current_screen else {
+                        panic!("screen was not level select {:?}", current_screen);
+                    };
                     current_screen = Screens::ChooseLevelScreen { page: page - 1 };
                 }
                 _ => {}
