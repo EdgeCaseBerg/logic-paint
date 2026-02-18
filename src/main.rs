@@ -166,8 +166,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let found_level = levels.iter_mut().find(|level| level.path == current_level);
                     if let Some(played_level) = found_level {
                         if !played_level.completed {
-                            played_level.completed = true;
-                            // TODO: Persist this to the file
+                            played_level.mark_completed().expect("could not persist level completion")
                         }
                     }
                 }

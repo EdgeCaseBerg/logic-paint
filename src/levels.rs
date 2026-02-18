@@ -1,7 +1,7 @@
 use crate::netbpm::{LoadPbmErr, Pbm};
 use crate::netppm::{LoadPpmErr, Ppm};
 
-use std::fs::{read_dir, read_to_string};
+use std::fs::{read_dir, read_to_string, write};
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -11,6 +11,13 @@ pub struct Level {
     pub image: Ppm,
     pub completed: bool,
     pub path: PathBuf,
+}
+
+impl Level {
+    pub fn mark_completed(&mut self) -> std::io::Result<()> {
+        self.completed = true;
+        write(&self.path, "1")
+    }
 }
 
 #[derive(Debug)]
