@@ -34,6 +34,8 @@ pub enum ScreenAction {
     WipeLeft,
     WipeRight,
     WipeDone,
+    PreviousPage,
+    NextPage,
 }
 
 pub fn play_game_screen(
@@ -318,6 +320,9 @@ pub fn level_select_screen(
         } else {
             (Color::BLUE, Color::WHITE)
         };
+        if rect.contains(world_xy) && left_mouse_pressed {
+            action = ScreenAction::PreviousPage;
+        }
         gfx.rect()
             .color(bg)
             .size(btn_size)
@@ -340,6 +345,9 @@ pub fn level_select_screen(
         } else {
             (Color::BLUE, Color::WHITE)
         };
+        if rect.contains(world_xy) && left_mouse_pressed {
+            action = ScreenAction::NextPage;
+        }
         gfx.rect().color(bg).size(btn_size).at(next_btn_position);
         gfx.polygon()
             .at(next_btn_position + vec2(btn_width / 5., 10.))
@@ -351,9 +359,6 @@ pub fn level_select_screen(
             ])
             .color(fg);
     }
-
-    // PreviousPage
-    //         NextPage
 
     action
 }
