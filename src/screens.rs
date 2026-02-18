@@ -149,9 +149,8 @@ pub fn win_screen(
         font_color,
     );
     if left_mouse_pressed && should_highlight {
-        // Tmp go back to game screen for now
         ScreenAction::ChangeScreen {
-            to: Screens::GameScreen,
+            to: Screens::ChooseLevelScreen { page: 0 },
         }
     } else {
         ScreenAction::NoAction
