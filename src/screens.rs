@@ -266,6 +266,12 @@ pub fn level_select_screen(
         .size(level_bg_size)
         .color(Color::BLUE);
 
+
+    let input = &mut (frame_context.input);
+    let (mx, my) = input.mouse_position();
+    let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
+    let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
+
     // TODO: move to ui method
     let padding = vec2(10., 10.);
     let level_tile_height = (level_bg_size.y - padding.y * 2.) / rows as f32 - padding.y * 2.;
@@ -278,6 +284,16 @@ pub fn level_select_screen(
     for (r, levels_in_row) in levels_to_show.chunks(levels_per_row).enumerate() {
         for (c, level) in levels_in_row.into_iter().enumerate() {
             let pos = anchor + vec2(c as f32, r as f32) * (level_tile_size + padding);
+            let rect = egor::math::Rect::new(pos, level_tile_size);
+            let highlight_color = if rect.contains(world_xy) {
+                Color::BLACK
+            } else {
+                Color::WHITE
+            };
+            gfx.rect()
+                .color(highlight_color)
+                .at(pos - padding / 4.)
+                .size(level_tile_size + padding / 4.);
             if level.completed {
                 draw_ppm_at(&level.image, pos, level_tile_size, gfx);
             } else {
