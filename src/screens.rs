@@ -233,6 +233,7 @@ pub fn level_select_screen(
     page: usize,
     frame_context: &mut FrameContext,
     current_level: &mut PlayState,
+    unknown_ppm: &Ppm,
 ) -> ScreenAction {
     let levels_per_page = 15;
     let levels_per_row = 5;
@@ -249,7 +250,6 @@ pub fn level_select_screen(
     let title_text_position = center - vec2(0., screen_size.y / 4.);
     let level_bg_position = title_text_position + vec2(screen_size.x / -4., 72.);
     let level_bg_size = vec2(screen_size.x / 2., screen_size.y / 2.);
-
 
     gfx.camera().target(center);
 
@@ -281,7 +281,7 @@ pub fn level_select_screen(
             if level.completed {
                 draw_ppm_at(&level.image, pos, level_tile_size, gfx);
             } else {
-                gfx.rect().at(pos).size(level_tile_size).color(Color::GREEN);
+                draw_ppm_at(&unknown_ppm, pos, level_tile_size, gfx);
             }
         }
     }

@@ -44,6 +44,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => "./assets/P3.ppm",
     };
 
+    let unknown_ppm = read_to_string("./assets/unsolved.ppm")?;
+    let unknown_ppm: netppm::Ppm = unknown_ppm.parse()?;
     let test_pbm = read_to_string(filename_pbm)?;
     let test_pbm: netbpm::Pbm = test_pbm.parse()?;
     let test_ppm = read_to_string(filename_ppm)?;
@@ -103,9 +105,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &palette,
                     &mut debuggable_stuff,
                 ),
-                Screens::ChooseLevelScreen { page } => {
-                    screens::level_select_screen(&levels, *page, frame_context, &mut game_state)
-                }
+                Screens::ChooseLevelScreen { page } => screens::level_select_screen(
+                    &levels,
+                    *page,
+                    frame_context,
+                    &mut game_state,
+                    &unknown_ppm,
+                ),
                 _ => ScreenAction::NoAction,
             };
             if show_wipe {
