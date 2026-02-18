@@ -307,18 +307,50 @@ pub fn level_select_screen(
 
     // draw a long tall < and > for the page buttons.
     let btn_width = 30.;
+    let btn_size = vec2(btn_width, level_bg_size.y);
     let previous_btn_position = level_bg_position - vec2(btn_width, 0.) - vec2(padding.x, 0.);
     let next_btn_position = level_bg_position + vec2(level_bg_size.x, 0.) + vec2(padding.x, 0.);
 
-    gfx.rect()
-        .color(Color::WHITE)
-        .size(vec2(btn_width, level_bg_size.y))
-        .at(previous_btn_position);
+    if page > 0 {
+        let rect = Rect::new(previous_btn_position, btn_size);
+        let (bg, fg) = if rect.contains(world_xy) {
+            (Color::WHITE, Color::BLUE)
+        } else {
+            (Color::BLUE, Color::WHITE)
+        };
+        gfx.rect()
+            .color(bg)
+            .size(btn_size)
+            .at(previous_btn_position);
+        gfx.polygon()
+            .at(previous_btn_position + vec2(btn_width - btn_width / 5., 10.))
+            .points(&[
+                vec2(0., 0.),
+                vec2(-btn_width + btn_width / 4., btn_size.y / 2.),
+                vec2(0., btn_size.y - 10.),
+                vec2(0., 0.),
+            ])
+            .color(fg);
+    }
 
-    gfx.rect()
-        .color(Color::WHITE)
-        .size(vec2(btn_width, level_bg_size.y))
-        .at(next_btn_position);
+    if levels.iter().skip(levels_per_page * (page + 1)).len() > 0 {
+        let rect = Rect::new(next_btn_position, btn_size);
+        let (bg, fg) = if rect.contains(world_xy) {
+            (Color::WHITE, Color::BLUE)
+        } else {
+            (Color::BLUE, Color::WHITE)
+        };
+        gfx.rect().color(bg).size(btn_size).at(next_btn_position);
+        gfx.polygon()
+            .at(next_btn_position + vec2(btn_width / 5., 10.))
+            .points(&[
+                vec2(0., 0.),
+                vec2(btn_width - btn_width / 4., btn_size.y / 2.),
+                vec2(0., btn_size.y - 10.),
+                vec2(0., 0.),
+            ])
+            .color(fg);
+    }
 
     // PreviousPage
     //         NextPage
