@@ -36,6 +36,7 @@ pub enum ScreenAction {
     WipeDone,
     PreviousPage,
     NextPage,
+    MarkLevelComplete,
 }
 
 pub fn play_game_screen(
@@ -153,7 +154,7 @@ pub fn win_screen(
             to: Screens::ChooseLevelScreen { page: 0 },
         }
     } else {
-        ScreenAction::NoAction
+        ScreenAction::MarkLevelComplete
     }
 }
 

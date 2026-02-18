@@ -158,6 +158,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         panic!("screen was not level select {:?}", current_screen);
                     };
                     current_screen = Screens::ChooseLevelScreen { page: page - 1 };
+                },
+                ScreenAction::MarkLevelComplete => {
+                    // if already marked, leave it alone. otherwise do the work.
                 }
                 _ => {}
             };
