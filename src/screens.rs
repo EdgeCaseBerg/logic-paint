@@ -4,6 +4,7 @@ use crate::levels::Level;
 use crate::netppm::Ppm;
 use crate::ui::{Action, ColorPalette, PlayArea, PlayerInput, draw_ppm_at};
 
+use egor::math::Rect;
 use egor::{
     app::FrameContext,
     app::egui::lerp,
@@ -266,7 +267,6 @@ pub fn level_select_screen(
         .size(level_bg_size)
         .color(Color::BLUE);
 
-
     let input = &mut (frame_context.input);
     let (mx, my) = input.mouse_position();
     let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
@@ -286,7 +286,7 @@ pub fn level_select_screen(
     for (r, levels_in_row) in levels_to_show.chunks(levels_per_row).enumerate() {
         for (c, level) in levels_in_row.into_iter().enumerate() {
             let pos = anchor + vec2(c as f32, r as f32) * (level_tile_size + padding);
-            let rect = egor::math::Rect::new(pos, level_tile_size);
+            let rect = Rect::new(pos, level_tile_size);
             let highlight_color = if rect.contains(world_xy) {
                 Color::BLACK
             } else {
