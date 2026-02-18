@@ -44,18 +44,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => "./assets/P3.ppm",
     };
 
+    // todo use options and whatnot to load things up properly and such
     let unknown_ppm = read_to_string("./assets/unsolved.ppm")?;
     let unknown_ppm: netppm::Ppm = unknown_ppm.parse()?;
     let test_pbm = read_to_string(filename_pbm)?;
     let test_pbm: netbpm::Pbm = test_pbm.parse()?;
     let win_image = read_to_string(filename_ppm)?;
-    let mut win_image: netppm::Ppm =  win_image.parse()?;
+    let mut win_image: netppm::Ppm = win_image.parse()?;
     let mut game_state: gamestate::PlayState = (&test_pbm).into();
     let level_dir_path = Path::new("./levels");
-    let levels = levels::load_levels_from_dir(level_dir_path)?;
+    let mut levels = levels::load_levels_from_dir(level_dir_path)?;
     let mut debuggable_stuff = DebugStuff::new();
     let mut palette = ColorPalette::meeks();
     let mut current_screen = Screens::ChooseLevelScreen { page: 0 };
+    let mut current_level = levels[0].path.clone();
     let mut wipe_progress = 0.0;
     let mut show_wipe = false;
     let mut last_action = ScreenAction::NoAction;
@@ -111,6 +113,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     frame_context,
                     &mut game_state,
                     &mut win_image,
+                    &mut current_level,
                     &unknown_ppm,
                 ),
                 _ => ScreenAction::NoAction,
@@ -158,9 +161,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         panic!("screen was not level select {:?}", current_screen);
                     };
                     current_screen = Screens::ChooseLevelScreen { page: page - 1 };
-                },
+                }
                 ScreenAction::MarkLevelComplete => {
-                    // if already marked, leave it alone. otherwise do the work.
+                    let found_level = levels.iter_mut().find(|level| level.path == current_level);
+                    if let Some(played_level) = found_level {
+                        if !played_level.completed {
+                            played_level.completed = true;
+                            // TODO: Persist this to the file
+                        }
+                    }
                 }
                 _ => {}
             };

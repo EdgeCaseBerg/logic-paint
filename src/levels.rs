@@ -10,6 +10,7 @@ pub struct Level {
     pub info: Pbm,
     pub image: Ppm,
     pub completed: bool,
+    pub path: PathBuf,
 }
 
 #[derive(Debug)]
@@ -120,6 +121,7 @@ pub fn load_levels_from_dir(dir: &Path) -> LevelsLoadResult<Vec<Level>> {
                 info: pbm,
                 image: ppm,
                 completed,
+                path: level_file.clone(),
             })
         })
         .collect()
