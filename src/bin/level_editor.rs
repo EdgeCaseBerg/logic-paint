@@ -7,8 +7,12 @@ use egor::{
     input::KeyCode,
 };
 
+use egor::app::egui::Rgba;
 use egor::{
-    app::{FrameContext, egui::ComboBox, egui::Slider, egui::TextEdit, egui::Window},
+    app::{
+        FrameContext, egui::ComboBox, egui::Slider, egui::TextEdit, egui::Window,
+        egui::widgets::Button,
+    },
     math::Vec2,
 };
 
@@ -64,8 +68,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 ui.separator();
                 ui.label("Current Palette:");
-
-                // TODO: Load color from ppm
+                for mut color in &mut level_settings.lru_colors {
+                    ui.horizontal(|ui| {
+                        // ui.color_edit_button_rgba_unmultiplied(&mut color);
+                        ui.scope(|ui| {
+                            //https://github.com/emilk/egui/discussions/3356
+                            // https://docs.rs/egui/latest/egui/style/struct.WidgetVisuals.html
+                            ui.style_mut().visuals.widgets.inactive.weak_bg_fill =
+                                Rgba::from_rgba_unmultiplied(
+                                    color[0], color[1], color[2], color[3],
+                                )
+                                .into();
+                            // TODO: handle on click
+                            ui.button("Select")
+                        })
+                    });
+                }
             });
         });
 
@@ -88,7 +106,7 @@ impl Default for LevelSettings {
             height: 10,
             filename: String::from("test"),
             current_color: [0., 0., 0., 1.0],
-            lru_colors: Vec::new(),
+            lru_colors: vec![[0., 0., 0., 1.0], [1., 0., 0., 1.0], [0., 1., 1., 1.0]],
             max_colors: 12,
         }
     }
