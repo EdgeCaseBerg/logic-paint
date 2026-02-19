@@ -1,4 +1,4 @@
-use crate::DebugStuff;
+use crate::ui::DebugStuff;
 use crate::gamestate::PlayState;
 use crate::levels::Level;
 use crate::netppm::Ppm;
