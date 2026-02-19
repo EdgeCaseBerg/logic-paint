@@ -8,7 +8,7 @@ use egor::{
 };
 
 use egor::{
-    app::{FrameContext, egui::ComboBox, egui::Slider, egui::Window},
+    app::{FrameContext, egui::ComboBox, egui::Slider, egui::Window, egui::TextEdit},
     math::Vec2,
 };
 
@@ -17,6 +17,11 @@ use std::fs::read_to_string;
 use std::path::Path;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut level_width = 10;
+    let mut level_height = 10;
+    let mut current_color = [0., 0., 0., 1.0];
+    let mut file_name = String::from("test");
+
     App::new()
         .window_size(1280, 720)
         .title("Logic Brush Level Editor")
@@ -41,11 +46,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let (mx, my) = input.mouse_position();
             let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
 
-            let mut level_width = 5;
-            let mut level_height = 5;
-            let mut current_color = [0., 0., 0., 1.0];
 
-            Window::new("Debug").show(egui_ctx, |ui| {
+            Window::new("Settings").show(egui_ctx, |ui| {
                 ui.add(Slider::new(&mut level_width, 5..=20).text("Level Width"));
                 ui.add(Slider::new(&mut level_height, 5..=20).text("Level Height"));
 
@@ -55,8 +57,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 ui.color_edit_button_rgba_unmultiplied(&mut current_color);
 
                 ui.separator();
-                // TODO: file name + save button
-                // TODO: Load files from levels?
+
+                ui.horizontal(|ui| {
+                    ui.label("Filename (no extension)");
+                    ui.add(TextEdit::singleline(&mut file_name));
+                    if ui.button("Save").clicked() {
+                        // TODO: Save current
+                    }
+                });
+
+                ui.separator();
+                ui.label("Current Palette:");
+
+                // TODO: Load color from ppm
             });
         });
 
