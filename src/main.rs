@@ -1,9 +1,9 @@
-mod gamestate;
-mod levels;
-mod netbpm;
-mod netppm;
-mod screens;
-mod ui;
+use gamestate;
+use levels;
+use netbpm;
+use netppm;
+use screens;
+use ui;
 
 use crate::gamestate::PlayState;
 
