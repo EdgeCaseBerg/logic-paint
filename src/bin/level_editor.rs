@@ -79,8 +79,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     color[0], color[1], color[2], color[3],
                                 )
                                 .into();
-                            // TODO: handle on click
-                            ui.button("Select")
+                            if ui.button("Select").clicked() {
+                                level_settings.current_color = color.clone();
+                            }
                         })
                     });
                 }
