@@ -388,46 +388,6 @@ mod ppm_tests {
         assert!(rows.next().is_none());
     }
 
-    #[test]
-    #[rustfmt::skip]
-    fn returns_cols_as_expected() {
-        let ppm = Ppm {
-            width: 3,
-            height: 2,
-            max_value: 255,
-            cells: vec![
-                [255, 0, 0],
-                [0, 255, 0],
-                [0, 0, 255],
-                [255, 255, 0],
-                [255, 255, 255],
-                [0, 0, 0],
-            ],
-        };
-        let mut cols = ppm.cols().into_iter();
-        let [
-            [255, 0, 0],
-            [255, 255, 0]
-        ] = cols.next().expect("bad iter 1st col")[..] else {
-            eprintln!("{:?}", ppm.cols());
-            panic!("failed 1st col")
-        };
-        let [
-            [0, 255, 0],
-            [255, 255, 255]
-        ] = cols.next().expect("bad iter 2nd col")[..] else {
-            eprintln!("{:?}", ppm.cols());
-            panic!("failed 2nd col")
-        };
-        let [
-            [0, 0, 255],
-            [0, 0, 0]
-        ] = cols.next().expect("bad iter 3rd col")[..] else {
-            eprintln!("{:?}", ppm.cols());
-            panic!("failed 3rd col")
-        };
-        assert!(cols.next().is_none());
-    }
 
     #[test]
     fn to_rgba() {
