@@ -84,3 +84,51 @@ impl Default for EditorGrids {
     }
 }
 
+impl EditorGrids {
+    fn ui(&mut self, frame_context: &mut FrameContext, level_settings: &mut LevelSettings) {
+        let gfx = &mut (frame_context.gfx);
+        let input = &mut (frame_context.input);
+
+        let num_boxes_x = level_settings.width;
+        let num_boxes_y = level_settings.height; // TODO: maybe just always have a square
+        let gutter = 2.;
+        let cell_size = (self.size.x - (gutter + gutter * num_boxes_x as f32)) / num_boxes_x as f32;
+
+        let pbm_anchor = self.top_left;
+        gfx.rect()
+            .at(pbm_anchor)
+            .size(self.size)
+            .color(Color::WHITE);
+
+        let pbm_anchor = pbm_anchor + gutter * 0.5;
+        for (r, row) in self.pbm_grid.iter().take(num_boxes_x).enumerate() {
+            for (c, filled) in row.iter().take(num_boxes_y).enumerate() {
+                let position =
+                    pbm_anchor + vec2(c as f32, r as f32) * (Vec2::splat(cell_size) + gutter);
+                let color = if *filled { Color::RED } else { Color::BLACK };
+                gfx.rect()
+                    .at(position)
+                    .size(Vec2::splat(cell_size) - gutter)
+                    .color(color);
+            }
+        }
+
+        let ppm_anchor = pbm_anchor + vec2(400. + 50., 0.);
+        gfx.rect()
+            .at(ppm_anchor)
+            .size(self.size)
+            .color(Color::WHITE);
+
+        let ppm_anchor = ppm_anchor + gutter;
+        for (r, row) in self.ppm_grid.iter().take(num_boxes_x).enumerate() {
+            for (c, rgb) in row.iter().take(num_boxes_y).enumerate() {
+                let position =
+                    ppm_anchor + vec2(c as f32, r as f32) * (Vec2::splat(cell_size) + gutter);
+                gfx.rect()
+                    .at(position)
+                    .size(Vec2::splat(cell_size) - gutter)
+                    .color(Color::new(*rgb));
+            }
+        }
+    }
+}
