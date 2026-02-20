@@ -1,6 +1,8 @@
 mod level_settings;
+mod ui_actions;
 
 use level_settings::LevelSettings;
+use ui_actions::UiActions;
 use logicpaint::netbpm;
 use logicpaint::netppm;
 use logicpaint::ui;
@@ -55,8 +57,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .default_size([100.0, 500.0])
                 .show(egui_ctx, |ui| {
                     ui.label(format!("{} {} {}", mx, my, world_xy));
-                    level_settings.ui(ui);
                     grids.ui(frame_context, &mut level_settings);
+                    match level_settings.ui(ui) {
+                        UiActions::Nothing => {}
+                        UiActions::SaveLevel => {
+                            // TODO: 
+                        }
+                    }
                 });
         });
 

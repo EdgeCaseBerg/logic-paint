@@ -1,6 +1,8 @@
 use egor::app::egui::Rgba;
 use egor::app::{egui::Slider, egui::TextEdit, egui::Ui, egui::widgets::Button};
 
+use crate::ui_actions::UiActions;
+
 pub struct LevelSettings {
     pub width: usize,
     pub height: usize,
@@ -24,7 +26,8 @@ impl Default for LevelSettings {
 }
 
 impl LevelSettings {
-    pub fn ui(&mut self, ui: &mut Ui) {
+    pub fn ui(&mut self, ui: &mut Ui) -> UiActions {
+        let mut result = UiActions::Nothing;
         ui.add(Slider::new(&mut self.width, 5..=20).text("Level Width"));
         ui.add(Slider::new(&mut self.height, 5..=20).text("Level Height"));
 
@@ -39,7 +42,7 @@ impl LevelSettings {
             ui.label("Filename (no extension)");
             ui.add(TextEdit::singleline(&mut self.filename).desired_width(100.));
             if ui.button("Save").clicked() {
-                // TODO: Save current
+                result = UiActions::SaveLevel;
             }
         });
 
@@ -59,5 +62,6 @@ impl LevelSettings {
                 })
             });
         }
+        result
     }
 }
