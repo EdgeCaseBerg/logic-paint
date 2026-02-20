@@ -2,12 +2,12 @@ use egor::app::egui::Rgba;
 use egor::app::{egui::Slider, egui::TextEdit, egui::Ui, egui::widgets::Button};
 
 pub struct LevelSettings {
-    width: usize,
-    height: usize,
-    filename: String,
-    current_color: [f32; 4],
-    lru_colors: Vec<[f32; 4]>,
-    max_colors: usize,
+    pub width: usize,
+    pub height: usize,
+    pub filename: String,
+    pub current_color: [f32; 4],
+    pub lru_colors: Vec<[f32; 4]>,
+    pub max_colors: usize,
 }
 
 impl Default for LevelSettings {
@@ -37,7 +37,7 @@ impl LevelSettings {
 
         ui.horizontal(|ui| {
             ui.label("Filename (no extension)");
-            ui.add(TextEdit::singleline(&mut self.filename));
+            ui.add(TextEdit::singleline(&mut self.filename).desired_width(100.));
             if ui.button("Save").clicked() {
                 // TODO: Save current
             }
