@@ -50,10 +50,7 @@ impl LevelSettings {
         ui.label("Current Palette:");
         for color in &mut self.lru_colors {
             ui.horizontal(|ui| {
-                // ui.color_edit_button_rgba_unmultiplied(&mut color);
                 ui.scope(|ui| {
-                    //https://github.com/emilk/egui/discussions/3356
-                    // https://docs.rs/egui/latest/egui/style/struct.WidgetVisuals.html
                     ui.style_mut().visuals.widgets.inactive.weak_bg_fill =
                         Rgba::from_rgba_unmultiplied(color[0], color[1], color[2], color[3]).into();
                     if ui.button("Select").clicked() {
