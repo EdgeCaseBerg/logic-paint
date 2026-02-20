@@ -2,10 +2,10 @@ mod level_settings;
 mod ui_actions;
 
 use level_settings::LevelSettings;
-use ui_actions::UiActions;
-use logicpaint::netbpm;
-use logicpaint::netppm;
-use logicpaint::ui;
+use crate::ui_actions::UiActions;
+
+// use logicpaint::netbpm;
+// use logicpaint::netppm;
 
 use egor::{
     app::{App, WindowEvent},
@@ -15,11 +15,11 @@ use egor::{
 
 use egor::{
     app::{
-        FrameContext, egui::Align2, egui::ComboBox, egui::Slider, egui::TextEdit, egui::Ui,
-        egui::Window, egui::widgets::Button,
+        FrameContext, egui::Align2, 
+        egui::Window,
     },
     math::{Rect, Vec2, vec2},
-    render::{Color, Graphics},
+    render::{Color},
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
