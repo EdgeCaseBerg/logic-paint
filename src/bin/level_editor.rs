@@ -21,6 +21,7 @@ use egor::{
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut level_settings = LevelSettings::default();
+    let mut grids = EditorGrids::default();
 
     App::new()
         .window_size(1280, 720)
@@ -43,10 +44,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let egui_ctx = frame_context.egui_ctx;
 
             let screen_size = gfx.screen_size();
+            gfx.camera().target(screen_size / 2.);
+
             let (mx, my) = input.mouse_position();
             let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
 
-            Window::new("Settings").show(egui_ctx, |ui| level_settings.ui(ui));
+            Window::new("Settings")
+                .anchor(Align2::LEFT_TOP, egor::app::egui::Vec2::ZERO)
+                .default_size([100.0, 500.0])
+                .show(egui_ctx, |ui| {
+                    ui.label(format!("{} {} {}", mx, my, world_xy));
+                    level_settings.ui(ui);
+                    grids.ui(frame_context, &mut level_settings);
+                });
         });
 
     Ok(())
