@@ -1,7 +1,7 @@
 use crate::gamestate::CellState;
 use crate::gamestate::PlayState;
-use crate::netppm::Ppm;
 use crate::netbpm::Pbm;
+use crate::netppm::Ppm;
 use std::fs::read_to_string;
 
 use egor::{
@@ -348,10 +348,10 @@ pub fn draw_ppm_at(ppm: &Ppm, top_left: Vec2, size: Vec2, gfx: &mut Graphics) {
 }
 
 pub struct DebugStuff {
-    size_x: usize,
-    size_y: usize,
-    selected_level: usize,
-    transition_duration: f32,
+    pub size_x: usize,
+    pub size_y: usize,
+    pub selected_level: usize,
+    pub transition_duration: f32,
 }
 
 impl DebugStuff {

@@ -388,7 +388,6 @@ mod ppm_tests {
         assert!(rows.next().is_none());
     }
 
-
     #[test]
     fn to_rgba() {
         let ppm = Ppm {

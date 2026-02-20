@@ -1,9 +1,11 @@
-use gamestate;
-use levels;
-use netbpm;
-use netppm;
-use screens;
-use ui;
+use logicpaint::gamestate;
+use logicpaint::levels;
+use logicpaint::netbpm;
+use logicpaint::netppm;
+use logicpaint::screens;
+use logicpaint::ui;
+use logicpaint::ui::DebugStuff;
+use logicpaint::ui::debug_window;
 
 use crate::gamestate::PlayState;
 
@@ -60,6 +62,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut wipe_progress = 0.0;
     let mut show_wipe = false;
     let mut last_action = ScreenAction::NoAction;
+    let mut debuggable_stuff = DebugStuff::new();
 
     App::new()
         .window_size(1280, 720)
@@ -165,7 +168,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let found_level = levels.iter_mut().find(|level| level.path == current_level);
                     if let Some(played_level) = found_level {
                         if !played_level.completed {
-                            played_level.mark_completed().expect("could not persist level completion")
+                            played_level
+                                .mark_completed()
+                                .expect("could not persist level completion")
                         }
                     }
                 }
@@ -183,5 +188,3 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-
-

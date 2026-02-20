@@ -1,7 +1,7 @@
-use crate::ui::DebugStuff;
 use crate::gamestate::PlayState;
 use crate::levels::Level;
 use crate::netppm::Ppm;
+use crate::ui::DebugStuff;
 use crate::ui::{Action, ColorPalette, PlayArea, PlayerInput, draw_ppm_at};
 use std::path::PathBuf;
 
@@ -55,8 +55,10 @@ pub fn play_game_screen(
     gfx.camera().target(screen_size / 2.);
     let (mx, my) = input.mouse_position();
     let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
-    let left_mouse_pressed = input.mouse_pressed(MouseButton::Left) || input.mouse_held(MouseButton::Left);
-    let right_mouse_pressed = input.mouse_pressed(MouseButton::Right) || input.mouse_held(MouseButton::Right);
+    let left_mouse_pressed =
+        input.mouse_pressed(MouseButton::Left) || input.mouse_held(MouseButton::Left);
+    let right_mouse_pressed =
+        input.mouse_pressed(MouseButton::Right) || input.mouse_held(MouseButton::Right);
 
     let play_area = PlayArea {
         top_left: bg_position,
