@@ -18,6 +18,15 @@ impl Level {
         self.completed = true;
         write(&self.path, "1")
     }
+
+    pub fn save(&self) -> std::io::Result<()> {
+        write(&self.path, "1")?;
+        let pbm_path = self.path.with_extension("pbm");
+        let ppm_path = self.path.with_extension("ppm");
+        write(&pbm_path, format!("{}", self.info))?;
+        write(&ppm_path, format!("{}", self.image))?;
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
