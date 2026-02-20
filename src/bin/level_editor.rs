@@ -10,18 +10,14 @@ use egor::{
     input::KeyCode,
 };
 
-use egor::app::egui::Rgba;
 use egor::{
     app::{
-        FrameContext, egui::ComboBox, egui::Slider, egui::TextEdit, egui::Ui, egui::Window,
-        egui::widgets::Button,
+        FrameContext, egui::Align2, egui::ComboBox, egui::Slider, egui::TextEdit, egui::Ui,
+        egui::Window, egui::widgets::Button,
     },
-    math::Vec2,
+    math::{Vec2, vec2},
+    render::{Color, Graphics},
 };
-
-use std::env;
-use std::fs::read_to_string;
-use std::path::Path;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut level_settings = LevelSettings::default();
@@ -55,3 +51,36 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+struct EditorGrids {
+    pbm_grid: Vec<Vec<bool>>,
+    ppm_grid: Vec<Vec<[f32; 4]>>,
+    size: Vec2,
+    top_left: Vec2,
+}
+
+impl Default for EditorGrids {
+    fn default() -> EditorGrids {
+        let mut pbm_grid = Vec::with_capacity(20);
+        let mut ppm_grid = Vec::with_capacity(20);
+
+        for _ in 0..20 {
+            let mut pbm_row = Vec::with_capacity(20);
+            let mut ppm_row = Vec::with_capacity(20);
+            for _ in 0..20 {
+                pbm_row.push(false);
+                ppm_row.push([0.0, 0.0, 0.0, 1.0]);
+            }
+            pbm_grid.push(pbm_row);
+            ppm_grid.push(ppm_row);
+        }
+
+        EditorGrids {
+            pbm_grid,
+            ppm_grid,
+            size: vec2(400., 400.),
+            top_left: vec2(400., 120.), // [ 90 + 500 + 100 + 500 + 90  ]
+        }
+    }
+}
+
