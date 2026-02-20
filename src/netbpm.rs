@@ -66,6 +66,16 @@ impl std::fmt::Display for LoadPbmErr {
     }
 }
 
+impl std::fmt::Display for Pbm {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "P1\n{} {}\n", self.width, self.height)?;
+        for cell in &self.cells {
+            write!(f, "{}\n", if *cell { "1" } else { "0" })?;
+        }
+        Ok(())
+    }
+}
+
 impl FromStr for Pbm {
     type Err = LoadPbmErr;
     fn from_str(string: &str) -> PbmResult<Pbm> {
