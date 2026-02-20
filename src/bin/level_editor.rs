@@ -8,6 +8,7 @@ use logicpaint::ui;
 use egor::{
     app::{App, WindowEvent},
     input::KeyCode,
+    input::MouseButton,
 };
 
 use egor::{
@@ -15,7 +16,7 @@ use egor::{
         FrameContext, egui::Align2, egui::ComboBox, egui::Slider, egui::TextEdit, egui::Ui,
         egui::Window, egui::widgets::Button,
     },
-    math::{Vec2, vec2},
+    math::{Rect, Vec2, vec2},
     render::{Color, Graphics},
 };
 
@@ -98,11 +99,19 @@ impl EditorGrids {
     fn ui(&mut self, frame_context: &mut FrameContext, level_settings: &mut LevelSettings) {
         let gfx = &mut (frame_context.gfx);
         let input = &mut (frame_context.input);
+        let left_mouse_pressed =
+            input.mouse_pressed(MouseButton::Left) || input.mouse_held(MouseButton::Left);
+        let right_mouse_pressed =
+            input.mouse_pressed(MouseButton::Right) || input.mouse_held(MouseButton::Right);
+        let (mx, my) = input.mouse_position();
+        let screen_size = gfx.screen_size();
+        let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
 
         let num_boxes_x = level_settings.width;
         let num_boxes_y = level_settings.height; // TODO: maybe just always have a square
         let gutter = 2.;
         let cell_size = (self.size.x - (gutter + gutter * num_boxes_x as f32)) / num_boxes_x as f32;
+        let cell_size = Vec2::splat(cell_size);
 
         let pbm_anchor = self.top_left;
         gfx.rect()
@@ -110,16 +119,24 @@ impl EditorGrids {
             .size(self.size)
             .color(Color::WHITE);
 
-        let pbm_anchor = pbm_anchor + gutter * 0.5;
-        for (r, row) in self.pbm_grid.iter().take(num_boxes_x).enumerate() {
-            for (c, filled) in row.iter().take(num_boxes_y).enumerate() {
-                let position =
-                    pbm_anchor + vec2(c as f32, r as f32) * (Vec2::splat(cell_size) + gutter);
-                let color = if *filled { Color::RED } else { Color::BLACK };
-                gfx.rect()
-                    .at(position)
-                    .size(Vec2::splat(cell_size) - gutter)
-                    .color(color);
+        let pbm_anchor = pbm_anchor + gutter;
+        for r in 0..num_boxes_y {
+            for c in 0..num_boxes_x {
+                let position = pbm_anchor + vec2(c as f32, r as f32) * (cell_size + gutter);
+                let color = if self.pbm_grid[r][c] {
+                    Color::RED
+                } else {
+                    Color::BLACK
+                };
+
+                if Rect::new(position, cell_size).contains(world_xy) && left_mouse_pressed {
+                    self.pbm_grid[r][c] = true;
+                }
+                if Rect::new(position, cell_size).contains(world_xy) && right_mouse_pressed {
+                    self.pbm_grid[r][c] = false;
+                }
+
+                gfx.rect().at(position).size(cell_size).color(color);
             }
         }
 
@@ -130,14 +147,24 @@ impl EditorGrids {
             .color(Color::WHITE);
 
         let ppm_anchor = ppm_anchor + gutter;
-        for (r, row) in self.ppm_grid.iter().take(num_boxes_x).enumerate() {
-            for (c, rgb) in row.iter().take(num_boxes_y).enumerate() {
-                let position =
-                    ppm_anchor + vec2(c as f32, r as f32) * (Vec2::splat(cell_size) + gutter);
+        for r in 0..num_boxes_y {
+            for c in 0..num_boxes_x {
+                let position = ppm_anchor + vec2(c as f32, r as f32) * (cell_size + gutter);
+
+                if Rect::new(position, cell_size).contains(world_xy) && left_mouse_pressed {
+                    self.ppm_grid[r][c] = level_settings.current_color;
+                }
+                if Rect::new(position, cell_size).contains(world_xy) && right_mouse_pressed {
+                    self.ppm_grid[r][c] = [0.0, 0.0, 0.0, 1.0];
+                }
+
+                let rgb = self.ppm_grid[r][c];
+
                 gfx.rect()
                     .at(position)
-                    .size(Vec2::splat(cell_size) - gutter)
-                    .color(Color::new(*rgb));
+                    .size(cell_size)
+                    .color(Color::new(rgb));
+
             }
         }
     }
