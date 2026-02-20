@@ -123,11 +123,6 @@ impl EditorGrids {
         for r in 0..num_boxes_y {
             for c in 0..num_boxes_x {
                 let position = pbm_anchor + vec2(c as f32, r as f32) * (cell_size + gutter);
-                let color = if self.pbm_grid[r][c] {
-                    Color::RED
-                } else {
-                    Color::BLACK
-                };
 
                 if Rect::new(position, cell_size).contains(world_xy) && left_mouse_pressed {
                     self.pbm_grid[r][c] = true;
@@ -135,6 +130,11 @@ impl EditorGrids {
                 if Rect::new(position, cell_size).contains(world_xy) && right_mouse_pressed {
                     self.pbm_grid[r][c] = false;
                 }
+                let color = if self.pbm_grid[r][c] {
+                    Color::RED
+                } else {
+                    Color::BLACK
+                };
 
                 gfx.rect().at(position).size(cell_size).color(color);
             }
@@ -157,14 +157,12 @@ impl EditorGrids {
                 if Rect::new(position, cell_size).contains(world_xy) && right_mouse_pressed {
                     self.ppm_grid[r][c] = [0.0, 0.0, 0.0, 1.0];
                 }
-
                 let rgb = self.ppm_grid[r][c];
 
                 gfx.rect()
                     .at(position)
                     .size(cell_size)
                     .color(Color::new(rgb));
-
             }
         }
     }
