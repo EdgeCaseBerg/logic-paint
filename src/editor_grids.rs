@@ -3,12 +3,12 @@ use crate::levels::Level;
 use crate::netbpm::Pbm;
 use crate::netppm::Ppm;
 use egor::app::FrameContext;
-use egor::app::egui::lerp;
 use egor::input::MouseButton;
 use egor::math::Rect;
 use egor::math::{Vec2, vec2};
 use egor::render::Color;
 use std::path::PathBuf;
+use std::collections::HashMap;
 
 pub struct EditorGrids {
     pub pbm_grid: Vec<Vec<bool>>,
@@ -43,6 +43,31 @@ impl Default for EditorGrids {
 }
 
 impl EditorGrids {
+    pub fn unique_colors(&self) -> Vec<[f32; 4]> {
+        let mut unique = HashMap::new();
+        for row in &self.ppm_grid {
+            for &[r, g, b, a] in row {
+                // each value is u16, 16 * 4 = 64 and so...
+                let key =
+                    (percent_to_u16(r, 255.) as u64) << 48 |
+                    (percent_to_u16(g, 255.) as u64) << 32 |
+                    (percent_to_u16(b, 255.) as u64) << 16 |
+                    (percent_to_u16(a, 255.) as u64);
+                unique.insert(key, [r, g, b, a]);
+            }
+        }
+        let mut unique: Vec<_> = unique.into_values().collect();
+        unique.sort_by(|a, b| {
+            // https://doc.rust-lang.org/std/primitive.f32.html#method.total_cmp
+            a[0].total_cmp(&b[0])
+                .then(a[1].total_cmp(&b[1]))
+                .then(a[2].total_cmp(&b[2]))
+                .then(a[3].total_cmp(&b[3]))
+        });
+
+        unique
+    }
+
     pub fn ui(&mut self, frame_context: &mut FrameContext, level_settings: &mut LevelSettings) {
         let gfx = &mut (frame_context.gfx);
         let input = &mut (frame_context.input);

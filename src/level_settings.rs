@@ -8,7 +8,7 @@ pub struct LevelSettings {
     pub height: usize,
     pub filename: String,
     pub current_color: [f32; 4],
-    pub lru_colors: Vec<[f32; 4]>,
+    pub palette: Vec<[f32; 4]>,
     pub max_colors: usize,
 }
 
@@ -19,7 +19,7 @@ impl Default for LevelSettings {
             height: 10,
             filename: String::from("test"),
             current_color: [0., 0., 0., 1.0],
-            lru_colors: vec![[0., 0., 0., 1.0], [1., 0., 0., 1.0], [0., 1., 1., 1.0]],
+            palette: vec![[0., 0., 0., 1.0], [1., 0., 0., 1.0], [0., 1., 1., 1.0]],
             max_colors: 12,
         }
     }
@@ -48,17 +48,23 @@ impl LevelSettings {
 
         ui.separator();
         ui.label("Current Palette:");
-        for color in &mut self.lru_colors {
+        for color in &mut self.palette {
             ui.horizontal(|ui| {
                 ui.scope(|ui| {
                     ui.style_mut().visuals.widgets.inactive.weak_bg_fill =
                         Rgba::from_rgba_unmultiplied(color[0], color[1], color[2], color[3]).into();
+
                     if ui.button("Select").clicked() {
                         self.current_color = color.clone();
+                        result = UiActions::RecomputePalette;
                     }
                 })
             });
         }
         result
+    }
+
+    pub fn refresh_palette_with(&mut self, unique_colors: Vec<[f32; 4]>) {
+        self.palette = unique_colors;
     }
 }

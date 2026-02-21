@@ -55,6 +55,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     grids.ui(frame_context, &mut level_settings);
                     match level_settings.ui(ui) {
                         UiActions::Nothing => {}
+                        UiActions::RecomputePalette => {
+                            level_settings.refresh_palette_with(grids.unique_colors());
+                        }
                         UiActions::SaveLevel => {
                             let level = save_grid_as_level(&level_settings, &grids);
                             level.save();
