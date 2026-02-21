@@ -1,14 +1,9 @@
-mod level_settings;
-mod ui_actions;
-mod editor_grids;
-
-use level_settings::LevelSettings;
-use editor_grids::{EditorGrids, save_grid_as_level};
-use crate::ui_actions::UiActions;
-
+use logicpaint::editor_grids::{EditorGrids, save_grid_as_level};
+use logicpaint::level_settings::LevelSettings;
+use logicpaint::levels::Level;
 use logicpaint::netbpm::Pbm;
 use logicpaint::netppm::Ppm;
-use logicpaint::levels::Level;
+use logicpaint::ui_actions::UiActions;
 
 use egor::{
     app::{App, WindowEvent},
@@ -17,12 +12,9 @@ use egor::{
 };
 
 use egor::{
-    app::{
-        FrameContext, egui::Align2, 
-        egui::Window,
-    },
+    app::{FrameContext, egui::Align2, egui::Window},
     math::{Rect, Vec2, vec2},
-    render::{Color},
+    render::Color,
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

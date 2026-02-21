@@ -1,10 +1,13 @@
-use crate::LevelSettings;
-use crate::Level;
-use crate::{Vec2, vec2};
-use crate::Rect;
-use crate::Color;
-use crate::FrameContext;
-use crate::MouseButton;
+use crate::level_settings::LevelSettings;
+use crate::levels::Level;
+use crate::netbpm::Pbm;
+use crate::netppm::Ppm;
+use egor::app::FrameContext;
+use egor::app::egui::lerp;
+use egor::input::MouseButton;
+use egor::math::Rect;
+use egor::math::{Vec2, vec2};
+use egor::render::Color;
 use std::path::PathBuf;
 
 pub struct EditorGrids {
