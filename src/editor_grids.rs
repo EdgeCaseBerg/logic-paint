@@ -127,8 +127,8 @@ pub fn save_grid_as_level(level_settings: &LevelSettings, grids: &EditorGrids) -
     }
 }
 
-fn percent_to_u16_255(t: f32, max_value: f32) -> u16 {
-    (t.clamp(0.0, 1.0) * 255.0).round() as u16
+fn percent_to_u16(t: f32, max_value: f32) -> u16 {
+    (t.clamp(0.0, 1.0) * max_value).round() as u16
 }
 
 impl From<(&LevelSettings, &EditorGrids)> for Ppm {
@@ -143,9 +143,9 @@ impl From<(&LevelSettings, &EditorGrids)> for Ppm {
             for c in 0..width {
                 // [0.15354905, 0.13828914, 0.6661099, 1.0]
                 let rgba = grids.ppm_grid[r][c];
-                let r: u16 = percent_to_u16_255(rgba[0], max_value);
-                let g: u16 = percent_to_u16_255(rgba[1], max_value);
-                let b: u16 = percent_to_u16_255(rgba[2], max_value);
+                let r: u16 = percent_to_u16(rgba[0], max_value);
+                let g: u16 = percent_to_u16(rgba[1], max_value);
+                let b: u16 = percent_to_u16(rgba[2], max_value);
                 cells.push([r, g, b]);
             }
         }
