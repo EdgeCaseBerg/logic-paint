@@ -1,6 +1,5 @@
-
 use egor::app::egui::Rgba;
-use egor::app::{egui::Slider, egui::TextEdit, egui::Ui, egui::widgets::Button};
+use egor::app::{egui::Slider, egui::TextEdit, egui::Ui};
 
 use crate::ui_actions::UiActions;
 
