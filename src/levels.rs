@@ -20,7 +20,7 @@ impl Level {
     }
 
     pub fn save(&self) -> std::io::Result<()> {
-        write(&self.path, "1")?;
+        write(&self.path, "0")?;
         let pbm_path = self.path.with_extension("pbm");
         let ppm_path = self.path.with_extension("ppm");
         write(&pbm_path, format!("{}", self.info))?;
