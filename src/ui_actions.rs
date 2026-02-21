@@ -1,6 +1,4 @@
-
-
 pub enum UiActions {
-	Nothing,
-	SaveLevel,
+    Nothing,
+    SaveLevel,
 }

@@ -80,9 +80,13 @@ impl std::fmt::Display for LoadPpmErr {
 
 impl std::fmt::Display for Ppm {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "P3\n{} {}\n{}\n", self.width, self.height, self.max_value)?;
-        for [r,g,b] in &self.cells {
-            write!(f, "{} {} {}\n", r,g,b)?;
+        write!(
+            f,
+            "P3\n{} {}\n{}\n",
+            self.width, self.height, self.max_value
+        )?;
+        for [r, g, b] in &self.cells {
+            write!(f, "{} {} {}\n", r, g, b)?;
         }
         Ok(())
     }
