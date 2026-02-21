@@ -56,7 +56,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     match level_settings.ui(ui) {
                         UiActions::Nothing => {}
                         UiActions::SaveLevel => {
-                            // TODO: 
+                            let level = save_grid_as_level(&level_settings, &grids);
+                            level.save();
                         }
                     }
                 });
