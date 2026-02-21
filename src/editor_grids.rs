@@ -116,13 +116,66 @@ impl EditorGrids {
 }
 
 pub fn save_grid_as_level(level_settings: &LevelSettings, grids: &EditorGrids) -> Level {
-    let ppm = grids.into();
-    let pbm = grids.into();
-    let path: PathBuf = ["./levels", &level_settings.filename, ].iter().collect();
+    let ppm = (level_settings, grids).into();
+    let pbm = (level_settings, grids).into();
+    let path: PathBuf = ["./levels", &level_settings.filename].iter().collect();
     Level {
         info: pbm,
         image: ppm,
         completed: false,
         path: path.with_extension("level"),
+    }
+}
+
+fn percent_to_u16_255(t: f32, max_value: f32) -> u16 {
+    (t.clamp(0.0, 1.0) * 255.0).round() as u16
+}
+
+impl From<(&LevelSettings, &EditorGrids)> for Ppm {
+    fn from(tuple: (&LevelSettings, &EditorGrids)) -> Ppm {
+        let (level_settings, grids) = tuple;
+        let width = level_settings.width;
+        let height = level_settings.height;
+        let mut cells = Vec::with_capacity(height * width);
+        let max_value = 255.;
+
+        for r in 0..height {
+            for c in 0..width {
+                // [0.15354905, 0.13828914, 0.6661099, 1.0]
+                let rgba = grids.ppm_grid[r][c];
+                let r: u16 = percent_to_u16_255(rgba[0], max_value);
+                let g: u16 = percent_to_u16_255(rgba[1], max_value);
+                let b: u16 = percent_to_u16_255(rgba[2], max_value);
+                cells.push([r, g, b]);
+            }
+        }
+
+        Ppm {
+            width,
+            height,
+            max_value: max_value as u16,
+            cells,
+        }
+    }
+}
+
+impl From<(&LevelSettings, &EditorGrids)> for Pbm {
+    fn from(tuple: (&LevelSettings, &EditorGrids)) -> Pbm {
+        let (level_settings, grids) = tuple;
+        let width = level_settings.width;
+        let height = level_settings.height;
+
+        let mut cells = Vec::with_capacity(height * width);
+        for r in 0..height {
+            for c in 0..width {
+                cells.push(grids.pbm_grid[r][c]);
+            }
+        }
+
+        Pbm {
+            width,
+            height,
+            cells,
+        }
     }
 }
