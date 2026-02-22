@@ -98,6 +98,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &mut win_image,
                     &mut current_level,
                     &loaded_ppms,
+                    &palette,
                 ),
                 _ => ScreenAction::NoAction,
             };

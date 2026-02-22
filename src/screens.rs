@@ -240,6 +240,7 @@ pub fn level_select_screen(
     current_win_image: &mut Ppm,
     current_path: &mut PathBuf,
     loaded_ppms: &LoadedPpms,
+    palette: &ColorPalette,
 ) -> ScreenAction {
     let levels_per_page = 15;
     let levels_per_row = 5;
