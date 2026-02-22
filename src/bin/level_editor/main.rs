@@ -43,8 +43,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let input = &mut (frame_context.input);
             let egui_ctx = frame_context.egui_ctx;
 
+            gfx.clear(Color::new([0.5, 0.5, 0.5, 1.0]));
             let screen_size = gfx.screen_size();
             gfx.camera().target(screen_size / 2.);
+
 
             let (mx, my) = input.mouse_position();
             let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
