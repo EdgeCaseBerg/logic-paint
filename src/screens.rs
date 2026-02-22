@@ -2,7 +2,7 @@ use crate::gamestate::PlayState;
 use crate::levels::Level;
 use crate::netppm::Ppm;
 use crate::ui::{
-    Action, ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_ppm_at, draw_quit_button,
+    Action, ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_ppm_at, draw_quit_button, draw_x_at
 };
 use std::path::PathBuf;
 
@@ -46,12 +46,26 @@ pub fn play_game_screen(
     game_state: &mut PlayState,
     frame_context: &mut FrameContext,
     palette: &mut ColorPalette,
+    loaded_ppms: &LoadedPpms,
 ) -> ScreenAction {
     let gfx = &mut (frame_context.gfx);
     let input = &mut (frame_context.input);
-    let bg_position = vec2(1280. / 2. - 163., 720. / 2. - 209.);
-    let bg_size = 525;
-    let box_offset = 8.0;
+
+    let x_unit = 1280. / 32.;
+    let y_unit = 720. / 18.;
+    let bg_position = vec2(16. * x_unit, 7. * y_unit);
+    let bg_size = x_unit * 10.;
+    let box_offset = x_unit / 8.0;
+
+    let quit_position = vec2(28. * x_unit, 1. * y_unit);
+    let quit_btn_size = vec2(3. * x_unit, 3. * y_unit);
+
+    let mouse_left_position = vec2(27. * x_unit, 5. * y_unit);
+    let mouse_left_size = vec2(2. * x_unit, 2. * y_unit);
+
+    let mouse_right_position = vec2(27. * x_unit, 8. * y_unit);
+    let mouse_right_size = vec2(2. * x_unit, 2. * y_unit);
+
 
     let screen_size = gfx.screen_size();
     gfx.camera().target(screen_size / 2.);
