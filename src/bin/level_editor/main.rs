@@ -4,6 +4,7 @@ use logicpaint::levels::Level;
 use logicpaint::netbpm::Pbm;
 use logicpaint::netppm::Ppm;
 use logicpaint::ui_actions::UiActions;
+use logicpaint::pop_up::PopUp;
 
 use egor::{
     app::{App, WindowEvent},
@@ -20,6 +21,7 @@ use egor::{
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut level_settings = LevelSettings::default();
     let mut grids = EditorGrids::default();
+    let mut save_pop_up: Option<PopUp> = None;
 
     App::new()
         .window_size(1280, 720)
@@ -60,8 +62,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                         UiActions::SaveLevel => {
                             let level = save_grid_as_level(&level_settings, &grids);
-                            level.save();
+                            match level.save() {
+                                Ok(_) => {
+                                    save_pop_up = Some(PopUp {
+                                        heading: "Saved".to_owned(),
+                                        msg: "Your level has been saved".to_owned(),
+                                        visible: true,
+                                    });
+                                },
+                                Err(error) => {
+                                    save_pop_up = Some(PopUp {
+                                        heading: "Error".to_owned(),
+                                        msg: format!("Error: {error}").to_owned(),
+                                        visible: true,
+                                    });
+                                }
+                            }
                         }
+                    }
+                    if let Some(popup) = save_pop_up.as_mut() {
+                        popup.ui(ui);
                     }
                 });
         });
