@@ -267,14 +267,14 @@ pub fn level_select_screen(
     let x_unit = 1280. / 32.;
     let y_unit = 720. / 18.;
     let level_bg_size = vec2(16. * x_unit, 10. * y_unit);
-    let title_text_position = vec2(8. * x_unit, 5. * y_unit) + vec2(level_bg_size.x / 2., 0.);
+    let title_text_position = vec2(8. * x_unit, 4. * y_unit) + vec2(level_bg_size.x / 2., 0.);
     let level_bg_position = vec2(8. * x_unit, 6. * y_unit);
     let quit_position = vec2(28. * x_unit, 1. * y_unit);
     let quit_btn_size = vec2(3. * x_unit, 3. * y_unit);
 
     draw_centered_text(
         gfx,
-        "Logic Paint",
+        "Logicross",
         title_text_position,
         3. * y_unit,
         Color::new(palette.background),
@@ -317,9 +317,9 @@ pub fn level_select_screen(
             let pos = anchor + vec2(c as f32, r as f32) * (level_tile_size + padding);
             let rect = Rect::new(pos, level_tile_size);
             let highlight_color = if rect.contains(world_xy) {
-                Color::BLACK
+                Color::new(palette.cell_filled_in)
             } else {
-                Color::WHITE
+                Color::new(palette.group_highlight)
             };
             gfx.rect()
                 .color(highlight_color)
@@ -351,9 +351,9 @@ pub fn level_select_screen(
     if page > 0 {
         let rect = Rect::new(previous_btn_position, btn_size);
         let (bg, fg) = if rect.contains(world_xy) {
-            (Color::WHITE, Color::BLUE)
+            (Color::new(palette.group_highlight), Color::new(palette.background))
         } else {
-            (Color::BLUE, Color::WHITE)
+            (Color::new(palette.background), Color::new(palette.group_highlight))
         };
         if rect.contains(world_xy) && left_mouse_pressed {
             action = ScreenAction::PreviousPage;
@@ -376,9 +376,9 @@ pub fn level_select_screen(
     if levels.iter().skip(levels_per_page * (page + 1)).len() > 0 {
         let rect = Rect::new(next_btn_position, btn_size);
         let (bg, fg) = if rect.contains(world_xy) {
-            (Color::WHITE, Color::BLUE)
+            (Color::new(palette.group_highlight), Color::new(palette.background))
         } else {
-            (Color::BLUE, Color::WHITE)
+            (Color::new(palette.background), Color::new(palette.group_highlight))
         };
         if rect.contains(world_xy) && left_mouse_pressed {
             action = ScreenAction::NextPage;
