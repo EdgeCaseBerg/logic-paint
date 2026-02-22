@@ -255,15 +255,23 @@ pub fn level_select_screen(
     let gfx = &mut (frame_context.gfx);
     let screen_size = gfx.screen_size();
     let center = screen_size / 2.;
-    let title_text_position = center - vec2(0., screen_size.y / 4.);
-    let level_bg_position = title_text_position + vec2(screen_size.x / -4., 72.);
-    let level_bg_size = vec2(screen_size.x / 2., screen_size.y / 2.);
-
     gfx.camera().target(center);
+    let x_unit = 1280. / 32.;
+    let y_unit = 720. / 18.;
+    let level_bg_size = vec2(16. * x_unit, 10. * y_unit);
+    let title_text_position = gfx.camera().screen_to_world(
+        vec2(8. * x_unit, 5. * y_unit) + vec2(level_bg_size.x / 2., 0.),
+        screen_size,
+    );
+    let level_bg_position = gfx
+        .camera()
+        .screen_to_world(vec2(8. * x_unit, 6. * y_unit), screen_size);
+    let quit_position = vec2(28. * x_unit, 1. * y_unit);
+    let quit_btn_size = vec2(3. * x_unit, 3. * y_unit);
 
     draw_centered_text(
         gfx,
-        "Level Select",
+        "Logic Paint",
         title_text_position,
         36.,
         Color::WHITE, // TODO: bring in the palette
@@ -272,7 +280,9 @@ pub fn level_select_screen(
     gfx.rect()
         .at(level_bg_position)
         .size(level_bg_size)
-        .color(Color::BLUE);
+        .color(Color::BLUE); // TODO: bring in the palette
+
+    draw_ppm_at(&loaded_ppms.quit_ppm, quit_position, quit_btn_size, gfx);
 
     let input = &mut (frame_context.input);
     let (mx, my) = input.mouse_position();
