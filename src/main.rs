@@ -81,9 +81,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             };
 
             let mut action = match screen_to_draw {
-                Screens::GameScreen => {
-                    screens::play_game_screen(&mut game_state, frame_context, &mut palette, &loaded_ppms)
-                }
+                Screens::GameScreen => screens::play_game_screen(
+                    &mut game_state,
+                    frame_context,
+                    &mut palette,
+                    &loaded_ppms,
+                ),
                 Screens::WinScreen => {
                     screens::win_screen(&mut game_state, &mut win_image, frame_context, &palette)
                 }
