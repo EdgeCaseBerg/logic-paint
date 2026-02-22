@@ -100,7 +100,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &mut game_state,
                     &mut win_image,
                     &mut current_level,
-                    &loaded_ppms.unknown_ppm,
+                    &loaded_ppms,
                 ),
                 _ => ScreenAction::NoAction,
             };

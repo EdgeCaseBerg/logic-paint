@@ -2,7 +2,7 @@ use crate::gamestate::PlayState;
 use crate::levels::Level;
 use crate::netppm::Ppm;
 use crate::ui::DebugStuff;
-use crate::ui::{Action, ColorPalette, PlayArea, PlayerInput, draw_ppm_at};
+use crate::ui::{Action, ColorPalette, PlayArea, PlayerInput, draw_ppm_at, LoadedPpms};
 use std::path::PathBuf;
 
 use egor::math::Rect;
@@ -241,7 +241,7 @@ pub fn level_select_screen(
     current_level: &mut PlayState,
     current_win_image: &mut Ppm,
     current_path: &mut PathBuf,
-    unknown_ppm: &Ppm,
+    loaded_ppms: &LoadedPpms,
 ) -> ScreenAction {
     let levels_per_page = 15;
     let levels_per_row = 5;
@@ -306,7 +306,7 @@ pub fn level_select_screen(
             if level.completed {
                 draw_ppm_at(&level.image, pos, level_tile_size, gfx);
             } else {
-                draw_ppm_at(&unknown_ppm, pos, level_tile_size, gfx);
+                draw_ppm_at(&loaded_ppms.unknown_ppm, pos, level_tile_size, gfx);
             }
             if rect.contains(world_xy) && left_mouse_pressed {
                 action = ScreenAction::ChangeScreen {
