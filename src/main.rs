@@ -6,6 +6,7 @@ use logicpaint::screens;
 use logicpaint::ui;
 use logicpaint::ui::DebugStuff;
 use logicpaint::ui::debug_window;
+use logicpaint::pop_up::PopUp;
 
 use crate::gamestate::PlayState;
 
@@ -63,6 +64,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut show_wipe = false;
     let mut last_action = ScreenAction::NoAction;
     let mut debuggable_stuff = DebugStuff::new();
+    let mut maybe_popup: Option<PopUp> = None;
 
     App::new()
         .window_size(1280, 720)
@@ -168,15 +170,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let found_level = levels.iter_mut().find(|level| level.path == current_level);
                     if let Some(played_level) = found_level {
                         if !played_level.completed {
-                            played_level
-                                .mark_completed()
-                                .expect("could not persist level completion")
+                            match played_level.mark_completed() {
+                                Ok(_) => {},
+                                Err(error) => {
+                                    maybe_popup = Some(PopUp {
+                                        heading: "Error".to_owned(),
+                                        msg: format!("There was a problem {}", error).to_owned(),
+                                        visible: true,
+                                    });
+                                }
+                            }
                         }
                     }
                 }
                 _ => {}
             };
             last_action = action;
+
+            if let Some(popup) = maybe_popup.as_mut() {
+                let egui_ctx = frame_context.egui_ctx;
+                Window::new("!").show(egui_ctx, |ui| {
+                    popup.ui(ui);
+                });
+                if !popup.visible {
+                    maybe_popup = None;
+                }
+            }
 
             debug_window(
                 frame_context,
