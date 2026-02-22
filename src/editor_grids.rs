@@ -91,7 +91,7 @@ impl EditorGrids {
         gfx.rect()
             .at(pbm_anchor)
             .size(self.size)
-            .color(Color::WHITE);
+            .color(Color::BLUE);
 
         let pbm_anchor = pbm_anchor + gutter;
         for r in 0..num_boxes_y {
@@ -105,7 +105,7 @@ impl EditorGrids {
                     self.pbm_grid[r][c] = false;
                 }
                 let color = if self.pbm_grid[r][c] {
-                    Color::RED
+                    Color::WHITE
                 } else {
                     Color::BLACK
                 };
