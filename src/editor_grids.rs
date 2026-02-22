@@ -1,8 +1,8 @@
+use crate::base_dir;
 use crate::level_settings::LevelSettings;
 use crate::levels::Level;
 use crate::netbpm::Pbm;
 use crate::netppm::Ppm;
-use crate::base_dir;
 use egor::app::FrameContext;
 use egor::input::MouseButton;
 use egor::math::Rect;

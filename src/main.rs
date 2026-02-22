@@ -6,8 +6,8 @@ use logicpaint::netppm;
 use logicpaint::pop_up::PopUp;
 use logicpaint::screens;
 use logicpaint::ui;
-use logicpaint::ui::LoadedPpms;
 use logicpaint::ui::DebugStuff;
+use logicpaint::ui::LoadedPpms;
 use logicpaint::ui::debug_window;
 
 use crate::gamestate::PlayState;
@@ -189,4 +189,3 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-

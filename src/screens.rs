@@ -2,7 +2,7 @@ use crate::gamestate::PlayState;
 use crate::levels::Level;
 use crate::netppm::Ppm;
 use crate::ui::DebugStuff;
-use crate::ui::{Action, ColorPalette, PlayArea, PlayerInput, draw_ppm_at, LoadedPpms};
+use crate::ui::{Action, ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_ppm_at};
 use std::path::PathBuf;
 
 use egor::math::Rect;

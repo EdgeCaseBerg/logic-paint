@@ -9,7 +9,6 @@ pub mod screens;
 pub mod ui;
 pub mod ui_actions;
 
-
 pub fn base_dir() -> std::path::PathBuf {
     let mut dir = std::env::current_exe()
         .expect("failed to get current_exe")

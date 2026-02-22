@@ -433,12 +433,10 @@ pub fn debug_window(
     });
 }
 
-
 pub struct LoadedPpms {
     pub unknown_ppm: Ppm,
     pub quit_ppm: Ppm,
 }
-
 
 impl LoadedPpms {
     pub fn load(assets: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
