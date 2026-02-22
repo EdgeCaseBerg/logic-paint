@@ -15,7 +15,7 @@ jobs:
         include:
           - os: ubuntu-latest
             name: linux
-            container: ubuntu:22.04   # ← important
+            container: ubuntu:22.04 # binary should run on this forward
           - os: macos-latest
             name: macos
           - os: windows-latest
