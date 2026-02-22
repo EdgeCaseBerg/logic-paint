@@ -6,9 +6,7 @@ use logicpaint::netppm;
 use logicpaint::pop_up::PopUp;
 use logicpaint::screens;
 use logicpaint::ui;
-use logicpaint::ui::DebugStuff;
 use logicpaint::ui::LoadedPpms;
-use logicpaint::ui::debug_window;
 
 use crate::gamestate::PlayState;
 
@@ -36,6 +34,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut current_screen = Screens::ChooseLevelScreen { page: 0 };
     let mut levels = levels::load_levels_from_dir(&level_dir_path)?;
     let mut palette = ColorPalette::meeks();
+    let mut transition_duration = 0.8;
 
     // TODO: Refactor this to be one struct passed around
     let mut win_image = levels[0].image.clone();
@@ -45,7 +44,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut wipe_progress = 0.0;
     let mut show_wipe = false;
     let mut last_action = ScreenAction::NoAction;
-    let mut debuggable_stuff = DebugStuff::new();
     let mut maybe_popup: Option<PopUp> = None;
 
     App::new()
@@ -91,7 +89,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &mut win_image,
                     frame_context,
                     &palette,
-                    &mut debuggable_stuff,
                 ),
                 Screens::ChooseLevelScreen { page } => screens::level_select_screen(
                     &levels,
@@ -107,7 +104,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             if show_wipe {
                 action = screens::wipe_screen(
                     &mut wipe_progress,
-                    debuggable_stuff.transition_duration,
+                    transition_duration,
                     frame_context,
                     &palette,
                 );
@@ -120,7 +117,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     current_screen = Screens::WipeScreen {
                         from: Box::new(current_screen.clone()),
                         to: Box::new(to.clone()),
-                        duration: debuggable_stuff.transition_duration,
+                        duration: transition_duration,
                     };
                 }
                 ScreenAction::WipeDone => {
@@ -132,7 +129,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     else {
                         panic!("screen was not wipe!{:?}", current_screen)
                     };
-                    debuggable_stuff.transition_duration = duration;
+                    transition_duration = duration;
                     show_wipe = false;
                     current_screen = *to.clone();
                 }
@@ -178,13 +175,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     maybe_popup = None;
                 }
             }
-
-            debug_window(
-                frame_context,
-                &mut debuggable_stuff,
-                &mut palette,
-                &mut game_state,
-            );
         });
 
     Ok(())

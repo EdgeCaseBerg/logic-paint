@@ -1,7 +1,6 @@
 use crate::gamestate::PlayState;
 use crate::levels::Level;
 use crate::netppm::Ppm;
-use crate::ui::DebugStuff;
 use crate::ui::{Action, ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_ppm_at};
 use std::path::PathBuf;
 
@@ -98,7 +97,6 @@ pub fn win_screen(
     ppm: &Ppm,
     frame_context: &mut FrameContext,
     palette: &ColorPalette,
-    _debuggable_stuff: &DebugStuff,
 ) -> ScreenAction {
     let gfx = &mut (frame_context.gfx);
     let input = &mut (frame_context.input);
