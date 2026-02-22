@@ -264,6 +264,18 @@ pub fn level_select_screen(
     let (mx, my) = input.mouse_position();
     let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
     let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
+    let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
+    // TODO refactor this to a common helper
+    let player_input = PlayerInput {
+        position: world_xy,
+        action: {
+            match (left_mouse_pressed, right_mouse_pressed) {
+                (false, false) => None,
+                (true, false) => Some(Action::FillCell),
+                (_, true) => Some(Action::MarkCell),
+            }
+        },
+    };
     let mut action = ScreenAction::NoAction;
 
     let x_unit = 1280. / 32.;
@@ -288,21 +300,16 @@ pub fn level_select_screen(
         .color(Color::new(palette.background));
 
     // TODO move to ui: draw_quit_button
-    let rect = Rect::new(quit_position, quit_btn_size);
-    let highlight_color = if rect.contains(world_xy) {
-        if left_mouse_pressed {
-            action = ScreenAction::QuitGame;
-        }
-        Color::new(palette.cell_incorrect)
-    } else {
-        Color::new(palette.group_highlight)
-    };
-    gfx.rect()
-        .color(highlight_color)
-        .at(quit_position - 4.)
-        .size(quit_btn_size + 4.);
-    draw_ppm_at(&loaded_ppms.quit_ppm, quit_position, quit_btn_size, gfx);
-
+    if let Some(quit_action) = draw_quit_button(
+        quit_position,
+        quit_btn_size,
+        &loaded_ppms.quit_ppm,
+        &palette,
+        &player_input,
+        gfx,
+    ) {
+        action = quit_action;
+    }
 
     // TODO: move to ui method
     let padding = vec2(10., 10.);
