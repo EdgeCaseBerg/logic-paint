@@ -1,7 +1,9 @@
 use crate::gamestate::PlayState;
 use crate::levels::Level;
 use crate::netppm::Ppm;
-use crate::ui::{Action, ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_ppm_at};
+use crate::ui::{
+    Action, ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_ppm_at, draw_quit_button,
+};
 use std::path::PathBuf;
 
 use egor::math::Rect;
@@ -310,7 +312,6 @@ pub fn level_select_screen(
         (level_bg_size.x - (level_tile_height + padding.x) * levels_per_row as f32) / 2.;
     let centering_y_offset = (level_bg_size.y - (level_tile_height + padding.y) * rows as f32) / 2.;
 
-
     let anchor = level_bg_position + padding + vec2(centering_x_offset, centering_y_offset);
     for (r, levels_in_row) in levels_to_show.chunks(levels_per_row).enumerate() {
         for (c, level) in levels_in_row.into_iter().enumerate() {
@@ -351,9 +352,15 @@ pub fn level_select_screen(
     if page > 0 {
         let rect = Rect::new(previous_btn_position, btn_size);
         let (bg, fg) = if rect.contains(world_xy) {
-            (Color::new(palette.group_highlight), Color::new(palette.background))
+            (
+                Color::new(palette.group_highlight),
+                Color::new(palette.background),
+            )
         } else {
-            (Color::new(palette.background), Color::new(palette.group_highlight))
+            (
+                Color::new(palette.background),
+                Color::new(palette.group_highlight),
+            )
         };
         if rect.contains(world_xy) && left_mouse_pressed {
             action = ScreenAction::PreviousPage;
@@ -376,9 +383,15 @@ pub fn level_select_screen(
     if levels.iter().skip(levels_per_page * (page + 1)).len() > 0 {
         let rect = Rect::new(next_btn_position, btn_size);
         let (bg, fg) = if rect.contains(world_xy) {
-            (Color::new(palette.group_highlight), Color::new(palette.background))
+            (
+                Color::new(palette.group_highlight),
+                Color::new(palette.background),
+            )
         } else {
-            (Color::new(palette.background), Color::new(palette.group_highlight))
+            (
+                Color::new(palette.background),
+                Color::new(palette.group_highlight),
+            )
         };
         if rect.contains(world_xy) && left_mouse_pressed {
             action = ScreenAction::NextPage;
