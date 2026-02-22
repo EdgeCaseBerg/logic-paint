@@ -86,9 +86,25 @@ pub fn play_game_screen(
     play_area.draw_column_groups(&game_state, gfx);
     game_state.update_groups();
 
+    draw_ppm_at(&loaded_ppms.mouse_left, mouse_left_position, mouse_left_size, gfx);
+    gfx.rect().at(mouse_left_position + vec2(mouse_left_size.x, 0.)).size(mouse_left_size).color(Color::new(palette.cell_filled_in));
+    draw_ppm_at(&loaded_ppms.mouse_right, mouse_right_position, mouse_right_size, gfx);
+    draw_x_at(mouse_right_position + vec2(mouse_right_size.x, 0.), mouse_right_size, Color::new(palette.cell_incorrect), gfx);
+
     if game_state.is_complete() {
         ScreenAction::ChangeScreen {
             to: Screens::WinScreen,
+        }
+    } else if let Some(quit_action) = draw_quit_button(
+        quit_position,
+        quit_btn_size,
+        &loaded_ppms.quit_ppm,
+        &palette,
+        &player_input,
+        gfx,
+        ) {
+        ScreenAction::ChangeScreen {
+            to: Screens::ChooseLevelScreen { page: 0 }
         }
     } else {
         ScreenAction::NoAction
