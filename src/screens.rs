@@ -37,6 +37,7 @@ pub enum ScreenAction {
     PreviousPage,
     NextPage,
     MarkLevelComplete,
+    QuitGame,
 }
 
 pub fn play_game_screen(
@@ -255,6 +256,13 @@ pub fn level_select_screen(
     let screen_size = gfx.screen_size();
     let center = screen_size / 2.;
     gfx.camera().target(center);
+    gfx.clear(Color::new(palette.grid_even));
+
+    let input = &mut (frame_context.input);
+    let (mx, my) = input.mouse_position();
+    let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
+    let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
+    let mut action = ScreenAction::NoAction;
 
     let x_unit = 1280. / 32.;
     let y_unit = 720. / 18.;
@@ -268,21 +276,31 @@ pub fn level_select_screen(
         gfx,
         "Logic Paint",
         title_text_position,
-        36.,
-        Color::WHITE, // TODO: bring in the palette
+        3. * y_unit,
+        Color::new(palette.background),
     );
 
     gfx.rect()
         .at(level_bg_position)
         .size(level_bg_size)
-        .color(Color::BLUE); // TODO: bring in the palette
+        .color(Color::new(palette.background));
 
+    // TODO move to ui: draw_quit_button
+    let rect = Rect::new(quit_position, quit_btn_size);
+    let highlight_color = if rect.contains(world_xy) {
+        if left_mouse_pressed {
+            action = ScreenAction::QuitGame;
+        }
+        Color::new(palette.cell_incorrect)
+    } else {
+        Color::new(palette.group_highlight)
+    };
+    gfx.rect()
+        .color(highlight_color)
+        .at(quit_position - 4.)
+        .size(quit_btn_size + 4.);
     draw_ppm_at(&loaded_ppms.quit_ppm, quit_position, quit_btn_size, gfx);
 
-    let input = &mut (frame_context.input);
-    let (mx, my) = input.mouse_position();
-    let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
-    let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
 
     // TODO: move to ui method
     let padding = vec2(10., 10.);
@@ -292,7 +310,6 @@ pub fn level_select_screen(
         (level_bg_size.x - (level_tile_height + padding.x) * levels_per_row as f32) / 2.;
     let centering_y_offset = (level_bg_size.y - (level_tile_height + padding.y) * rows as f32) / 2.;
 
-    let mut action = ScreenAction::NoAction;
 
     let anchor = level_bg_position + padding + vec2(centering_x_offset, centering_y_offset);
     for (r, levels_in_row) in levels_to_show.chunks(levels_per_row).enumerate() {

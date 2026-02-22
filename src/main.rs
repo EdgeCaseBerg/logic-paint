@@ -112,6 +112,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             match action {
                 ScreenAction::NoAction => {}
+                ScreenAction::QuitGame => {
+                    std::process::exit(0);
+                }
                 ScreenAction::ChangeScreen { ref to } => {
                     wipe_progress = 0.0;
                     show_wipe = true;
