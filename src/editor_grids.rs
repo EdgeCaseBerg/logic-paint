@@ -2,6 +2,7 @@ use crate::level_settings::LevelSettings;
 use crate::levels::Level;
 use crate::netbpm::Pbm;
 use crate::netppm::Ppm;
+use crate::base_dir;
 use egor::app::FrameContext;
 use egor::input::MouseButton;
 use egor::math::Rect;
@@ -142,7 +143,9 @@ impl EditorGrids {
 pub fn save_grid_as_level(level_settings: &LevelSettings, grids: &EditorGrids) -> Level {
     let ppm = (level_settings, grids).into();
     let pbm = (level_settings, grids).into();
-    let path: PathBuf = ["./levels", &level_settings.filename].iter().collect();
+    let base = base_dir();
+    let path: PathBuf = ["levels", &level_settings.filename].iter().collect();
+    let path = base.join(path);
     Level {
         info: pbm,
         image: ppm,

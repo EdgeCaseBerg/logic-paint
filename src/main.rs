@@ -1,3 +1,4 @@
+use logicpaint::base_dir;
 use logicpaint::gamestate;
 use logicpaint::levels;
 use logicpaint::netbpm;
@@ -212,22 +213,3 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-pub fn base_dir() -> PathBuf {
-    let mut dir = env::current_exe()
-        .expect("failed to get current_exe")
-        .parent()
-        .unwrap()
-        .to_path_buf();
-
-    // To avoid a bit of friction with cargo run versus cargo build --release + run the binary
-    // we can find out if we're in "dev mode" by looking for the tell tale signs of development
-    // aka: there's a toml file hanging out somewhere above wherever we are.
-    let mut probe = dir.clone();
-    while probe.pop() {
-        if probe.join("Cargo.toml").exists() {
-            return probe;
-        }
-    }
-
-    dir
-}
