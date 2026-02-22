@@ -349,9 +349,12 @@ pub fn draw_ppm_at(ppm: &Ppm, top_left: Vec2, size: Vec2, gfx: &mut Graphics) {
     }
 }
 
+// TODO: remove _ppm suffix
 pub struct LoadedPpms {
     pub unknown_ppm: Ppm,
     pub quit_ppm: Ppm,
+    pub mouse_left: Ppm,
+    pub mouse_right: Ppm,
 }
 
 impl LoadedPpms {
@@ -362,9 +365,17 @@ impl LoadedPpms {
         let quit_ppm = read_to_string(assets.join("quit.ppm"))?;
         let quit_ppm: Ppm = quit_ppm.parse()?;
 
+        let mouse_left = read_to_string(assets.join("mouse-left.ppm"))?;
+        let mouse_left: Ppm = mouse_left.parse()?;
+
+        let mouse_right = read_to_string(assets.join("mouse-right.ppm"))?;
+        let mouse_right: Ppm = mouse_right.parse()?;
+
         Ok(LoadedPpms {
             unknown_ppm,
             quit_ppm,
+            mouse_left,
+            mouse_right,
         })
     }
 }
