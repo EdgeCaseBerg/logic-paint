@@ -3,8 +3,8 @@ use logicpaint::level_settings::LevelSettings;
 use logicpaint::levels::Level;
 use logicpaint::netbpm::Pbm;
 use logicpaint::netppm::Ppm;
-use logicpaint::ui_actions::UiActions;
 use logicpaint::pop_up::PopUp;
+use logicpaint::ui_actions::UiActions;
 
 use egor::{
     app::{App, WindowEvent},
@@ -47,7 +47,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let screen_size = gfx.screen_size();
             gfx.camera().target(screen_size / 2.);
 
-
             let (mx, my) = input.mouse_position();
             let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
 
@@ -70,7 +69,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                         msg: "Your level has been saved".to_owned(),
                                         visible: true,
                                     });
-                                },
+                                }
                                 Err(error) => {
                                     save_pop_up = Some(PopUp {
                                         heading: "Error".to_owned(),

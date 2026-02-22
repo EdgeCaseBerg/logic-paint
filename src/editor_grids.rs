@@ -88,10 +88,7 @@ impl EditorGrids {
         let cell_size = vec2(cell_size_x, cell_size_y);
 
         let pbm_anchor = self.top_left;
-        gfx.rect()
-            .at(pbm_anchor)
-            .size(self.size)
-            .color(Color::BLUE);
+        gfx.rect().at(pbm_anchor).size(self.size).color(Color::BLUE);
 
         let pbm_anchor = pbm_anchor + gutter;
         for r in 0..num_boxes_y {
