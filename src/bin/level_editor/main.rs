@@ -55,7 +55,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .anchor(Align2::LEFT_TOP, egor::app::egui::Vec2::ZERO)
                 .default_size([100.0, 500.0])
                 .show(egui_ctx, |ui| {
-                    ui.label(format!("{} {} {}", mx, my, world_xy));
                     grids.ui(frame_context, &mut level_settings);
                     match level_settings.ui(ui) {
                         UiActions::Nothing => {}

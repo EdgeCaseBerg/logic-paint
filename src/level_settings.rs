@@ -28,6 +28,11 @@ impl Default for LevelSettings {
 impl LevelSettings {
     pub fn ui(&mut self, ui: &mut Ui) -> UiActions {
         let mut result = UiActions::Nothing;
+        ui.heading("Instructions");
+        ui.label("Left click to apply changes to the grids, right click to remove");
+        ui.label("The PBM grid defines the cells to fill for the puzzle");
+        ui.label("The PPM grid defines the pixel art reward. ");
+        ui.separator();
         ui.add(Slider::new(&mut self.width, 5..=20).text("Level Width"));
         ui.add(Slider::new(&mut self.height, 5..=20).text("Level Height"));
 
@@ -42,8 +47,10 @@ impl LevelSettings {
 
         ui.separator();
 
+        ui.heading("Warning:");
+        ui.label("Saving will overwrite any file with the same name");
         ui.horizontal(|ui| {
-            ui.label("Filename (no extension)");
+            ui.label("Filename (do not enter an extension)");
             ui.add(TextEdit::singleline(&mut self.filename).desired_width(100.));
             if ui.button("Save").clicked() {
                 result = UiActions::SaveLevel;
