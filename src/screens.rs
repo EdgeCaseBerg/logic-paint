@@ -299,7 +299,6 @@ pub fn level_select_screen(
         .size(level_bg_size)
         .color(Color::new(palette.background));
 
-    // TODO move to ui: draw_quit_button
     if let Some(quit_action) = draw_quit_button(
         quit_position,
         quit_btn_size,

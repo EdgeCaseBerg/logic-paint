@@ -93,7 +93,7 @@ pub struct PlayArea {
     pub palette: ColorPalette,
 }
 
-fn draw_x_at(position: Vec2, cell_size: Vec2, color: Color, gfx: &mut Graphics) {
+pub fn draw_x_at(position: Vec2, cell_size: Vec2, color: Color, gfx: &mut Graphics) {
     let thickness = cell_size * 0.2;
     gfx.polygon()
         .at(position + vec2(0., thickness.y))
