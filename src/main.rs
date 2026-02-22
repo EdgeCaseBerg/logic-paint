@@ -6,6 +6,7 @@ use logicpaint::netppm;
 use logicpaint::pop_up::PopUp;
 use logicpaint::screens;
 use logicpaint::ui;
+use logicpaint::ui::LoadedPpms;
 use logicpaint::ui::DebugStuff;
 use logicpaint::ui::debug_window;
 
@@ -30,9 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let assets = exe_dir.join("assets");
     let level_dir_path = exe_dir.join("levels");
 
-    // Load up the assets we care about now
-    let unknown_ppm = read_to_string(assets.join("unsolved.ppm"))?;
-    let unknown_ppm: netppm::Ppm = unknown_ppm.parse()?;
+    let loaded_ppms = LoadedPpms::load(assets)?;
 
     let mut current_screen = Screens::ChooseLevelScreen { page: 0 };
     let mut levels = levels::load_levels_from_dir(&level_dir_path)?;
@@ -101,7 +100,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &mut game_state,
                     &mut win_image,
                     &mut current_level,
-                    &unknown_ppm,
+                    &loaded_ppms.unknown_ppm,
                 ),
                 _ => ScreenAction::NoAction,
             };

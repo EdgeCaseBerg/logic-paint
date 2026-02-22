@@ -3,6 +3,7 @@ use crate::gamestate::PlayState;
 use crate::netbpm::Pbm;
 use crate::netppm::Ppm;
 use std::fs::read_to_string;
+use std::path::PathBuf;
 
 use egor::{
     app::{FrameContext, egui::ComboBox, egui::Slider, egui::Window},
@@ -430,4 +431,26 @@ pub fn debug_window(
             Slider::new(&mut debuggable_stuff.transition_duration, 0.5..=5.0).text("Wipe duration"),
         );
     });
+}
+
+
+pub struct LoadedPpms {
+    pub unknown_ppm: Ppm,
+    pub quit_ppm: Ppm,
+}
+
+
+impl LoadedPpms {
+    pub fn load(assets: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
+        let unknown_ppm = read_to_string(assets.join("unsolved.ppm"))?;
+        let unknown_ppm: Ppm = unknown_ppm.parse()?;
+
+        let quit_ppm = read_to_string(assets.join("quit.ppm"))?;
+        let quit_ppm: Ppm = quit_ppm.parse()?;
+
+        Ok(LoadedPpms {
+            unknown_ppm,
+            quit_ppm,
+        })
+    }
 }
