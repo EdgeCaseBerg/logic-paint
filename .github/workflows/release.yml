@@ -1,5 +1,8 @@
 name: Build Release Bundles
 
+permissions:
+  contents: write
+
 on:
   push:
     tags:
@@ -80,3 +83,12 @@ jobs:
           path: |
             *.tar.gz
             *.zip
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            logicpaint-linux.tar.gz
+            logicpaint-macos.tar.gz
+            logicpaint-windows.zip
+          env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
