@@ -2,7 +2,8 @@ use crate::gamestate::PlayState;
 use crate::levels::Level;
 use crate::netppm::Ppm;
 use crate::ui::{
-    Action, ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_ppm_at, draw_quit_button, draw_x_at
+    Action, ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_ppm_at, draw_quit_button,
+    draw_x_at,
 };
 use std::path::PathBuf;
 
@@ -66,7 +67,6 @@ pub fn play_game_screen(
     let mouse_right_position = vec2(27. * x_unit, 8. * y_unit);
     let mouse_right_size = vec2(2. * x_unit, 2. * y_unit);
 
-
     let screen_size = gfx.screen_size();
     gfx.camera().target(screen_size / 2.);
     let (mx, my) = input.mouse_position();
@@ -100,10 +100,28 @@ pub fn play_game_screen(
     play_area.draw_column_groups(&game_state, gfx);
     game_state.update_groups();
 
-    draw_ppm_at(&loaded_ppms.mouse_left, mouse_left_position, mouse_left_size, gfx);
-    gfx.rect().at(mouse_left_position + vec2(mouse_left_size.x, 0.)).size(mouse_left_size).color(Color::new(palette.cell_filled_in));
-    draw_ppm_at(&loaded_ppms.mouse_right, mouse_right_position, mouse_right_size, gfx);
-    draw_x_at(mouse_right_position + vec2(mouse_right_size.x, 0.), mouse_right_size, Color::new(palette.cell_incorrect), gfx);
+    draw_ppm_at(
+        &loaded_ppms.mouse_left,
+        mouse_left_position,
+        mouse_left_size,
+        gfx,
+    );
+    gfx.rect()
+        .at(mouse_left_position + vec2(mouse_left_size.x, 0.))
+        .size(mouse_left_size)
+        .color(Color::new(palette.cell_filled_in));
+    draw_ppm_at(
+        &loaded_ppms.mouse_right,
+        mouse_right_position,
+        mouse_right_size,
+        gfx,
+    );
+    draw_x_at(
+        mouse_right_position + vec2(mouse_right_size.x, 0.),
+        mouse_right_size,
+        Color::new(palette.cell_marked_user),
+        gfx,
+    );
 
     if game_state.is_complete() {
         ScreenAction::ChangeScreen {
@@ -116,9 +134,9 @@ pub fn play_game_screen(
         &palette,
         &player_input,
         gfx,
-        ) {
+    ) {
         ScreenAction::ChangeScreen {
-            to: Screens::ChooseLevelScreen { page: 0 }
+            to: Screens::ChooseLevelScreen { page: 0 },
         }
     } else {
         ScreenAction::NoAction
