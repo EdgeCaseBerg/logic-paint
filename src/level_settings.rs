@@ -19,7 +19,7 @@ impl Default for LevelSettings {
             height: 10,
             filename: String::from("test"),
             current_color: [0., 0., 0., 1.0],
-            palette: vec![[0., 0., 0., 1.0], [1., 0., 0., 1.0], [0., 1., 1., 1.0]],
+            palette: vec![[0., 0., 0., 1.0]],
             max_colors: 12,
         }
     }
