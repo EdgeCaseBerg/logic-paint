@@ -7,8 +7,8 @@ use egor::input::MouseButton;
 use egor::math::Rect;
 use egor::math::{Vec2, vec2};
 use egor::render::Color;
-use std::path::PathBuf;
 use std::collections::HashMap;
+use std::path::PathBuf;
 
 pub struct EditorGrids {
     pub pbm_grid: Vec<Vec<bool>>,
@@ -48,11 +48,10 @@ impl EditorGrids {
         for row in &self.ppm_grid {
             for &[r, g, b, a] in row {
                 // each value is u16, 16 * 4 = 64 and so...
-                let key =
-                    (percent_to_u16(r, 255.) as u64) << 48 |
-                    (percent_to_u16(g, 255.) as u64) << 32 |
-                    (percent_to_u16(b, 255.) as u64) << 16 |
-                    (percent_to_u16(a, 255.) as u64);
+                let key = (percent_to_u16(r, 255.) as u64) << 48
+                    | (percent_to_u16(g, 255.) as u64) << 32
+                    | (percent_to_u16(b, 255.) as u64) << 16
+                    | (percent_to_u16(a, 255.) as u64);
                 unique.insert(key, [r, g, b, a]);
             }
         }
@@ -82,8 +81,10 @@ impl EditorGrids {
         let num_boxes_x = level_settings.width;
         let num_boxes_y = level_settings.height; // TODO: maybe just always have a square
         let gutter = 2.;
-        let cell_size_x = (self.size.x - (gutter + gutter * num_boxes_x as f32)) / num_boxes_x as f32;
-        let cell_size_y = (self.size.y - (gutter + gutter * num_boxes_y as f32)) / num_boxes_y as f32;
+        let cell_size_x =
+            (self.size.x - (gutter + gutter * num_boxes_x as f32)) / num_boxes_x as f32;
+        let cell_size_y =
+            (self.size.y - (gutter + gutter * num_boxes_y as f32)) / num_boxes_y as f32;
         let cell_size = vec2(cell_size_x, cell_size_y);
 
         let pbm_anchor = self.top_left;
