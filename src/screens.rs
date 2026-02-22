@@ -258,7 +258,7 @@ pub fn level_select_screen(
     let screen_size = gfx.screen_size();
     let center = screen_size / 2.;
     gfx.camera().target(center);
-    gfx.clear(Color::new(palette.grid_even));
+    gfx.clear(Color::new(palette.background));
 
     let input = &mut (frame_context.input);
     let (mx, my) = input.mouse_position();
@@ -291,7 +291,7 @@ pub fn level_select_screen(
         "Logicross",
         title_text_position,
         3. * y_unit,
-        Color::new(palette.background),
+        Color::new(palette.group_highlight),
     );
 
     gfx.rect()
