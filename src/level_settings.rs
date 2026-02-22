@@ -34,7 +34,11 @@ impl LevelSettings {
         ui.separator();
 
         ui.label("Color: ");
+        let previous_color = self.current_color.clone();
         ui.color_edit_button_rgba_unmultiplied(&mut self.current_color);
+        if previous_color != self.current_color {
+            result = UiActions::RecomputePalette;
+        }
 
         ui.separator();
 
