@@ -82,8 +82,9 @@ impl EditorGrids {
         let num_boxes_x = level_settings.width;
         let num_boxes_y = level_settings.height; // TODO: maybe just always have a square
         let gutter = 2.;
-        let cell_size = (self.size.x - (gutter + gutter * num_boxes_x as f32)) / num_boxes_x as f32;
-        let cell_size = Vec2::splat(cell_size);
+        let cell_size_x = (self.size.x - (gutter + gutter * num_boxes_x as f32)) / num_boxes_x as f32;
+        let cell_size_y = (self.size.y - (gutter + gutter * num_boxes_y as f32)) / num_boxes_y as f32;
+        let cell_size = vec2(cell_size_x, cell_size_y);
 
         let pbm_anchor = self.top_left;
         gfx.rect()
