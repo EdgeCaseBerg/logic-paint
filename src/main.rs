@@ -23,48 +23,26 @@ use egor::{
 use crate::screens::{ScreenAction, Screens};
 use crate::ui::ColorPalette;
 
-use std::env;
 use std::fs::read_to_string;
-use std::path::Path;
-use std::path::PathBuf;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let arguments: Vec<String> = env::args().collect();
-    if arguments.is_empty() {
-        eprintln!("{:?}", "pass the pbm data as the first argument.");
-        eprintln!("{:?}", "pass the ppm data as the second argument.");
-        return Err("Could not load file".into());
-    }
     let exe_dir = base_dir();
-
     let assets = exe_dir.join("assets");
     let level_dir_path = exe_dir.join("levels");
 
-    let mut arguments = arguments.iter();
-    arguments.next(); // skip the name of the program being ran
-    let filename_pbm = match arguments.next() {
-        Some(arg) => arg,
-        _ => "./assets/P1.pbm",
-    };
-
-    arguments.next(); // skip the name of the program being ran
-    let filename_ppm = match arguments.next() {
-        Some(arg) => arg,
-        _ => "./assets/P3.ppm",
-    };
-
-    // todo use options and whatnot to load things up properly and such
+    // Load up the assets we care about now
     let unknown_ppm = read_to_string(assets.join("unsolved.ppm"))?;
     let unknown_ppm: netppm::Ppm = unknown_ppm.parse()?;
-    let test_pbm = read_to_string(filename_pbm)?;
-    let test_pbm: netbpm::Pbm = test_pbm.parse()?;
-    let win_image = read_to_string(filename_ppm)?;
-    let mut win_image: netppm::Ppm = win_image.parse()?;
-    let mut game_state: gamestate::PlayState = (&test_pbm).into();
+
+    let mut current_screen = Screens::ChooseLevelScreen { page: 0 };
     let mut levels = levels::load_levels_from_dir(&level_dir_path)?;
     let mut palette = ColorPalette::meeks();
-    let mut current_screen = Screens::ChooseLevelScreen { page: 0 };
+
+    // TODO: Refactor this to be one struct passed around
+    let mut win_image = levels[0].image.clone();
     let mut current_level = levels[0].path.clone();
+    let mut game_state: gamestate::PlayState = (&levels[0].info).into();
+
     let mut wipe_progress = 0.0;
     let mut show_wipe = false;
     let mut last_action = ScreenAction::NoAction;
