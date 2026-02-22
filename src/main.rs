@@ -34,6 +34,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("{:?}", "pass the ppm data as the second argument.");
         return Err("Could not load file".into());
     }
+    let exe_dir = base_dir();
+
+    let assets = exe_dir.join("assets");
+    let level_dir_path = exe_dir.join("levels");
 
     let mut arguments = arguments.iter();
     arguments.next(); // skip the name of the program being ran
@@ -49,15 +53,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     // todo use options and whatnot to load things up properly and such
-    let unknown_ppm = read_to_string("./assets/unsolved.ppm")?;
+    let unknown_ppm = read_to_string(assets.join("unsolved.ppm"))?;
     let unknown_ppm: netppm::Ppm = unknown_ppm.parse()?;
     let test_pbm = read_to_string(filename_pbm)?;
     let test_pbm: netbpm::Pbm = test_pbm.parse()?;
     let win_image = read_to_string(filename_ppm)?;
     let mut win_image: netppm::Ppm = win_image.parse()?;
     let mut game_state: gamestate::PlayState = (&test_pbm).into();
-    let level_dir_path = Path::new("./levels");
-    let mut levels = levels::load_levels_from_dir(level_dir_path)?;
+    let mut levels = levels::load_levels_from_dir(&level_dir_path)?;
     let mut palette = ColorPalette::meeks();
     let mut current_screen = Screens::ChooseLevelScreen { page: 0 };
     let mut current_level = levels[0].path.clone();
@@ -172,7 +175,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     if let Some(played_level) = found_level {
                         if !played_level.completed {
                             match played_level.mark_completed() {
-                                Ok(_) => {},
+                                Ok(_) => {}
                                 Err(error) => {
                                     maybe_popup = Some(PopUp {
                                         heading: "Error".to_owned(),
@@ -207,4 +210,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
 
     Ok(())
+}
+
+pub fn base_dir() -> PathBuf {
+    let mut dir = env::current_exe()
+        .expect("failed to get current_exe")
+        .parent()
+        .unwrap()
+        .to_path_buf();
+
+    // To avoid a bit of friction with cargo run versus cargo build --release + run the binary
+    // we can find out if we're in "dev mode" by looking for the tell tale signs of development
+    // aka: there's a toml file hanging out somewhere above wherever we are.
+    let mut probe = dir.clone();
+    while probe.pop() {
+        if probe.join("Cargo.toml").exists() {
+            return probe;
+        }
+    }
+
+    dir
 }
