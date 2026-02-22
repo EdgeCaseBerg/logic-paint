@@ -84,12 +84,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Screens::GameScreen => {
                     screens::play_game_screen(&mut game_state, frame_context, &mut palette)
                 }
-                Screens::WinScreen => screens::win_screen(
-                    &mut game_state,
-                    &mut win_image,
-                    frame_context,
-                    &palette,
-                ),
+                Screens::WinScreen => {
+                    screens::win_screen(&mut game_state, &mut win_image, frame_context, &palette)
+                }
                 Screens::ChooseLevelScreen { page } => screens::level_select_screen(
                     &levels,
                     *page,
