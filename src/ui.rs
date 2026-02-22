@@ -2,6 +2,7 @@ use crate::gamestate::CellState;
 use crate::gamestate::PlayState;
 use crate::netbpm::Pbm;
 use crate::netppm::Ppm;
+use crate::screens::ScreenAction;
 use std::fs::read_to_string;
 use std::path::PathBuf;
 
@@ -366,4 +367,30 @@ impl LoadedPpms {
             quit_ppm,
         })
     }
+}
+
+pub fn draw_quit_button(
+    position: Vec2,
+    size: Vec2,
+    ppm: &Ppm,
+    palette: &ColorPalette,
+    input: &PlayerInput,
+    gfx: &mut Graphics,
+) -> Option<ScreenAction> {
+    let mut action = None;
+    let rect = Rect::new(position, size);
+    let highlight_color = if input.overlaps(&rect) {
+        if input.can_fill_at(&rect) {
+            action = Some(ScreenAction::QuitGame);
+        }
+        Color::new(palette.cell_incorrect)
+    } else {
+        Color::new(palette.group_highlight)
+    };
+    gfx.rect()
+        .color(highlight_color)
+        .at(position - 4.)
+        .size(size + 4.);
+    draw_ppm_at(&ppm, position, size, gfx);
+    return action;
 }
