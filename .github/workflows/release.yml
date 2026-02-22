@@ -40,6 +40,9 @@ jobs:
         if: runner.os != 'Linux'
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Build (release)
+        run: cargo build --release --locked
+
       - name: Prepare dist folder (Linux/macOS)
         if: runner.os != 'Windows'
         run: |
