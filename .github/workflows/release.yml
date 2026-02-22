@@ -1,0 +1,61 @@
+name: Build Release Bundles
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release
+        run: cargo build --release
+
+      - name: Prepare dist folder (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p dist
+          cp target/release/logicpaint dist/
+          cp target/release/level_editor dist/
+          cp -r assets dist/
+          cp -r levels dist/
+
+      - name: Prepare dist folder (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          mkdir dist
+          copy target\release\logicpaint.exe dist\
+          copy target\release\level_editor.exe dist\
+          xcopy assets dist\assets /E /I
+          xcopy levels dist\levels /E /I
+
+      - name: Create archive (Linux)
+        if: runner.os == 'Linux'
+        run: tar -czf logicpaint-linux.tar.gz -C dist .
+
+      - name: Create archive (macOS)
+        if: runner.os == 'macOS'
+        run: tar -czf logicpaint-macos.tar.gz -C dist .
+
+      - name: Create archive (Windows)
+        if: runner.os == 'Windows'
+        run: powershell Compress-Archive dist logicpaint-windows.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: logicpaint-${{ runner.os }}
+          path: |
+            *.tar.gz
+            *.zip
