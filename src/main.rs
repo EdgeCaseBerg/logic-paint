@@ -2,11 +2,11 @@ use logicpaint::gamestate;
 use logicpaint::levels;
 use logicpaint::netbpm;
 use logicpaint::netppm;
+use logicpaint::pop_up::PopUp;
 use logicpaint::screens;
 use logicpaint::ui;
 use logicpaint::ui::DebugStuff;
 use logicpaint::ui::debug_window;
-use logicpaint::pop_up::PopUp;
 
 use crate::gamestate::PlayState;
 
@@ -25,6 +25,7 @@ use crate::ui::ColorPalette;
 use std::env;
 use std::fs::read_to_string;
 use std::path::Path;
+use std::path::PathBuf;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let arguments: Vec<String> = env::args().collect();
