@@ -1,4 +1,3 @@
-use crate::netbpm::Pbm;
 use crate::netppm::Ppm;
 use crate::playstate::CellState;
 use crate::playstate::PlayState;
@@ -7,7 +6,6 @@ use std::fs::read_to_string;
 use std::path::PathBuf;
 
 use egor::{
-    app::{FrameContext, egui::ComboBox, egui::Slider, egui::Window},
     input::{Input, MouseButton},
     math::{Rect, Vec2, vec2},
     render::{Color, Graphics},
