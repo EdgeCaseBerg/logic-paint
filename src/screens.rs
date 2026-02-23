@@ -3,7 +3,7 @@ use crate::levels::Level;
 use crate::netppm::Ppm;
 use crate::ui::{
     Action, ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_ppm_at, draw_quit_button,
-    draw_x_at,
+    draw_x_at, world_unit_size,
 };
 use std::path::PathBuf;
 
@@ -52,22 +52,21 @@ pub fn play_game_screen(
     let gfx = &mut (frame_context.gfx);
     let input = &mut (frame_context.input);
 
-    let x_unit = 1280. / 32.;
-    let y_unit = 720. / 18.;
-    let bg_position = vec2(16. * x_unit, 7. * y_unit);
-    let bg_size = x_unit * 10.;
-    let box_offset = x_unit / 8.0;
+    let unit_size = world_unit_size();
+    let bg_position = unit_size * vec2(16., 7.);
+    let bg_size = unit_size.x * 10.;
+    let box_offset = unit_size.x / 8.0;
 
-    let quit_position = vec2(28. * x_unit, 1. * y_unit);
-    let quit_btn_size = vec2(3. * x_unit, 3. * y_unit);
+    let quit_position = unit_size * vec2(28., 1.);
+    let quit_btn_size = unit_size * vec2(3., 3.);
 
-    let mouse_left_position = vec2(27. * x_unit, 5. * y_unit);
-    let mouse_left_size = vec2(2. * x_unit, 2. * y_unit);
+    let mouse_left_position = unit_size * vec2(27., 5.);
+    let mouse_left_size = unit_size * vec2(2., 2.);
 
-    let mouse_right_position = vec2(27. * x_unit, 8. * y_unit);
-    let mouse_right_size = vec2(2. * x_unit, 2. * y_unit);
+    let mouse_right_position = unit_size * vec2(27., 8.);
+    let mouse_right_size = unit_size * vec2(2., 2.);
 
-    let instruction_text_position = vec2(1. * x_unit, 1. * y_unit);
+    let instruction_text_position = unit_size * vec2(1., 1.);
     let font_size = 18;
 
     let screen_size = gfx.screen_size();
