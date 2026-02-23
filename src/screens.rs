@@ -126,7 +126,7 @@ pub fn play_game_screen(
         ScreenAction::ChangeScreen {
             to: Screens::WinScreen,
         }
-    } else if let Some(quit_action) = draw_quit_button(
+    } else if let Some(ScreenAction::QuitGame) = draw_quit_button(
         quit_position,
         quit_btn_size,
         &loaded_ppms.quit,
@@ -185,7 +185,7 @@ pub fn win_screen(
 
     draw_ppm_at(ppm, win_image_position, win_image_size, gfx);
 
-    if let Some(quit_action) = draw_quit_button(
+    if let Some(ScreenAction::QuitGame) = draw_quit_button(
         quit_position,
         quit_btn_size,
         &loaded_ppms.quit,
