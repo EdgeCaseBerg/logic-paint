@@ -1,6 +1,6 @@
-use crate::gamestate::PlayState;
 use crate::levels::Level;
 use crate::netppm::Ppm;
+use crate::playstate::PlayState;
 use crate::ui::{
     Action, ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_ppm_at, draw_quit_button,
     draw_x_at, world_unit_size,

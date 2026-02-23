@@ -1,9 +1,9 @@
 pub mod editor_grids;
-pub mod gamestate;
 pub mod level_settings;
 pub mod levels;
 pub mod netbpm;
 pub mod netppm;
+pub mod playstate;
 pub mod pop_up;
 pub mod screens;
 pub mod ui;

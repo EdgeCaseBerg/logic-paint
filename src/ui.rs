@@ -1,7 +1,7 @@
-use crate::gamestate::CellState;
-use crate::gamestate::PlayState;
 use crate::netbpm::Pbm;
 use crate::netppm::Ppm;
+use crate::playstate::CellState;
+use crate::playstate::PlayState;
 use crate::screens::ScreenAction;
 use std::fs::read_to_string;
 use std::path::PathBuf;

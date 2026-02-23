@@ -1,6 +1,6 @@
 use logicpaint::base_dir;
-use logicpaint::gamestate;
 use logicpaint::levels;
+use logicpaint::playstate::PlayState;
 use logicpaint::pop_up::PopUp;
 use logicpaint::screens;
 use logicpaint::ui;
@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // TODO: Refactor this to be one struct passed around
     let mut win_image = levels[0].image.clone();
     let mut current_level = levels[0].path.clone();
-    let mut game_state: gamestate::PlayState = (&levels[0].info).into();
+    let mut game_state: PlayState = (&levels[0].info).into();
 
     let mut wipe_progress = 0.0;
     let mut show_wipe = false;
