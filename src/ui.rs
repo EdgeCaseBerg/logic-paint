@@ -429,3 +429,12 @@ pub fn draw_quit_button(
     draw_ppm_at(&ppm, position, size, gfx);
     return action;
 }
+
+// Returns a tuple that you can use to compute
+// x,y locations in world units. Assuming a screen
+// of 32 by 18 for placement.
+pub fn world_unit_size() -> Vec2 {
+    let x_unit = 1280. / 32.;
+    let y_unit = 720. / 18.;
+    vec2(x_unit, y_unit)
+}
