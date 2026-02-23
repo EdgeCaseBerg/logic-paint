@@ -46,7 +46,7 @@ pub enum ScreenAction {
 pub fn play_game_screen(
     game_state: &mut PlayState,
     frame_context: &mut FrameContext,
-    palette: &mut ColorPalette,
+    palette: &ColorPalette,
     loaded_ppms: &LoadedPpms,
 ) -> ScreenAction {
     let gfx = &mut (frame_context.gfx);
