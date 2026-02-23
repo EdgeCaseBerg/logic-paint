@@ -1,28 +1,19 @@
 use logicpaint::base_dir;
 use logicpaint::gamestate;
 use logicpaint::levels;
-use logicpaint::netbpm;
-use logicpaint::netppm;
 use logicpaint::pop_up::PopUp;
 use logicpaint::screens;
 use logicpaint::ui;
 use logicpaint::ui::LoadedPpms;
 
-use crate::gamestate::PlayState;
-
+use egor::app::egui::Window;
 use egor::{
     app::{App, WindowEvent},
     input::KeyCode,
 };
-use egor::{
-    app::{FrameContext, egui::ComboBox, egui::Slider, egui::Window},
-    math::Vec2,
-};
 
 use crate::screens::{ScreenAction, Screens};
 use crate::ui::ColorPalette;
-
-use std::fs::read_to_string;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let exe_dir = base_dir();
