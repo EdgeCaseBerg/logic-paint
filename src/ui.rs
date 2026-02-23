@@ -23,6 +23,7 @@ pub struct ColorPalette {
     pub cell_highlight: [f32; 4],
     pub cell_incorrect: [f32; 4],
     pub group_highlight: [f32; 4],
+    pub group_font: [f32; 4],
 }
 
 fn rgba(r: u8, g: u8, b: u8, a: f32) -> [f32; 4] {
@@ -41,6 +42,7 @@ impl ColorPalette {
             cell_highlight: rgba(252, 255, 172, 1.0),
             cell_incorrect: rgba(255, 0, 0, 1.0),
             group_highlight: rgba(251, 212, 207, 1.0),
+            group_font: rgba(0, 0, 0, 1.0),
         }
     }
 
@@ -292,7 +294,7 @@ impl PlayArea {
                     .size(0.5 * box_size)
                     .color(match groups[g].filled {
                         true => Color::new(self.palette.cell_filled_in),
-                        false => Color::new(self.palette.background),
+                        false => Color::new(self.palette.group_font),
                     })
                     .at(screen_position);
             }
@@ -325,7 +327,7 @@ impl PlayArea {
                     .size(0.5 * box_size)
                     .color(match groups[g].filled {
                         true => Color::new(self.palette.cell_filled_in),
-                        false => Color::new(self.palette.background),
+                        false => Color::new(self.palette.group_font),
                     })
                     .at(screen_position);
             }
