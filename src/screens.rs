@@ -206,10 +206,14 @@ pub fn win_screen(
             .color(Color::new(palette.group_highlight))
             .at(result_text_position);
     } else {
-        gfx.text(&format!("Incorrect {}", num_incorrect))
-            .size(16.)
+        gfx.text(&format!("Nice try!"))
+            .size(78.)
             .color(Color::new(palette.group_highlight))
             .at(result_text_position);
+        gfx.text(&format!("You got {} incorrect", num_incorrect))
+            .size(16.)
+            .color(Color::new(palette.group_highlight))
+            .at(result_text_position + vec2(0., 78.));
     }
 
     draw_ppm_at(ppm, win_image_position, win_image_size, gfx);
