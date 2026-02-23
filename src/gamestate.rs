@@ -46,7 +46,6 @@ impl CellState {
         }
     }
 
-    // TODO: should this and attempt_file do &mut instead so we dont have to always assign a result?
     pub fn mark_cell(&self) -> CellState {
         use CellState::*;
         match *self {
