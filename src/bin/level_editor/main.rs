@@ -41,11 +41,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let screen_size = gfx.screen_size();
             gfx.camera().target(screen_size / 2.);
 
+            grids.ui(frame_context, &mut level_settings);
             Window::new("Settings")
                 .anchor(Align2::LEFT_TOP, egor::app::egui::Vec2::ZERO)
                 .default_size([100.0, 500.0])
                 .show(egui_ctx, |ui| {
-                    grids.ui(frame_context, &mut level_settings);
                     match level_settings.ui(ui) {
                         UiActions::Nothing => {}
                         UiActions::RecomputePalette => {
