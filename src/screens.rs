@@ -67,6 +67,9 @@ pub fn play_game_screen(
     let mouse_right_position = vec2(27. * x_unit, 8. * y_unit);
     let mouse_right_size = vec2(2. * x_unit, 2. * y_unit);
 
+    let instruction_text_position = vec2(1. * x_unit, 1. * y_unit);
+    let font_size = 18;
+
     let screen_size = gfx.screen_size();
     gfx.camera().target(screen_size / 2.);
     let (mx, my) = input.mouse_position();
@@ -122,6 +125,19 @@ pub fn play_game_screen(
         Color::new(palette.cell_marked_user),
         gfx,
     );
+
+    let instructions = [
+        "Fill in the groups of cells based on the hints to their group sizes.",
+        "Groups are always separated by at least one cell.",
+        "Right click to mark a cell as empty",
+        "Left click to fill and find out if you're correct.",
+    ];
+    for (i, instruction) in instructions.iter().enumerate() {
+        gfx.text(instruction)
+            .at(instruction_text_position + vec2(0., (font_size * i) as f32))
+            .size(font_size as f32)
+            .color(Color::new(palette.group_highlight));
+    }
 
     if game_state.is_complete() {
         ScreenAction::ChangeScreen {
