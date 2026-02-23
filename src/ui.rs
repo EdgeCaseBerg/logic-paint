@@ -139,6 +139,30 @@ pub fn draw_x_at(position: Vec2, cell_size: Vec2, color: Color, gfx: &mut Graphi
         .color(color);
 }
 
+struct GridLayout {
+    pub area: Rect,
+    pub rows: usize,
+    pub columns: usize,
+    pub cell_gap: f32,
+}
+
+impl GridLayout {
+    pub fn cell_size(&self) -> Vec2 {
+        let total = self.area.size;
+
+        // [gap [cell] gap [cell] gap ]
+        let gaps = vec2(
+            (self.columns as f32 + 1.0) * self.cell_gap,
+            (self.rows as f32 + 1.0) * self.cell_gap,
+        );
+
+        // (max(vec)) to avoid negative space
+        let space_for_cells = (total - gaps).max(vec2(0.0, 0.0));
+
+        space_for_cells / vec2(self.columns as f32, self.rows as f32)
+    }
+}
+
 impl PlayArea {
     fn play_area_gutter(&self) -> Vec2 {
         self.size * 0.4
