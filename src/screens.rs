@@ -400,7 +400,7 @@ pub fn level_select_screen(
             if level.completed {
                 draw_ppm_at(&level.image, pos, level_tile_size, gfx);
             } else {
-                draw_ppm_at(&loaded_ppms.unknown_ppm, pos, level_tile_size, gfx);
+                draw_ppm_at(&loaded_ppms.unknown_level, pos, level_tile_size, gfx);
             }
             if rect.contains(world_xy) && left_mouse_pressed {
                 action = ScreenAction::ChangeScreen {

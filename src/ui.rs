@@ -353,7 +353,7 @@ pub fn draw_ppm_at(ppm: &Ppm, top_left: Vec2, size: Vec2, gfx: &mut Graphics) {
 
 // TODO: remove _ppm suffix
 pub struct LoadedPpms {
-    pub unknown_ppm: Ppm,
+    pub unknown_level: Ppm,
     pub quit_ppm: Ppm,
     pub mouse_left: Ppm,
     pub mouse_right: Ppm,
@@ -361,8 +361,8 @@ pub struct LoadedPpms {
 
 impl LoadedPpms {
     pub fn load(assets: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
-        let unknown_ppm = read_to_string(assets.join("unsolved.ppm"))?;
-        let unknown_ppm: Ppm = unknown_ppm.parse()?;
+        let unknown_level = read_to_string(assets.join("unsolved.ppm"))?;
+        let unknown_level: Ppm = unknown_level.parse()?;
 
         let quit_ppm = read_to_string(assets.join("quit.ppm"))?;
         let quit_ppm: Ppm = quit_ppm.parse()?;
@@ -374,7 +374,7 @@ impl LoadedPpms {
         let mouse_right: Ppm = mouse_right.parse()?;
 
         Ok(LoadedPpms {
-            unknown_ppm,
+            unknown_level,
             quit_ppm,
             mouse_left,
             mouse_right,
