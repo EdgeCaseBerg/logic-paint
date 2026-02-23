@@ -1,20 +1,15 @@
 use logicpaint::editor_grids::{EditorGrids, save_grid_as_level};
 use logicpaint::level_settings::LevelSettings;
-use logicpaint::levels::Level;
-use logicpaint::netbpm::Pbm;
-use logicpaint::netppm::Ppm;
 use logicpaint::pop_up::PopUp;
 use logicpaint::ui_actions::UiActions;
 
 use egor::{
     app::{App, WindowEvent},
     input::KeyCode,
-    input::MouseButton,
 };
 
 use egor::{
-    app::{FrameContext, egui::Align2, egui::Window},
-    math::{Rect, Vec2, vec2},
+    app::{egui::Align2, egui::Window},
     render::Color,
 };
 
@@ -40,15 +35,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
 
             let gfx = &mut (frame_context.gfx);
-            let input = &mut (frame_context.input);
             let egui_ctx = frame_context.egui_ctx;
 
             gfx.clear(Color::new([0.5, 0.5, 0.5, 1.0]));
             let screen_size = gfx.screen_size();
             gfx.camera().target(screen_size / 2.);
-
-            let (mx, my) = input.mouse_position();
-            let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
 
             Window::new("Settings")
                 .anchor(Align2::LEFT_TOP, egor::app::egui::Vec2::ZERO)
