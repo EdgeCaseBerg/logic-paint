@@ -157,15 +157,14 @@ pub fn win_screen(
 
     let player_input = PlayerInput::from(input, gfx);
 
-    let x_unit = 1280. / 32.;
-    let y_unit = 720. / 18.;
-    let win_image_position = vec2(11. * x_unit, 2. * y_unit);
-    let win_image_size = vec2(14. * x_unit, 14. * y_unit);
+    let unit_size = world_unit_size();
+    let win_image_position = unit_size * vec2(11., 2.);
+    let win_image_size = unit_size * vec2(14., 14.);
 
-    let quit_position = vec2(28. * x_unit, 1. * y_unit);
-    let quit_btn_size = vec2(3. * x_unit, 3. * y_unit);
+    let quit_position = unit_size * vec2(28., 1.);
+    let quit_btn_size = unit_size * vec2(3., 3.);
 
-    let result_text_position = vec2(2. * x_unit, 2. * y_unit);
+    let result_text_position = unit_size * vec2(2., 2.);
 
     let num_incorrect = game_state.number_incorrect();
     if num_incorrect == 0 {
