@@ -72,29 +72,13 @@ pub fn play_game_screen(
 
     let screen_size = gfx.screen_size();
     gfx.camera().target(screen_size / 2.);
-    let (mx, my) = input.mouse_position();
-    let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
-    let left_mouse_pressed =
-        input.mouse_pressed(MouseButton::Left) || input.mouse_held(MouseButton::Left);
-    let right_mouse_pressed =
-        input.mouse_pressed(MouseButton::Right) || input.mouse_held(MouseButton::Right);
 
+    let player_input = PlayerInput::from(input, gfx);
     let play_area = PlayArea {
         top_left: bg_position,
         size: Vec2::splat(bg_size as f32),
         grid_gutter: box_offset,
         palette: *palette,
-    };
-
-    let player_input = PlayerInput {
-        position: world_xy,
-        action: {
-            match (left_mouse_pressed, right_mouse_pressed) {
-                (false, false) => None,
-                (true, false) => Some(Action::FillCell),
-                (_, true) => Some(Action::MarkCell),
-            }
-        },
     };
 
     play_area.draw_backgrounds(&game_state, &player_input, gfx);
@@ -172,22 +156,7 @@ pub fn win_screen(
     let screen_size = gfx.screen_size();
     gfx.camera().target(screen_size / 2.);
 
-    let (mx, my) = input.mouse_position();
-    let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
-    let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
-    let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
-
-    // TODO: refactor to common helper
-    let player_input = PlayerInput {
-        position: world_xy,
-        action: {
-            match (left_mouse_pressed, right_mouse_pressed) {
-                (false, false) => None,
-                (true, false) => Some(Action::FillCell),
-                (_, true) => Some(Action::MarkCell),
-            }
-        },
-    };
+    let player_input = PlayerInput::from(input, gfx);
 
     let x_unit = 1280. / 32.;
     let y_unit = 720. / 18.;
@@ -336,18 +305,8 @@ pub fn level_select_screen(
     let (mx, my) = input.mouse_position();
     let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
     let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
-    let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
-    // TODO refactor this to a common helper
-    let player_input = PlayerInput {
-        position: world_xy,
-        action: {
-            match (left_mouse_pressed, right_mouse_pressed) {
-                (false, false) => None,
-                (true, false) => Some(Action::FillCell),
-                (_, true) => Some(Action::MarkCell),
-            }
-        },
-    };
+    let player_input = PlayerInput::from(input, gfx);
+
     let mut action = ScreenAction::NoAction;
 
     let x_unit = 1280. / 32.;

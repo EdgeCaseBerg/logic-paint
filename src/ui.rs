@@ -8,6 +8,7 @@ use std::path::PathBuf;
 
 use egor::{
     app::{FrameContext, egui::ComboBox, egui::Slider, egui::Window},
+    input::{Input, MouseButton},
     math::{Rect, Vec2, vec2},
     render::{Color, Graphics},
 };
@@ -69,6 +70,27 @@ pub struct PlayerInput {
 }
 
 impl PlayerInput {
+    pub fn from(input: &Input, gfx: &mut Graphics) -> PlayerInput {
+        let screen_size = gfx.screen_size();
+        let (mx, my) = input.mouse_position();
+        let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
+        let left_mouse_pressed =
+            input.mouse_pressed(MouseButton::Left) || input.mouse_held(MouseButton::Left);
+        let right_mouse_pressed =
+            input.mouse_pressed(MouseButton::Right) || input.mouse_held(MouseButton::Right);
+
+        PlayerInput {
+            position: world_xy,
+            action: {
+                match (left_mouse_pressed, right_mouse_pressed) {
+                    (false, false) => None,
+                    (true, false) => Some(Action::FillCell),
+                    (_, true) => Some(Action::MarkCell),
+                }
+            },
+        }
+    }
+
     fn can_fill_at(&self, cell: &Rect) -> bool {
         match self.action {
             Some(Action::FillCell) => cell.contains(self.position),
