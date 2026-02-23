@@ -164,6 +164,7 @@ pub fn win_screen(
     ppm: &Ppm,
     frame_context: &mut FrameContext,
     palette: &ColorPalette,
+    loaded_ppms: &LoadedPpms,
 ) -> ScreenAction {
     let gfx = &mut (frame_context.gfx);
     let input = &mut (frame_context.input);
@@ -174,50 +175,46 @@ pub fn win_screen(
     let (mx, my) = input.mouse_position();
     let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
     let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
-    // TODO: add in held so that one can drag easily.
+    let right_mouse_pressed = input.mouse_pressed(MouseButton::Right);
 
-    draw_ppm_at(ppm, vec2(75., 75.), vec2(450., 450.), gfx);
+    // TODO: refactor to common helper
+    let player_input = PlayerInput {
+        position: world_xy,
+        action: {
+            match (left_mouse_pressed, right_mouse_pressed) {
+                (false, false) => None,
+                (true, false) => Some(Action::FillCell),
+                (_, true) => Some(Action::MarkCell),
+            }
+        },
+    };
+
+    let x_unit = 1280. / 32.;
+    let y_unit = 720. / 18.;
+    let win_image_position = vec2(11. * x_unit, 2. * y_unit);
+    let win_image_size = vec2(14. * x_unit, 14. * y_unit);
+
+    let quit_position = vec2(28. * x_unit, 1. * y_unit);
+    let quit_btn_size = vec2(3. * x_unit, 3. * y_unit);
+
+    let result_text_position = vec2(2. * x_unit, 2. * y_unit);
 
     let num_incorrect = game_state.number_incorrect();
     if num_incorrect == 0 {
         gfx.text(&format!("Perfect!"))
             .size(78.)
             .color(Color::new(palette.group_highlight))
-            .at(screen_size / 2.);
+            .at(result_text_position);
     } else {
         gfx.text(&format!("Incorrect {}", num_incorrect))
             .size(16.)
             .color(Color::new(palette.group_highlight))
-            .at(screen_size / 2.);
+            .at(result_text_position);
     }
 
-    let button_bg_pos = screen_size / 2. + vec2(-50., 100.);
-    let button_size = vec2(200., 100.);
-    let rect = egor::math::Rect::new(button_bg_pos, button_size);
-    let should_highlight = rect.contains(world_xy);
-    let (btn_color, font_color) = if should_highlight {
-        (
-            Color::new(palette.group_highlight),
-            Color::new(palette.background),
-        )
-    } else {
-        (
-            Color::new(palette.background),
-            Color::new(palette.group_highlight),
-        )
-    };
-    gfx.rect()
-        .at(button_bg_pos)
-        .color(btn_color)
-        .size(button_size);
-    draw_centered_text(
-        gfx,
-        &format!("Return to Menu"),
-        button_bg_pos + button_size * 0.5,
-        16.,
-        font_color,
-    );
-    if left_mouse_pressed && should_highlight {
+    draw_ppm_at(ppm, win_image_position, win_image_size, gfx);
+
+    if let Some(quit_action) = draw_quit_button(quit_position, quit_btn_size, &loaded_ppms.quit_ppm, palette, &player_input, gfx) {
         ScreenAction::ChangeScreen {
             to: Screens::ChooseLevelScreen { page: 0 },
         }

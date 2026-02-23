@@ -88,7 +88,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     &loaded_ppms,
                 ),
                 Screens::WinScreen => {
-                    screens::win_screen(&mut game_state, &mut win_image, frame_context, &palette)
+                    screens::win_screen(&mut game_state, &mut win_image, frame_context, &palette, &loaded_ppms)
                 }
                 Screens::ChooseLevelScreen { page } => screens::level_select_screen(
                     &levels,
