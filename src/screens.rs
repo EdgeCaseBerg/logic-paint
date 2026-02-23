@@ -218,7 +218,14 @@ pub fn win_screen(
 
     draw_ppm_at(ppm, win_image_position, win_image_size, gfx);
 
-    if let Some(quit_action) = draw_quit_button(quit_position, quit_btn_size, &loaded_ppms.quit, palette, &player_input, gfx) {
+    if let Some(quit_action) = draw_quit_button(
+        quit_position,
+        quit_btn_size,
+        &loaded_ppms.quit,
+        palette,
+        &player_input,
+        gfx,
+    ) {
         ScreenAction::ChangeScreen {
             to: Screens::ChooseLevelScreen { page: 0 },
         }
