@@ -1,5 +1,5 @@
 pub mod editor_grids;
-pub mod level_settings;
+pub mod editor_settings;
 pub mod levels;
 pub mod netbpm;
 pub mod netppm;

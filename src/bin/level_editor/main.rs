@@ -1,5 +1,5 @@
 use logicpaint::editor_grids::{EditorGrids, save_grid_as_level};
-use logicpaint::level_settings::LevelSettings;
+use logicpaint::editor_settings::LevelSettings;
 use logicpaint::pop_up::PopUp;
 use logicpaint::ui_actions::UiActions;
 

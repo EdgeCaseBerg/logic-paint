@@ -1,5 +1,5 @@
 use crate::base_dir;
-use crate::level_settings::LevelSettings;
+use crate::editor_settings::LevelSettings;
 use crate::levels::Level;
 use crate::netbpm::Pbm;
 use crate::netppm::Ppm;
