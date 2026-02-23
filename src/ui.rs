@@ -373,7 +373,6 @@ pub fn draw_ppm_at(ppm: &Ppm, top_left: Vec2, size: Vec2, gfx: &mut Graphics) {
     }
 }
 
-// TODO: remove _ppm suffix
 pub struct LoadedPpms {
     pub unknown_level: Ppm,
     pub quit: Ppm,
