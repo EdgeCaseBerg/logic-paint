@@ -146,7 +146,7 @@ pub fn play_game_screen(
     } else if let Some(quit_action) = draw_quit_button(
         quit_position,
         quit_btn_size,
-        &loaded_ppms.quit_ppm,
+        &loaded_ppms.quit,
         &palette,
         &player_input,
         gfx,
@@ -218,7 +218,7 @@ pub fn win_screen(
 
     draw_ppm_at(ppm, win_image_position, win_image_size, gfx);
 
-    if let Some(quit_action) = draw_quit_button(quit_position, quit_btn_size, &loaded_ppms.quit_ppm, palette, &player_input, gfx) {
+    if let Some(quit_action) = draw_quit_button(quit_position, quit_btn_size, &loaded_ppms.quit, palette, &player_input, gfx) {
         ScreenAction::ChangeScreen {
             to: Screens::ChooseLevelScreen { page: 0 },
         }
@@ -367,7 +367,7 @@ pub fn level_select_screen(
     if let Some(quit_action) = draw_quit_button(
         quit_position,
         quit_btn_size,
-        &loaded_ppms.quit_ppm,
+        &loaded_ppms.quit,
         &palette,
         &player_input,
         gfx,
