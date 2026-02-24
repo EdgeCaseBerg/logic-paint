@@ -337,8 +337,9 @@ impl PlayArea {
                 play_state.mark_cell(r, c);
             }
         }
+    }
 
-        // The side bar area
+    pub fn draw_left_group_backgrounds(&self, play_state: &PlayState, input: &PlayerInput, gfx: &mut Graphics) {
         let side_areas_size = self.play_area_gutter();
         let layout = GridLayout {
             area: Rect {
