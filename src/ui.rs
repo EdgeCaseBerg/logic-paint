@@ -289,68 +289,81 @@ impl PlayArea {
     }
 
     pub fn draw_grid(&self, play_state: &mut PlayState, input: &PlayerInput, gfx: &mut Graphics) {
-        let halfset = self.halfset();
-        let anchor = self.anchor();
-        let offset = Vec2::splat(halfset);
-        let num_boxes = play_state.rows().len();
-        let box_size = self.box_size(num_boxes);
-        let cell_size = Vec2::splat(box_size);
-        let side_areas_size = self.play_area_gutter();
-
-        for (r, row) in play_state.rows().into_iter().enumerate() {
+        let layout = GridLayout {
+            area: Rect {
+                position: self.top_left,
+                size: self.size
+            },
+            rows: play_state.rows().len(),
+            columns: play_state.cols().len(),
+            cell_gap: self.grid_gutter,
+        };
+        let state_by_rows = play_state.rows();
+        for (r, c, cell_rect) in layout.iter_cells() {
             let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
+            let cell = state_by_rows[r][c];
 
-            let y_offset = r as f32 * (halfset + box_size);
-            let row_group_bg_position = anchor - vec2(side_areas_size.x, -y_offset);
-            let row_group_bg = if row_group_bg_position.y <= input.position.y
-                && input.position.y <= row_group_bg_position.y + box_size
-            {
+            let color = match cell {
+                CellState::Empty => Color::new(even_odd_bg_color),
+                CellState::Filled => Color::new(self.palette.cell_filled_in),
+                CellState::Incorrect => Color::new(self.palette.cell_incorrect),
+                CellState::RuledOut => Color::new(self.palette.cell_marked_game),
+                CellState::UserRuledOut => Color::new(self.palette.cell_marked_user),
+            };
+            if input.overlaps(&cell_rect) {
+                gfx.rect()
+                    .at(cell_rect.min() - self.grid_gutter / 2.)
+                    .size(cell_rect.size + self.grid_gutter)
+                    .color(Color::new(self.palette.cell_highlight));
+            }
+
+            match cell {
+                CellState::Empty | CellState::Filled => {
+                    gfx.rect().at(cell_rect.min()).size(cell_rect.size).color(color);
+                }
+                _ => {
+                    gfx.rect()
+                        .at(cell_rect.min())
+                        .size(cell_rect.size)
+                        .color(Color::new(even_odd_bg_color));
+                    draw_x_at(cell_rect.min(), cell_rect.size, color, gfx);
+                }
+            };
+
+            if input.can_fill_at(&cell_rect) {
+                play_state.attempt_fill(r, c);
+            }
+            if input.can_mark_at(&cell_rect) {
+                play_state.mark_cell(r, c);
+            }
+        }
+
+        // The side bar area
+        let side_areas_size = self.play_area_gutter();
+        let layout = GridLayout {
+            area: Rect {
+                position: self.top_left - vec2(side_areas_size.x, 0.),
+                size: vec2(side_areas_size.x, self.size.y)
+            },
+            rows: play_state.rows().len(),
+            columns: 1,
+            cell_gap: self.grid_gutter,
+        };
+        for (r, c, cell_rect) in layout.iter_cells() {
+            let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
+            let extended_across_grid = Rect {
+                position: cell_rect.min(),
+                size: cell_rect.size + vec2(self.size.x, 0.)
+            };
+            let bg = if input.overlaps(&extended_across_grid) {
                 self.palette.group_highlight
             } else {
                 odd_even_bg_color
             };
             gfx.rect()
-                .at(row_group_bg_position)
-                .color(Color::new(row_group_bg))
-                .size(vec2(side_areas_size.x, box_size));
-
-            for (c, state) in row.iter().enumerate() {
-                let position = anchor + vec2(c as f32, r as f32) * (Vec2::splat(box_size) + offset);
-                let color = match state {
-                    CellState::Empty => Color::new(even_odd_bg_color),
-                    CellState::Filled => Color::new(self.palette.cell_filled_in),
-                    CellState::Incorrect => Color::new(self.palette.cell_incorrect),
-                    CellState::RuledOut => Color::new(self.palette.cell_marked_game),
-                    CellState::UserRuledOut => Color::new(self.palette.cell_marked_user),
-                };
-                let cell_rect = Rect::new(position, cell_size);
-                if input.overlaps(&cell_rect) {
-                    gfx.rect()
-                        .at(position - offset)
-                        .size(cell_size + offset * 2.)
-                        .color(Color::new(self.palette.cell_highlight));
-                }
-
-                match state {
-                    CellState::Empty | CellState::Filled => {
-                        gfx.rect().at(position).size(cell_size).color(color);
-                    }
-                    _ => {
-                        gfx.rect()
-                            .at(position)
-                            .size(cell_size)
-                            .color(Color::new(even_odd_bg_color));
-                        draw_x_at(position, cell_size, color, gfx);
-                    }
-                };
-
-                if input.can_fill_at(&cell_rect) {
-                    play_state.attempt_fill(r, c);
-                }
-                if input.can_mark_at(&cell_rect) {
-                    play_state.mark_cell(r, c);
-                }
-            }
+                .at(cell_rect.min())
+                .color(Color::new(bg))
+                .size(cell_rect.size);
         }
     }
 
