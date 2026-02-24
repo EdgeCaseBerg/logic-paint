@@ -369,32 +369,44 @@ impl PlayArea {
     }
 
     pub fn draw_row_groups(&self, play_state: &PlayState, gfx: &mut Graphics) {
-        let offset = self.halfset();
         let num_boxes = play_state.rows().len();
-        let box_size = self.box_size(num_boxes);
-        let padding = self.grid_gutter / 2. - box_size / 2.;
-        let offset = Vec2::splat(offset);
-        let grid_cell_size = Vec2::splat(box_size) + offset;
-        let scaler = vec2(0.5, 1.);
-        let anchor = self.anchor();
-        let anchor = anchor - padding;
         let screen_size = gfx.screen_size();
+        let side_areas_size = self.play_area_gutter();
+        // Because fonts are rendered in screen position, compute their grid layout
+        // with respect to that rather than raw world units
+        let screen_position = gfx
+            .camera()
+            .world_to_screen(self.top_left - vec2(side_areas_size.x, 0.), screen_size);
+
+        let layout = GridLayout {
+            area: Rect {
+                position: screen_position,
+                size: vec2(side_areas_size.x, self.size.y),
+            },
+            rows: num_boxes,
+            columns: num_boxes - num_boxes / 2, // If 5 cells, room for 3 numbers [x_x_x] and similar
+            cell_gap: self.grid_gutter,
+        };
 
         for (r, groups) in play_state.row_groups.iter().enumerate() {
-            let number_of_groups = groups.iter().len();
-            for i in 0..number_of_groups {
-                let grid_offset = vec2(-(i as f32) - 2., r as f32);
-                let position = anchor + grid_offset * grid_cell_size * scaler;
-                let screen_position = gfx.camera().world_to_screen(position, screen_size);
-                // write out the numbers from the right outward for alignment
-                let g = number_of_groups - i - 1;
-                gfx.text(&format!("{}", groups[g].num_cells))
-                    .size(0.5 * box_size)
-                    .color(match groups[g].filled {
+            let groups_in_row = groups.len();
+            let start_col = layout.columns - groups_in_row;
+
+            for (i, group) in groups.iter().enumerate() {
+                let column = start_col + i;
+                let rect = layout.cell_rect(r, column);
+                // for some reason fonts position their _center_ at the position we tell
+                // them to be. So just add have in to get the real placement location
+                let half_font = rect.size.y / 2.;
+                let position = rect.min() + vec2(0., half_font);
+
+                gfx.text(&format!("{}", group.num_cells))
+                    .at(position)
+                    .size(rect.size.y)
+                    .color(match group.filled {
                         true => Color::new(self.palette.cell_filled_in),
                         false => Color::new(self.palette.group_font),
-                    })
-                    .at(screen_position);
+                    });
             }
         }
     }
