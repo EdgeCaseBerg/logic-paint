@@ -404,7 +404,7 @@ impl PlayArea {
                 let column = start_col + i;
                 let rect = layout.cell_rect(r, column);
                 // for some reason fonts position their _center_ at the position we tell
-                // them to be. So just add have in to get the real placement location
+                // them to be. So just add half in to get the real placement location
                 let half_font = rect.size.y / 2.;
                 let position = rect.min() + vec2(0., half_font);
 
