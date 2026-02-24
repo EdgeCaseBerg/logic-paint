@@ -203,7 +203,7 @@ pub fn win_screen(
 }
 
 // TODO move to ui module
-fn draw_centered_text(
+pub fn draw_centered_text(
     gfx: &mut egor::render::Graphics,
     text: &str,
     center: Vec2,
