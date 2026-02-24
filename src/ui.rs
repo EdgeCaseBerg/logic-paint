@@ -161,6 +161,46 @@ impl GridLayout {
 
         space_for_cells / vec2(self.columns as f32, self.rows as f32)
     }
+
+    // Return the top left of where the cells start within the grid layout (offset by the gap)
+    pub fn origin(&self) -> Vec2 {
+        self.area.min() + vec2(self.cell_gap, self.cell_gap)
+    }
+
+    pub fn cell_rect(&self, r: usize, c: usize) -> Rect {
+        let cell = self.cell_size();
+
+        let origin = self.origin();
+
+        let offset = vec2(
+            c as f32 * (cell.x + self.cell_gap),
+            r as f32 * (cell.y + self.cell_gap),
+        );
+
+        Rect {
+            position: origin + offset,
+            size: cell,
+        }
+    }
+
+    // For me in 3 months: '_ is an anonymous lifetime tied to self.
+    // it just means the caller can't let the iterator last longer than this layout
+    pub fn iter_cells(&self) -> impl Iterator<Item = (usize, usize, Rect)> + '_ {
+        let cell_size = self.cell_size();
+        let origin = self.origin();
+        let step = cell_size + Vec2::splat(self.cell_gap);
+
+        (0..self.rows).flat_map(move |r| {
+            (0..self.columns).map(move |c| {
+                let top_left = origin + vec2(c as f32, r as f32) * step;
+                let cell = Rect {
+                    position: top_left,
+                    size: cell_size,
+                };
+                (r, c, cell)
+            })
+        })
+    }
 }
 
 impl PlayArea {
