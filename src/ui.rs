@@ -292,7 +292,7 @@ impl PlayArea {
         let layout = GridLayout {
             area: Rect {
                 position: self.top_left,
-                size: self.size
+                size: self.size,
             },
             rows: play_state.rows().len(),
             columns: play_state.cols().len(),
@@ -319,7 +319,10 @@ impl PlayArea {
 
             match cell {
                 CellState::Empty | CellState::Filled => {
-                    gfx.rect().at(cell_rect.min()).size(cell_rect.size).color(color);
+                    gfx.rect()
+                        .at(cell_rect.min())
+                        .size(cell_rect.size)
+                        .color(color);
                 }
                 _ => {
                     gfx.rect()
@@ -339,12 +342,17 @@ impl PlayArea {
         }
     }
 
-    pub fn draw_left_group_backgrounds(&self, play_state: &PlayState, input: &PlayerInput, gfx: &mut Graphics) {
+    pub fn draw_left_group_backgrounds(
+        &self,
+        play_state: &PlayState,
+        input: &PlayerInput,
+        gfx: &mut Graphics,
+    ) {
         let side_areas_size = self.play_area_gutter();
         let layout = GridLayout {
             area: Rect {
                 position: self.top_left - vec2(side_areas_size.x, 0.),
-                size: vec2(side_areas_size.x, self.size.y)
+                size: vec2(side_areas_size.x, self.size.y),
             },
             rows: play_state.rows().len(),
             columns: 1,
@@ -354,7 +362,7 @@ impl PlayArea {
             let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
             let extended_across_grid = Rect {
                 position: cell_rect.min(),
-                size: cell_rect.size + vec2(self.size.x, 0.)
+                size: cell_rect.size + vec2(self.size.x, 0.),
             };
             let bg = if input.overlaps(&extended_across_grid) {
                 self.palette.group_highlight
