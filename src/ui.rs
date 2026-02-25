@@ -221,6 +221,34 @@ impl PlayArea {
         (self.size.x - (halfset + halfset * number_of_boxes as f32)) / number_of_boxes as f32
     }
 
+    fn full_layout(&self, play_state: &PlayState) -> (usize, usize, GridLayout) {
+        let max_row_groups = play_state
+            .row_groups
+            .iter()
+            .map(|g| g.len())
+            .max()
+            .unwrap_or(1); // always include at least a bit of gutter
+        let max_column_groups = play_state
+            .column_groups
+            .iter()
+            .map(|g| g.len())
+            .max()
+            .unwrap_or(1); // always include at least a bit of gutter
+
+        let rows = play_state.rows().len() + max_row_groups;
+        let columns = play_state.cols().len() + max_column_groups;
+        let layout = GridLayout {
+            area: Rect {
+                position: self.top_left - self.play_area_gutter(),
+                size: self.size + self.play_area_gutter(),
+            },
+            rows,
+            columns,
+            cell_gap: self.grid_gutter,
+        };
+        (max_row_groups, max_column_groups, layout)
+    }
+
     pub fn draw_backgrounds(
         &self,
         play_state: &PlayState,
