@@ -255,6 +255,31 @@ impl PlayArea {
         input: &PlayerInput,
         gfx: &mut Graphics,
     ) {
+        let (origin_x, origin_y, layout) = self.full_layout(&play_state);
+        for (r, c, rect) in layout.iter_cells() {
+            match (r < origin_x, c < origin_y) {
+                (true, true) => {
+                    gfx.rect().at(rect.min()).size(rect.size).color(Color::BLUE);
+                }
+                (false, false) => {
+                    gfx.rect().at(rect.min()).size(rect.size).color(Color::RED);
+                }
+                (true, false) => {
+                    gfx.rect()
+                        .at(rect.min())
+                        .size(rect.size)
+                        .color(Color::new([128., 0., 128., 1.0]));
+                }
+                (false, true) => {
+                    gfx.rect()
+                        .at(rect.min())
+                        .size(rect.size)
+                        .color(Color::new([1.0, 1.0, 0.0, 1.0]));
+                }
+            }
+        }
+        return;
+
         let num_boxes = play_state.rows().len();
         let halfset = self.halfset();
         let anchor = self.anchor();
