@@ -423,20 +423,19 @@ impl PlayArea {
         let gutter = self.play_area_gutter();
         let grid_corner = self.top_left - vec2(0., gutter.y);
         let screen_position = gfx.camera().world_to_screen(grid_corner, screen_size);
-        let rows = num_boxes - num_boxes / 2;
         let layout = GridLayout {
             area: Rect {
                 position: screen_position,
                 size: vec2(self.size.x, gutter.y),
             },
-            rows: rows,
+            rows: num_boxes - num_boxes / 2,
             columns: num_boxes,
             cell_gap: self.grid_gutter,
         };
 
         for (c, groups) in play_state.column_groups.iter().enumerate() {
             let number_of_groups = groups.iter().len();
-            let start_row = rows - number_of_groups;
+            let start_row = layout.rows - number_of_groups;
             for (i, group) in groups.iter().enumerate() {
                 let r = start_row + i;
                 let rect = layout.cell_rect(r, c);
