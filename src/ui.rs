@@ -257,88 +257,53 @@ impl PlayArea {
     ) {
         let (origin_x, origin_y, layout) = self.full_layout(&play_state);
         for (r, c, rect) in layout.iter_cells() {
+            let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
             match (r < origin_x, c < origin_y) {
                 (true, true) => {
-                    gfx.rect().at(rect.min()).size(rect.size).color(Color::BLUE);
+                    // Draw nothing here in the space in the corner. Though we could
+                    // put a cute character smiling or something if we wanted to.
                 }
                 (false, false) => {
-                    gfx.rect().at(rect.min()).size(rect.size).color(Color::RED);
+                    // The Grid. https://www.youtube.com/watch?v=lWu40FA3eZk
+                    gfx.rect()
+                        .at(rect.min())
+                        .size(rect.size)
+                        .color(Color::new(self.palette.background));
                 }
                 (true, false) => {
+                    // Top gutter (column groups)
+                    let colors = [even_odd_bg_color, odd_even_bg_color];
+                    let mouse_within_column_range = true
+                        && rect.position.x <= input.position.x
+                        && input.position.x <= rect.position.x + rect.size.x;
+                    let color = if mouse_within_column_range {
+                        self.palette.group_highlight
+                    } else {
+                        colors[c % 2]
+                    };
                     gfx.rect()
                         .at(rect.min())
-                        .size(rect.size)
-                        .color(Color::new([128., 0., 128., 1.0]));
+                        .color(Color::new(color))
+                        .size(rect.size);
                 }
                 (false, true) => {
+                    // Left gutter (row groups)
+                    let mouse_within_row_range = true
+                        && rect.position.y <= input.position.y
+                        && input.position.y <= rect.position.y + rect.size.y;
+
+                    let color = if mouse_within_row_range {
+                        self.palette.group_highlight
+                    } else {
+                        odd_even_bg_color
+                    };
                     gfx.rect()
                         .at(rect.min())
-                        .size(rect.size)
-                        .color(Color::new([1.0, 1.0, 0.0, 1.0]));
+                        .color(Color::new(color))
+                        .size(rect.size);
                 }
             }
         }
-        return;
-
-        let num_boxes = play_state.rows().len();
-        let halfset = self.halfset();
-        let anchor = self.anchor();
-        let box_size = self.box_size(num_boxes);
-        let cell_and_gutter_size = halfset + box_size;
-        let cell_and_gutter_size_v = Vec2::splat(cell_and_gutter_size);
-        let side_areas_size = self.play_area_gutter();
-        let row_group_bg_size = vec2(side_areas_size.x, box_size);
-        let column_group_size = vec2(box_size, side_areas_size.y);
-
-        for (r, row) in play_state.rows().into_iter().enumerate() {
-            let y_offset = r as f32 * cell_and_gutter_size;
-            let row_group_bg_position = anchor - vec2(side_areas_size.x, -y_offset);
-            let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
-            let mouse_within_row_range = true
-                && row_group_bg_position.y <= input.position.y
-                && input.position.y <= row_group_bg_position.y + box_size;
-
-            let row_group_bg = if mouse_within_row_range {
-                self.palette.group_highlight
-            } else {
-                odd_even_bg_color
-            };
-
-            // backgrounds behind the row numbers
-            gfx.rect()
-                .at(row_group_bg_position)
-                .color(Color::new(row_group_bg))
-                .size(row_group_bg_size);
-
-            if r != 0 {
-                continue;
-            }
-
-            // backgrounds behind the column numbers
-            let colors = [even_odd_bg_color, odd_even_bg_color];
-            for (c, _) in row.iter().enumerate() {
-                let position = anchor + vec2(c as f32, r as f32) * cell_and_gutter_size_v;
-                let column_group_position = position + vec2(0., -side_areas_size.y);
-                let mouse_within_column_range = true
-                    && column_group_position.x <= input.position.x
-                    && input.position.x <= column_group_position.x + column_group_size.x;
-                let column_group_bg_color = if mouse_within_column_range {
-                    self.palette.group_highlight
-                } else {
-                    colors[c % 2]
-                };
-                gfx.rect()
-                    .at(column_group_position)
-                    .color(Color::new(column_group_bg_color))
-                    .size(column_group_size);
-            }
-        }
-
-        //The play area behind the grid
-        gfx.rect()
-            .at(self.top_left)
-            .size(self.size)
-            .color(Color::new(self.palette.background));
     }
 
     pub fn draw_grid(&self, play_state: &mut PlayState, input: &PlayerInput, gfx: &mut Graphics) {
