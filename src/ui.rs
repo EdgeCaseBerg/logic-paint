@@ -418,34 +418,38 @@ impl PlayArea {
     }
 
     pub fn draw_column_groups(&self, play_state: &PlayState, gfx: &mut Graphics) {
-        let offset = self.halfset();
-        let anchor = self.anchor();
-        let offset = Vec2::splat(offset);
         let num_boxes = play_state.cols().len();
-        let box_size = self.box_size(num_boxes);
-        let grid_cell_size = Vec2::splat(box_size) + offset;
         let screen_size = gfx.screen_size();
+        let gutter = self.play_area_gutter();
+        let grid_corner = self.top_left - vec2(0., gutter.y);
+        let screen_position = gfx.camera().world_to_screen(grid_corner, screen_size);
+        let rows = num_boxes - num_boxes / 2;
+        let layout = GridLayout {
+            area: Rect {
+                position: screen_position,
+                size: vec2(self.size.x, gutter.y),
+            },
+            rows: rows,
+            columns: num_boxes,
+            cell_gap: self.grid_gutter,
+        };
 
-        let padding = offset.y / 2. - box_size / 2.;
-        let anchor = anchor - padding;
-
-        let scaler = vec2(1., 0.5);
-        let anchor = anchor - offset;
         for (c, groups) in play_state.column_groups.iter().enumerate() {
             let number_of_groups = groups.iter().len();
-            for i in 0..number_of_groups {
-                let grid_offset = vec2(c as f32, -(i as f32) - 2.);
-                let position = anchor + grid_offset * grid_cell_size * scaler;
-                let screen_position = gfx.camera().world_to_screen(position, screen_size);
-                // render the bottom number closest to the top of the grid, then go up for alignment
-                let g = number_of_groups - i - 1;
-                gfx.text(&format!("{}", groups[g].num_cells))
-                    .size(0.5 * box_size)
-                    .color(match groups[g].filled {
-                        true => Color::new(self.palette.cell_filled_in),
-                        false => Color::new(self.palette.group_font),
-                    })
-                    .at(screen_position);
+            let start_row = rows - number_of_groups;
+            for (i, group) in groups.iter().enumerate() {
+                let r = start_row + i;
+                let rect = layout.cell_rect(r, c);
+                // for some reason fonts position their _center_ at the position we tell
+                // them to be. So just add half in to get the real placement location
+                let position = rect.min() + rect.size / 2.;
+                let text = &format!("{}", group.num_cells);
+                let font_color = match group.filled {
+                    true => Color::new(self.palette.cell_filled_in),
+                    false => Color::new(self.palette.group_font),
+                };
+
+                crate::screens::draw_centered_text(gfx, text, position, rect.size.y, font_color);
             }
         }
     }
