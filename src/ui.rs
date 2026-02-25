@@ -342,7 +342,7 @@ impl PlayArea {
         }
     }
 
-    pub fn draw_left_group_backgrounds(
+    pub fn draw_left_group_background(
         &self,
         play_state: &PlayState,
         input: &PlayerInput,
