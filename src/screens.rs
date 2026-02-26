@@ -233,14 +233,6 @@ pub fn wipe_screen(
 
     gfx.camera().target(screen_size / 2.);
 
-    draw_centered_text(
-        gfx,
-        &format!("{}%", *wipe_progress / duration),
-        pos,
-        20.,
-        Color::new(palette.group_highlight),
-    );
-
     let box_size = 60.0;
     let num_boxes = screen_size / box_size;
     let box_progress = *wipe_progress / duration;
