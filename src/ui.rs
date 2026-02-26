@@ -284,7 +284,7 @@ impl PlayArea {
                     gfx.rect()
                         .at(rect.min())
                         .color(Color::new(color))
-                        .size(rect.size);
+                        .size(rect.size + vec2(0., layout.cell_gap));
                 }
                 (false, true) => {
                     // Left gutter (row groups)
@@ -297,10 +297,11 @@ impl PlayArea {
                     } else {
                         odd_even_bg_color
                     };
+                    // we + gap to join the squares together
                     gfx.rect()
                         .at(rect.min())
                         .color(Color::new(color))
-                        .size(rect.size);
+                        .size(rect.size + vec2(layout.cell_gap, 0.));
                 }
             }
         }
