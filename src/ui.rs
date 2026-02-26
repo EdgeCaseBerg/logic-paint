@@ -307,90 +307,51 @@ impl PlayArea {
     }
 
     pub fn draw_grid(&self, play_state: &mut PlayState, input: &PlayerInput, gfx: &mut Graphics) {
-        let layout = GridLayout {
-            area: Rect {
-                position: self.top_left,
-                size: self.size,
-            },
-            rows: play_state.rows().len(),
-            columns: play_state.cols().len(),
-            cell_gap: self.grid_gutter,
-        };
+        let (origin_y, origin_x, layout) = self.full_layout(&play_state);
         let state_by_rows = play_state.rows();
-        for (r, c, cell_rect) in layout.iter_cells() {
+        for (r, row) in state_by_rows.iter().enumerate() {
             let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
-            let cell = state_by_rows[r][c];
+            for (c, cell) in row.iter().enumerate() {
+                // + origin because the full layout includes gutters and we need to skip em
+                let cell_rect = layout.cell_rect(origin_y + r, origin_x + c);
 
-            let color = match cell {
-                CellState::Empty => Color::new(even_odd_bg_color),
-                CellState::Filled => Color::new(self.palette.cell_filled_in),
-                CellState::Incorrect => Color::new(self.palette.cell_incorrect),
-                CellState::RuledOut => Color::new(self.palette.cell_marked_game),
-                CellState::UserRuledOut => Color::new(self.palette.cell_marked_user),
-            };
-            if input.overlaps(&cell_rect) {
-                gfx.rect()
-                    .at(cell_rect.min() - self.grid_gutter / 2.)
-                    .size(cell_rect.size + self.grid_gutter)
-                    .color(Color::new(self.palette.cell_highlight));
-            }
-
-            match cell {
-                CellState::Empty | CellState::Filled => {
+                let color = match cell {
+                    CellState::Empty => Color::new(even_odd_bg_color),
+                    CellState::Filled => Color::new(self.palette.cell_filled_in),
+                    CellState::Incorrect => Color::new(self.palette.cell_incorrect),
+                    CellState::RuledOut => Color::new(self.palette.cell_marked_game),
+                    CellState::UserRuledOut => Color::new(self.palette.cell_marked_user),
+                };
+                if input.overlaps(&cell_rect) {
                     gfx.rect()
-                        .at(cell_rect.min())
-                        .size(cell_rect.size)
-                        .color(color);
+                        .at(cell_rect.min() - self.grid_gutter / 2.)
+                        .size(cell_rect.size + self.grid_gutter)
+                        .color(Color::new(self.palette.cell_highlight));
                 }
-                _ => {
-                    gfx.rect()
-                        .at(cell_rect.min())
-                        .size(cell_rect.size)
-                        .color(Color::new(even_odd_bg_color));
-                    draw_x_at(cell_rect.min(), cell_rect.size, color, gfx);
+
+                match cell {
+                    CellState::Empty | CellState::Filled => {
+                        gfx.rect()
+                            .at(cell_rect.min())
+                            .size(cell_rect.size)
+                            .color(color);
+                    }
+                    _ => {
+                        gfx.rect()
+                            .at(cell_rect.min())
+                            .size(cell_rect.size)
+                            .color(Color::new(even_odd_bg_color));
+                        draw_x_at(cell_rect.min(), cell_rect.size, color, gfx);
+                    }
+                };
+
+                if input.can_fill_at(&cell_rect) {
+                    play_state.attempt_fill(r, c);
                 }
-            };
-
-            if input.can_fill_at(&cell_rect) {
-                play_state.attempt_fill(r, c);
+                if input.can_mark_at(&cell_rect) {
+                    play_state.mark_cell(r, c);
+                }
             }
-            if input.can_mark_at(&cell_rect) {
-                play_state.mark_cell(r, c);
-            }
-        }
-    }
-
-    pub fn draw_left_group_background(
-        &self,
-        play_state: &PlayState,
-        input: &PlayerInput,
-        gfx: &mut Graphics,
-    ) {
-        let side_areas_size = self.play_area_gutter();
-        let layout = GridLayout {
-            area: Rect {
-                position: self.top_left - vec2(side_areas_size.x, 0.),
-                size: vec2(side_areas_size.x, self.size.y),
-            },
-            rows: play_state.rows().len(),
-            columns: 1,
-            cell_gap: self.grid_gutter,
-        };
-        for (r, c, cell_rect) in layout.iter_cells() {
-            let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
-            let extended_across_grid = Rect {
-                position: cell_rect.min(),
-                size: cell_rect.size + vec2(self.size.x, 0.),
-            };
-            let bg = if input.overlaps(&extended_across_grid) {
-                self.palette.group_highlight
-            } else {
-                odd_even_bg_color
-            };
-            gfx.rect()
-                .at(cell_rect.min())
-                .color(Color::new(bg))
-                .size(cell_rect.size);
         }
     }
 
