@@ -357,32 +357,14 @@ impl PlayArea {
     }
 
     pub fn draw_row_groups(&self, play_state: &PlayState, gfx: &mut Graphics) {
-        let num_boxes = play_state.rows().len();
-        let screen_size = gfx.screen_size();
-        let side_areas_size = self.play_area_gutter();
-        // Because fonts are rendered in screen position, compute their grid layout
-        // with respect to that rather than raw world units
-        let screen_position = gfx
-            .camera()
-            .world_to_screen(self.top_left - vec2(side_areas_size.x, 0.), screen_size);
-
-        let layout = GridLayout {
-            area: Rect {
-                position: screen_position,
-                size: vec2(side_areas_size.x, self.size.y),
-            },
-            rows: num_boxes,
-            columns: num_boxes - num_boxes / 2, // If 5 cells, room for 3 numbers [x_x_x] and similar
-            cell_gap: self.grid_gutter,
-        };
-
+        let (origin_y, origin_x, layout) = self.full_layout(&play_state);
         for (r, groups) in play_state.row_groups.iter().enumerate() {
             let groups_in_row = groups.len();
-            let start_col = layout.columns - groups_in_row;
+            let start_col = origin_x - groups_in_row;
 
             for (i, group) in groups.iter().enumerate() {
                 let column = start_col + i;
-                let rect = layout.cell_rect(r, column);
+                let rect = layout.cell_rect(origin_y + r, column);
                 // for some reason fonts position their _center_ at the position we tell
                 // them to be. So just add half in to get the real placement location
                 let position = rect.min() + rect.size / 2.;
