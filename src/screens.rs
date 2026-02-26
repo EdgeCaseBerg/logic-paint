@@ -242,6 +242,7 @@ pub fn wipe_screen(
     let (even, odd) = palette.even_odd_color(0);
     let in_first_half_of_animation = *wipe_progress < duration * 0.5;
 
+    // TODO: use GridLayout
     for x in 0..max_boxes_to_draw_x {
         for y in 0..max_boxes_to_draw_y {
             let offset = if in_first_half_of_animation {
@@ -333,6 +334,7 @@ pub fn level_select_screen(
     }
 
     // TODO: move to ui method
+    // TODO: use GridLayout
     let padding = vec2(10., 10.);
     let level_tile_height = (level_bg_size.y - padding.y * 2.) / rows as f32 - padding.y * 2.;
     let level_tile_size = vec2(level_tile_height, level_tile_height);
