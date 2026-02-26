@@ -380,27 +380,14 @@ impl PlayArea {
     }
 
     pub fn draw_column_groups(&self, play_state: &PlayState, gfx: &mut Graphics) {
-        let num_boxes = play_state.cols().len();
-        let screen_size = gfx.screen_size();
-        let gutter = self.play_area_gutter();
-        let grid_corner = self.top_left - vec2(0., gutter.y);
-        let screen_position = gfx.camera().world_to_screen(grid_corner, screen_size);
-        let layout = GridLayout {
-            area: Rect {
-                position: screen_position,
-                size: vec2(self.size.x, gutter.y),
-            },
-            rows: num_boxes - num_boxes / 2,
-            columns: num_boxes,
-            cell_gap: self.grid_gutter,
-        };
-
+        let (origin_y, origin_x, layout) = self.full_layout(&play_state);
         for (c, groups) in play_state.column_groups.iter().enumerate() {
-            let number_of_groups = groups.iter().len();
-            let start_row = layout.rows - number_of_groups;
+            let groups_in_column = groups.len();
+            let start_row = origin_y - groups_in_column;
+
             for (i, group) in groups.iter().enumerate() {
-                let r = start_row + i;
-                let rect = layout.cell_rect(r, c);
+                let row = start_row + i;
+                let rect = layout.cell_rect(row, origin_x + c);
                 // for some reason fonts position their _center_ at the position we tell
                 // them to be. So just add half in to get the real placement location
                 let position = rect.min() + rect.size / 2.;
