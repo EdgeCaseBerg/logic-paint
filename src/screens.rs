@@ -81,7 +81,6 @@ pub fn play_game_screen(
     };
 
     play_area.draw_backgrounds(&game_state, &player_input, gfx);
-    play_area.draw_left_group_background(&game_state, &player_input, gfx);
     play_area.draw_grid(game_state, &player_input, gfx);
     play_area.draw_row_groups(&game_state, gfx);
     play_area.draw_column_groups(&game_state, gfx);
