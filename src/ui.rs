@@ -223,13 +223,13 @@ impl PlayArea {
 
     fn full_layout(&self, play_state: &PlayState) -> (usize, usize, GridLayout) {
         let max_row_groups = play_state
-            .row_groups
+            .column_groups
             .iter()
             .map(|g| g.len())
             .max()
             .unwrap_or(1); // always include at least a bit of gutter
         let max_column_groups = play_state
-            .column_groups
+            .row_groups
             .iter()
             .map(|g| g.len())
             .max()
