@@ -250,8 +250,6 @@ pub fn wipe_screen(
     frame_context: &mut FrameContext,
     palette: &ColorPalette,
 ) -> ScreenAction {
-    *wipe_progress += frame_context.timer.delta;
-
     let gfx = &mut (frame_context.gfx);
     let screen_size = gfx.screen_size();
     gfx.camera().target(screen_size / 2.);
@@ -259,7 +257,7 @@ pub fn wipe_screen(
     let layout = GridLayout {
         area: Rect {
             position: vec2(0., 0.),
-            size: screen_size
+            size: screen_size,
         },
         rows: 10,
         columns: 10,
@@ -267,13 +265,13 @@ pub fn wipe_screen(
     };
 
     let num_boxes = layout.rows * layout.columns;
+    *wipe_progress += frame_context.timer.delta;
     let box_progress = *wipe_progress / duration;
     let sin = lerp(0.0..=std::f32::consts::PI, box_progress);
-    let max_boxes_to_draw_this_frame = 1 + lerp(0.0..=num_boxes as f32, sin.sin()) as usize;
     let (even, odd) = palette.even_odd_color(0);
-    let in_first_half_of_animation = *wipe_progress < duration * 0.5;
 
     let spiral = spiral_indices(layout.rows, layout.columns);
+    let max_boxes_to_draw_this_frame = 1 + lerp(0.0..=num_boxes as f32, sin.sin()) as usize;
     for &(r, c) in spiral.iter().take(max_boxes_to_draw_this_frame) {
         let cell = layout.cell_rect(r, c);
         let color = if (r + c) % 2 == 0 { even } else { odd };
@@ -283,6 +281,7 @@ pub fn wipe_screen(
             .at(cell.min());
     }
 
+    let in_first_half_of_animation = *wipe_progress < duration * 0.5;
     if in_first_half_of_animation {
         ScreenAction::WipeLeft
     } else if *wipe_progress > duration {
