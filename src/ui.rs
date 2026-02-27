@@ -208,19 +208,6 @@ impl PlayArea {
         self.size * 0.4
     }
 
-    fn halfset(&self) -> f32 {
-        self.grid_gutter / 2.
-    }
-
-    fn anchor(&self) -> Vec2 {
-        self.top_left + Vec2::splat(self.halfset())
-    }
-
-    fn box_size(&self, number_of_boxes: usize) -> f32 {
-        let halfset = self.halfset();
-        (self.size.x - (halfset + halfset * number_of_boxes as f32)) / number_of_boxes as f32
-    }
-
     fn full_layout(&self, play_state: &PlayState) -> (usize, usize, GridLayout) {
         let max_row_groups = play_state
             .column_groups
@@ -311,7 +298,7 @@ impl PlayArea {
         let (origin_y, origin_x, layout) = self.full_layout(&play_state);
         let state_by_rows = play_state.rows();
         for (r, row) in state_by_rows.iter().enumerate() {
-            let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
+            let (even_odd_bg_color, _) = self.palette.even_odd_color(r);
             for (c, cell) in row.iter().enumerate() {
                 // + origin because the full layout includes gutters and we need to skip em
                 let cell_rect = layout.cell_rect(origin_y + r, origin_x + c);
