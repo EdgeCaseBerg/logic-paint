@@ -256,30 +256,31 @@ pub fn wipe_screen(
     let screen_size = gfx.screen_size();
     gfx.camera().target(screen_size / 2.);
 
-    let box_size = 60.0;
-    let num_boxes = screen_size / box_size;
+    let layout = GridLayout {
+        area: Rect {
+            position: vec2(0., 0.),
+            size: screen_size
+        },
+        rows: 10,
+        columns: 10,
+        cell_gap: 2.0,
+    };
+
+    let num_boxes = layout.rows * layout.columns;
     let box_progress = *wipe_progress / duration;
     let sin = lerp(0.0..=std::f32::consts::PI, box_progress);
-    let max_boxes_to_draw_x = 1 + lerp(0.0..=num_boxes.x, sin.sin()) as usize;
-    let max_boxes_to_draw_y = 1 + lerp(0.0..=num_boxes.y, sin.sin()) as usize;
+    let max_boxes_to_draw_this_frame = 1 + lerp(0.0..=num_boxes as f32, sin.sin()) as usize;
     let (even, odd) = palette.even_odd_color(0);
     let in_first_half_of_animation = *wipe_progress < duration * 0.5;
 
-    // TODO: use GridLayout
-    for x in 0..max_boxes_to_draw_x {
-        for y in 0..max_boxes_to_draw_y {
-            let offset = if in_first_half_of_animation {
-                vec2(x as f32, y as f32)
-            } else {
-                vec2(num_boxes.x - x as f32, num_boxes.y - y as f32)
-            };
-            let pos = offset * box_size;
-            let color = if x % 2 == 0 { even } else { odd };
-            gfx.rect()
-                .color(Color::new(color))
-                .size(vec2(box_size, box_size))
-                .at(pos);
-        }
+    let spiral = spiral_indices(layout.rows, layout.columns);
+    for &(r, c) in spiral.iter().take(max_boxes_to_draw_this_frame) {
+        let cell = layout.cell_rect(r, c);
+        let color = if (r + c) % 2 == 0 { even } else { odd };
+        gfx.rect()
+            .color(Color::new(color))
+            .size(cell.size)
+            .at(cell.min());
     }
 
     if in_first_half_of_animation {
