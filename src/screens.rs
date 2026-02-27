@@ -3,7 +3,7 @@ use crate::netppm::Ppm;
 use crate::playstate::PlayState;
 use crate::ui::{
     ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_centered_text, draw_ppm_at,
-    draw_quit_button, draw_x_at, world_unit_size,
+    draw_quit_button, draw_x_at, world_unit_size, GridLayout
 };
 use std::path::PathBuf;
 

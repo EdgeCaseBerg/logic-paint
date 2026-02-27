@@ -139,7 +139,7 @@ pub fn draw_x_at(position: Vec2, cell_size: Vec2, color: Color, gfx: &mut Graphi
         .color(color);
 }
 
-struct GridLayout {
+pub struct GridLayout {
     pub area: Rect,
     pub rows: usize,
     pub columns: usize,
