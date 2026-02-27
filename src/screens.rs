@@ -55,7 +55,7 @@ pub fn play_game_screen(
     let unit_size = world_unit_size();
     let bg_position = unit_size * vec2(16., 7.);
     let bg_size = unit_size.x * 10.;
-    let box_offset = unit_size.x / 8.0;
+    let box_offset = unit_size.x / 10.0;
 
     let quit_position = unit_size * vec2(28., 1.);
     let quit_btn_size = unit_size * vec2(3., 3.);
