@@ -243,6 +243,8 @@ impl PlayArea {
         gfx: &mut Graphics,
     ) {
         let (origin_x, origin_y, layout) = self.full_layout(&play_state);
+        // Hold the column colors fixed for the group clues
+        let (column_group_color_a, column_group_color_b) = self.palette.even_odd_color(0);
         for (r, c, rect) in layout.iter_cells() {
             let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
             match (r < origin_x, c < origin_y) {
@@ -259,7 +261,7 @@ impl PlayArea {
                 }
                 (true, false) => {
                     // Top gutter (column groups)
-                    let colors = [even_odd_bg_color, odd_even_bg_color];
+                    let colors = [column_group_color_a, column_group_color_b];
                     let mouse_within_column_range = true
                         && rect.position.x <= input.position.x
                         && input.position.x <= rect.position.x + rect.size.x;
