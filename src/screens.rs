@@ -204,6 +204,46 @@ pub fn win_screen(
     }
 }
 
+fn spiral_indices(rows: usize, cols: usize) -> Vec<(usize, usize)> {
+    let mut indices = Vec::with_capacity(rows * cols);
+
+    let mut top = 0;
+    let mut left = 0;
+    let mut bottom = rows - 1;
+    let mut right = cols - 1;
+
+    while left <= right && top <= bottom {
+        // along the top going right
+        for c in left..=right {
+            indices.push((top, c));
+        }
+        top += 1;
+        if top > bottom { break; }
+
+        // along the right side going down
+        for r in top..=bottom {
+            indices.push((r, right));
+        }
+        right = right.saturating_sub(1);
+        if left > right { break; }
+
+        // along the bottom going left
+        for c in (left..=right).rev() {
+            indices.push((bottom, c));
+        }
+        bottom = bottom.saturating_sub(1);
+        if top > bottom { break; }
+
+        // along the left going up
+        for r in (top..=bottom).rev() {
+            indices.push((r, left));
+        }
+        left += 1;
+    }
+
+    indices
+}
+
 pub fn wipe_screen(
     wipe_progress: &mut f32,
     duration: f32,
