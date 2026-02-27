@@ -361,7 +361,7 @@ impl PlayArea {
                     false => Color::new(self.palette.group_font),
                 };
 
-                crate::screens::draw_centered_text(gfx, text, position, rect.size.y, font_color);
+                draw_centered_text(gfx, text, position, rect.size.y, font_color);
             }
         }
     }
@@ -384,7 +384,7 @@ impl PlayArea {
                     false => Color::new(self.palette.group_font),
                 };
 
-                crate::screens::draw_centered_text(gfx, text, position, rect.size.y, font_color);
+                draw_centered_text(gfx, text, position, rect.size.y, font_color);
             }
         }
     }
@@ -406,6 +406,22 @@ pub fn draw_ppm_at(ppm: &Ppm, top_left: Vec2, size: Vec2, gfx: &mut Graphics) {
         let color = Color::new(ppm.to_rgba(rgb));
         gfx.rect().at(rect.position).size(rect.size).color(color);
     }
+}
+
+pub fn draw_centered_text(
+    gfx: &mut egor::render::Graphics,
+    text: &str,
+    center: Vec2,
+    size: f32,
+    color: Color,
+) {
+    // average font width is 0.53
+    let w = text.len() as f32 * size * 0.53;
+    let h = size;
+
+    let pos = center - vec2(w * 0.5, h * 0.5 - size / 2.);
+
+    gfx.text(text).size(size).color(color).at(pos);
 }
 
 pub struct LoadedPpms {

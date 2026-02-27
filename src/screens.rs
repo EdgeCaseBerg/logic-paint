@@ -3,7 +3,7 @@ use crate::netppm::Ppm;
 use crate::playstate::PlayState;
 use crate::ui::{
     ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_ppm_at, draw_quit_button, draw_x_at,
-    world_unit_size,
+    world_unit_size, draw_centered_text
 };
 use std::path::PathBuf;
 
@@ -199,23 +199,6 @@ pub fn win_screen(
     } else {
         ScreenAction::MarkLevelComplete
     }
-}
-
-// TODO move to ui module
-pub fn draw_centered_text(
-    gfx: &mut egor::render::Graphics,
-    text: &str,
-    center: Vec2,
-    size: f32,
-    color: Color,
-) {
-    // average font width is 0.53
-    let w = text.len() as f32 * size * 0.53;
-    let h = size;
-
-    let pos = center - vec2(w * 0.5, h * 0.5 - size / 2.);
-
-    gfx.text(text).size(size).color(color).at(pos);
 }
 
 pub fn wipe_screen(
