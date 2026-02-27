@@ -246,7 +246,7 @@ impl PlayArea {
         // Hold the column colors fixed for the group clues
         let (column_group_color_a, column_group_color_b) = self.palette.even_odd_color(0);
         for (r, c, rect) in layout.iter_cells() {
-            let (even_odd_bg_color, odd_even_bg_color) = self.palette.even_odd_color(r);
+            let (_, odd_even_bg_color) = self.palette.even_odd_color(r);
             match (r < origin_x, c < origin_y) {
                 (true, true) => {
                     // Draw nothing here in the space in the corner. Though we could
