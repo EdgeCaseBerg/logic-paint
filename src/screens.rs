@@ -2,8 +2,8 @@ use crate::levels::Level;
 use crate::netppm::Ppm;
 use crate::playstate::PlayState;
 use crate::ui::{
-    ColorPalette, LoadedPpms, PlayArea, PlayerInput, draw_centered_text, draw_ppm_at,
-    draw_quit_button, draw_x_at, world_unit_size, GridLayout
+    ColorPalette, GridLayout, LoadedPpms, PlayArea, PlayerInput, draw_centered_text, draw_ppm_at,
+    draw_quit_button, draw_x_at, world_unit_size,
 };
 use std::path::PathBuf;
 
@@ -116,7 +116,7 @@ pub fn play_game_screen(
         "least one cell.",
         "Right click to mark a cell as empty",
         "Left click to fill and find out if",
-        "you're correct."
+        "you're correct.",
     ];
     for (i, instruction) in instructions.iter().enumerate() {
         gfx.text(instruction)
@@ -218,21 +218,27 @@ fn spiral_indices(rows: usize, cols: usize) -> Vec<(usize, usize)> {
             indices.push((top, c));
         }
         top += 1;
-        if top > bottom { break; }
+        if top > bottom {
+            break;
+        }
 
         // along the right side going down
         for r in top..=bottom {
             indices.push((r, right));
         }
         right = right.saturating_sub(1);
-        if left > right { break; }
+        if left > right {
+            break;
+        }
 
         // along the bottom going left
         for c in (left..=right).rev() {
             indices.push((bottom, c));
         }
         bottom = bottom.saturating_sub(1);
-        if top > bottom { break; }
+        if top > bottom {
+            break;
+        }
 
         // along the left going up
         for r in (top..=bottom).rev() {
