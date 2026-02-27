@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut current_screen = Screens::ChooseLevelScreen { page: 0 };
     let mut levels = levels::load_levels_from_dir(&level_dir_path)?;
     let mut palette = ColorPalette::meeks();
-    let mut transition_duration = 0.8;
+    let mut transition_duration = 1.8;
 
     // TODO: Refactor this to be one struct passed around
     let mut win_image = levels[0].image.clone();
