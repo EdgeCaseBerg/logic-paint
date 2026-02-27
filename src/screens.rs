@@ -110,10 +110,13 @@ pub fn play_game_screen(
     );
 
     let instructions = [
-        "Fill in the groups of cells based on the hints to their group sizes.",
-        "Groups are always separated by at least one cell.",
+        "Fill in the groups of cells based on ",
+        "the hints to their group sizes.",
+        "Groups are always separated by at ",
+        "least one cell.",
         "Right click to mark a cell as empty",
-        "Left click to fill and find out if you're correct.",
+        "Left click to fill and find out if",
+        "you're correct."
     ];
     for (i, instruction) in instructions.iter().enumerate() {
         gfx.text(instruction)
