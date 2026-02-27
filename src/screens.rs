@@ -211,8 +211,6 @@ pub fn wipe_screen(
 
     let gfx = &mut (frame_context.gfx);
     let screen_size = gfx.screen_size();
-    let pos = screen_size / 2.;
-
     gfx.camera().target(screen_size / 2.);
 
     let box_size = 60.0;
