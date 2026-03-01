@@ -76,8 +76,7 @@ impl EditorGrids {
         let right_mouse_pressed =
             input.mouse_pressed(MouseButton::Right) || input.mouse_held(MouseButton::Right);
         let (mx, my) = input.mouse_position();
-        let screen_size = gfx.screen_size();
-        let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
+        let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my));
 
         let num_boxes_x = level_settings.width;
         let num_boxes_y = level_settings.height; // TODO: maybe just always have a square

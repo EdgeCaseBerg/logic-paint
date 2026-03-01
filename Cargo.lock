@@ -425,9 +425,9 @@ dependencies = [
 
 [[package]]
 name = "egor"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a6749fa84f214caeb970da91de0bb6c8054301b43c4cb2bb52caef4b07297aa"
+checksum = "2838c19969281b9d8c68220fcf32f397ee67715d29f89cf7219cf276debeb15f"
 dependencies = [
  "egor_app",
  "egor_glue",
@@ -436,9 +436,9 @@ dependencies = [
 
 [[package]]
 name = "egor_app"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e21d1aab930d3688e9721415c20e39cac18eb951da8083adfcc146c6f566383a"
+checksum = "0d0d1fc5e009bc38e7901a1538b455a38397b720b7d04f88a3b9eff4901c6bda"
 dependencies = [
  "pollster",
  "wasm-bindgen-futures",
@@ -448,9 +448,9 @@ dependencies = [
 
 [[package]]
 name = "egor_glue"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "37c4718fcfe885dd70c3a4df1be39f573fa088329f87c6a5537e6c0b0955f02e"
+checksum = "69dda72be5b40af0544f061f6120b692610a6dca87d37d7fd2b08ed458c76014"
 dependencies = [
  "color",
  "egor_app",
@@ -458,17 +458,17 @@ dependencies = [
  "egui",
  "egui-wgpu",
  "egui-winit",
+ "glam",
  "glyphon",
 ]
 
 [[package]]
 name = "egor_render"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3609317d056716e349ca4aaa7f195bd77f849be724c0d66a5edf8a4132ac1b5"
+checksum = "19e04c92aa14c038ab5ea0afdd6b0ae39f1c5a7900f6d5d317e6f75158e4ad2d"
 dependencies = [
  "bytemuck",
- "glam",
  "image",
  "wgpu",
 ]

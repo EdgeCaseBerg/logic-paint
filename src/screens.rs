@@ -324,7 +324,7 @@ pub fn level_select_screen(
 
     let input = &mut (frame_context.input);
     let (mx, my) = input.mouse_position();
-    let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
+    let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my));
     let left_mouse_pressed = input.mouse_pressed(MouseButton::Left);
     let player_input = PlayerInput::from(input, gfx);
 

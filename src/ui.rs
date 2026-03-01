@@ -69,9 +69,8 @@ pub struct PlayerInput {
 
 impl PlayerInput {
     pub fn from(input: &Input, gfx: &mut Graphics) -> PlayerInput {
-        let screen_size = gfx.screen_size();
         let (mx, my) = input.mouse_position();
-        let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my), screen_size);
+        let world_xy = gfx.camera().screen_to_world(Vec2::new(mx, my));
         let left_mouse_pressed =
             input.mouse_pressed(MouseButton::Left) || input.mouse_held(MouseButton::Left);
         let right_mouse_pressed =
