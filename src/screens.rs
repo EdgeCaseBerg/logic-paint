@@ -67,10 +67,7 @@ pub fn play_game_screen(
     let mouse_right_size = unit_size * vec2(2., 2.);
 
     let instruction_text_position = unit_size * vec2(1., 1.);
-    let font_size = 18;
-
-    let screen_size = gfx.screen_size();
-    gfx.camera().target(screen_size / 2.);
+    let font_size = 18;    
 
     let player_input = PlayerInput::from(input, gfx);
     let play_area = PlayArea {
@@ -154,9 +151,6 @@ pub fn win_screen(
 ) -> ScreenAction {
     let gfx = &mut (frame_context.gfx);
     let input = &mut (frame_context.input);
-
-    let screen_size = gfx.screen_size();
-    gfx.camera().target(screen_size / 2.);
 
     let player_input = PlayerInput::from(input, gfx);
 
@@ -258,7 +252,6 @@ pub fn wipe_screen(
 ) -> ScreenAction {
     let gfx = &mut (frame_context.gfx);
     let screen_size = gfx.screen_size();
-    gfx.camera().target(screen_size / 2.);
 
     let layout = GridLayout {
         area: Rect {
@@ -317,9 +310,6 @@ pub fn level_select_screen(
         .collect();
 
     let gfx = &mut (frame_context.gfx);
-    let screen_size = gfx.screen_size();
-    let center = screen_size / 2.;
-    gfx.camera().target(center);
     gfx.clear(Color::new(palette.background));
 
     let input = &mut (frame_context.input);
