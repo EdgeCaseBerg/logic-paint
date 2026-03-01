@@ -418,15 +418,14 @@ pub fn level_select_screen(
             .color(bg)
             .size(btn_size)
             .at(previous_btn_position);
-        gfx.polygon()
+        gfx.path()
             .at(previous_btn_position + vec2(btn_width - btn_width / 5., 10.))
-            .points(&[
-                vec2(0., 0.),
-                vec2(-btn_width + btn_width / 4., btn_size.y / 2.),
-                vec2(0., btn_size.y - 10.),
-                vec2(0., 0.),
-            ])
-            .color(fg);
+            .begin(vec2(0., 0.))
+            .line_to(vec2(-btn_width + btn_width / 4., btn_size.y / 2.))
+            .line_to(vec2(0., btn_size.y - 10.))
+            .line_to(vec2(0., 0.))
+            .fill_color(fg)
+            .close();
     }
 
     if levels.iter().skip(levels_per_page * (page + 1)).len() > 0 {
@@ -446,15 +445,14 @@ pub fn level_select_screen(
             action = ScreenAction::NextPage;
         }
         gfx.rect().color(bg).size(btn_size).at(next_btn_position);
-        gfx.polygon()
+        gfx.path()
             .at(next_btn_position + vec2(btn_width / 5., 10.))
-            .points(&[
-                vec2(0., 0.),
-                vec2(btn_width - btn_width / 4., btn_size.y / 2.),
-                vec2(0., btn_size.y - 10.),
-                vec2(0., 0.),
-            ])
-            .color(fg);
+            .begin(vec2(0., 0.))
+            .line_to(vec2(btn_width - btn_width / 4., btn_size.y / 2.))
+            .line_to(vec2(0., btn_size.y - 10.))
+            .line_to(vec2(0., 0.))
+            .fill_color(fg)
+            .close();
     }
 
     action

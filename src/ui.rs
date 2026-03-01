@@ -116,26 +116,24 @@ pub struct PlayArea {
 
 pub fn draw_x_at(position: Vec2, cell_size: Vec2, color: Color, gfx: &mut Graphics) {
     let thickness = cell_size * 0.2;
-    gfx.polygon()
+    gfx.path()
         .at(position + vec2(0., thickness.y))
-        .points(&[
-            vec2(thickness.x, 0.),
-            vec2(thickness.x, cell_size.y),
-            vec2(0., cell_size.y),
-            vec2(0., 0.),
-        ])
+        .begin(vec2(thickness.x, 0.))
+        .line_to(vec2(thickness.x, cell_size.y))
+        .line_to(vec2(0., cell_size.y))
+        .line_to(vec2(0., 0.))
         .rotate(-3.145 / 4.)
-        .color(color);
-    gfx.polygon()
+        .fill_color(color)
+        .close();
+    gfx.path()
         .at(position + vec2(cell_size.x - thickness.x, thickness.y))
-        .points(&[
-            vec2(thickness.x, 0.),
-            vec2(thickness.x, cell_size.y),
-            vec2(0., cell_size.y),
-            vec2(0., 0.),
-        ])
+        .begin(vec2(thickness.x, 0.))
+        .line_to(vec2(thickness.x, cell_size.y))
+        .line_to(vec2(0., cell_size.y))
+        .line_to(vec2(0., 0.))
         .rotate(-7. * 3.145 / 4.)
-        .color(color);
+        .fill_color(color)
+        .close();
 }
 
 pub struct GridLayout {
@@ -430,7 +428,7 @@ pub fn draw_centered_text(
     let w = text.len() as f32 * size * 0.53;
     let h = size;
 
-    let pos = center - vec2(w * 0.5, h * 0.5 - size / 2.);
+    let pos = center - vec2(w * 0.5, h * 0.5 );
 
     gfx.text(text).size(size).color(color).at(pos);
 }
