@@ -67,7 +67,7 @@ pub fn play_game_screen(
     let mouse_right_size = unit_size * vec2(2., 2.);
 
     let instruction_text_position = unit_size * vec2(1., 1.);
-    let font_size = 18;    
+    let font_size = 18;
 
     let player_input = PlayerInput::from(input, gfx);
     let play_area = PlayArea {

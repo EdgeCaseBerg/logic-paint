@@ -100,9 +100,7 @@ pub fn load_levels_from_dir(dir: &Path) -> LevelsLoadResult<Vec<Level>> {
 
     level_files
         .into_iter()
-        .map(|level_file| -> LevelsLoadResult<Level> {
-            load_level(level_file)
-        })
+        .map(|level_file| -> LevelsLoadResult<Level> { load_level(level_file) })
         .collect()
 }
 

@@ -428,7 +428,7 @@ pub fn draw_centered_text(
     let w = text.len() as f32 * size * 0.53;
     let h = size;
 
-    let pos = center - vec2(w * 0.5, h * 0.5 );
+    let pos = center - vec2(w * 0.5, h * 0.5);
 
     gfx.text(text).size(size).color(color).at(pos);
 }
