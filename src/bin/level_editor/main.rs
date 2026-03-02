@@ -1,14 +1,14 @@
+use logicpaint::base_dir;
 use logicpaint::editor_grids::{EditorGrids, save_grid_as_level};
 use logicpaint::editor_settings::LevelSettings;
 use logicpaint::pop_up::PopUp;
 use logicpaint::ui_actions::UiActions;
+use logicpaint::ui_actions::{IOWorkerRequest, IOWorkerResponse};
 
-use std::future::Future;
-use std::thread;
-use std::sync::mpsc::{ Receiver, Sender, channel };
-use std::path::PathBuf;
-use rfd::FileHandle;
 use rfd::FileDialog;
+use std::path::PathBuf;
+use std::sync::mpsc::{Receiver, Sender, channel};
+use std::thread;
 
 use egor::{
     app::{App, WindowEvent},
@@ -20,18 +20,38 @@ use egor::{
     render::Color,
 };
 
-struct IoThreadFacade {
-    open_file_channel: (Sender<PathBuf>, Receiver<PathBuf>),
-    file_to_load: Option<PathBuf>
-}
-
-fn execute<F: Future<Output = ()> + Send + 'static>(f: F) {
-    // this is stupid... use any executor of your choice instead
-    eprintln!("execute ");
-    std::thread::spawn(move || async {
-        eprintln!("in async");
-        f.await
+fn spawn_io_worker(
+    start_directory: PathBuf,
+) -> (Sender<IOWorkerRequest>, Receiver<IOWorkerResponse>) {
+    let (main_thread_sender, main_thread_reciever) = channel::<IOWorkerRequest>();
+    let (worker_thread_sender, worker_thread_reciever) = channel::<IOWorkerResponse>();
+    thread::spawn(move || {
+        while let Ok(request) = main_thread_reciever.recv() {
+            match request {
+                IOWorkerRequest::Shutdown => break,
+                IOWorkerRequest::OpenFileDialog => {
+                    let selected_file = FileDialog::new()
+                        .add_filter("level", &["level"])
+                        .set_directory(&start_directory)
+                        .pick_file();
+                    if let Some(file) = selected_file {
+                        match worker_thread_sender.send(IOWorkerResponse::IoOpenChoice(file)) {
+                            Ok(something) => {
+                                eprintln!("OK: {something:?}");
+                                // TODO dont break thing
+                                break;
+                            }
+                            Err(error) => {
+                                // TODO
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     });
+    (main_thread_sender, worker_thread_reciever)
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -39,7 +59,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut grids = EditorGrids::default();
     let mut save_pop_up: Option<PopUp> = None;
 
-    let mut io: (Sender<PathBuf>, Receiver<PathBuf>) = channel();
+    let base = base_dir();
+    let (io_sender, io_reciever) = spawn_io_worker(base);
 
     App::new()
         .window_size(1280, 720)
@@ -48,19 +69,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for event in &frame_context.events {
                 match event {
                     WindowEvent::CloseRequested => {
+                        let _ = io_sender.send(IOWorkerRequest::Shutdown);
                         std::process::exit(0);
                     }
                     _ => {}
                 }
             }
             if frame_context.input.key_pressed(KeyCode::Escape) {
+                let _ = io_sender.send(IOWorkerRequest::Shutdown);
                 std::process::exit(0);
             }
 
-            if let Ok(to_open) = io.1.try_recv() {
-                eprintln!("Open plz {:?}", to_open);
+            if let Ok(io_response) = io_reciever.try_recv() {
+                match io_response {
+                    IOWorkerResponse::IoOpenChoice(to_open) => {
+                        eprintln!("Open plz {:?}", to_open);
+                    }
+                }
             }
-
 
             let gfx = &mut (frame_context.gfx);
             let egui_ctx = frame_context.egui_ctx;
@@ -78,17 +104,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             level_settings.refresh_palette_with(grids.unique_colors());
                         }
                         UiActions::OpenLevel => {
-                            let sender = io.0.clone();
-                            std::thread::spawn(move || {
-                                let files = FileDialog::new()
-                                    .add_filter("level", &["level"])
-                                    .set_directory("/") // TODO set to startup area
-                                    .pick_file();
-                                if let Some(file) = files {
-                                    let _ = sender.send(file);
+                            match io_sender.send(IOWorkerRequest::OpenFileDialog) {
+                                Ok(_) => {}
+                                Err(errr) => {
+                                    eprintln!("Uh oh {:?}", errr)
                                 }
-                            });
-                            
+                            }
                         }
                         UiActions::SaveLevel => {
                             let level = save_grid_as_level(&level_settings, &grids);

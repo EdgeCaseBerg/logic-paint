@@ -1,8 +1,6 @@
 use egor::app::egui::Rgba;
 use egor::app::{egui::Slider, egui::TextEdit, egui::Ui};
 
-use rfd::FileDialog;
-
 use crate::ui_actions::UiActions;
 
 pub struct LevelSettings {
@@ -61,7 +59,6 @@ impl LevelSettings {
                 result = UiActions::OpenLevel;
             }
         });
-
 
         ui.separator();
         ui.label("Current Palette:");
