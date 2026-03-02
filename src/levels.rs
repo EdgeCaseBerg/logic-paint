@@ -101,44 +101,48 @@ pub fn load_levels_from_dir(dir: &Path) -> LevelsLoadResult<Vec<Level>> {
     level_files
         .into_iter()
         .map(|level_file| -> LevelsLoadResult<Level> {
-            let contents = read_to_string(&level_file).map_err(|e| LevelLoadError::Io {
-                path: level_file.clone(),
-                source: e,
-            })?;
-
-            let completed = contents.trim() == "1";
-
-            let pbm_path = level_file.with_extension("pbm");
-            let ppm_path = level_file.with_extension("ppm");
-
-            let pbm: Pbm = read_to_string(&pbm_path)
-                .map_err(|e| LevelLoadError::Io {
-                    path: pbm_path.clone(),
-                    source: e,
-                })?
-                .parse()
-                .map_err(|e| LevelLoadError::ParsePbm {
-                    path: pbm_path.clone(),
-                    source: e,
-                })?;
-
-            let ppm: Ppm = read_to_string(&ppm_path)
-                .map_err(|e| LevelLoadError::Io {
-                    path: ppm_path.clone(),
-                    source: e,
-                })?
-                .parse()
-                .map_err(|e| LevelLoadError::ParsePpm {
-                    path: ppm_path.clone(),
-                    source: e,
-                })?;
-
-            Ok(Level {
-                info: pbm,
-                image: ppm,
-                completed,
-                path: level_file.clone(),
-            })
+            load_level(level_file)
         })
         .collect()
+}
+
+pub fn load_level(level_file: PathBuf) -> LevelsLoadResult<Level> {
+    let contents = read_to_string(&level_file).map_err(|e| LevelLoadError::Io {
+        path: level_file.clone(),
+        source: e,
+    })?;
+
+    let completed = contents.trim() == "1";
+
+    let pbm_path = level_file.with_extension("pbm");
+    let ppm_path = level_file.with_extension("ppm");
+
+    let pbm: Pbm = read_to_string(&pbm_path)
+        .map_err(|e| LevelLoadError::Io {
+            path: pbm_path.clone(),
+            source: e,
+        })?
+        .parse()
+        .map_err(|e| LevelLoadError::ParsePbm {
+            path: pbm_path.clone(),
+            source: e,
+        })?;
+
+    let ppm: Ppm = read_to_string(&ppm_path)
+        .map_err(|e| LevelLoadError::Io {
+            path: ppm_path.clone(),
+            source: e,
+        })?
+        .parse()
+        .map_err(|e| LevelLoadError::ParsePpm {
+            path: ppm_path.clone(),
+            source: e,
+        })?;
+
+    Ok(Level {
+        info: pbm,
+        image: ppm,
+        completed,
+        path: level_file.clone(),
+    })
 }
