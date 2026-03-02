@@ -3,6 +3,13 @@ use logicpaint::editor_settings::LevelSettings;
 use logicpaint::pop_up::PopUp;
 use logicpaint::ui_actions::UiActions;
 
+use std::future::Future;
+use std::thread;
+use std::sync::mpsc::{ Receiver, Sender, channel };
+use std::path::PathBuf;
+use rfd::FileHandle;
+use rfd::FileDialog;
+
 use egor::{
     app::{App, WindowEvent},
     input::KeyCode,
@@ -13,10 +20,26 @@ use egor::{
     render::Color,
 };
 
+struct IoThreadFacade {
+    open_file_channel: (Sender<PathBuf>, Receiver<PathBuf>),
+    file_to_load: Option<PathBuf>
+}
+
+fn execute<F: Future<Output = ()> + Send + 'static>(f: F) {
+    // this is stupid... use any executor of your choice instead
+    eprintln!("execute ");
+    std::thread::spawn(move || async {
+        eprintln!("in async");
+        f.await
+    });
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut level_settings = LevelSettings::default();
     let mut grids = EditorGrids::default();
     let mut save_pop_up: Option<PopUp> = None;
+
+    let mut io: (Sender<PathBuf>, Receiver<PathBuf>) = channel();
 
     App::new()
         .window_size(1280, 720)
@@ -34,6 +57,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 std::process::exit(0);
             }
 
+            if let Ok(to_open) = io.1.try_recv() {
+                eprintln!("Open plz {:?}", to_open);
+            }
+
+
             let gfx = &mut (frame_context.gfx);
             let egui_ctx = frame_context.egui_ctx;
 
@@ -48,6 +76,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         UiActions::Nothing => {}
                         UiActions::RecomputePalette => {
                             level_settings.refresh_palette_with(grids.unique_colors());
+                        }
+                        UiActions::OpenLevel => {
+                            let sender = io.0.clone();
+                            std::thread::spawn(move || {
+                                let files = FileDialog::new()
+                                    .add_filter("level", &["level"])
+                                    .set_directory("/") // TODO set to startup area
+                                    .pick_file();
+                                if let Some(file) = files {
+                                    let _ = sender.send(file);
+                                }
+                            });
+                            
                         }
                         UiActions::SaveLevel => {
                             let level = save_grid_as_level(&level_settings, &grids);
