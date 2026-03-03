@@ -1,6 +1,7 @@
 use egor::app::egui::Rgba;
 use egor::app::{egui::Slider, egui::TextEdit, egui::Ui};
 
+use crate::levels::Level;
 use crate::ui_actions::UiActions;
 
 pub struct LevelSettings {
@@ -26,6 +27,16 @@ impl Default for LevelSettings {
 }
 
 impl LevelSettings {
+    pub fn load_level(&mut self, level: &Level) {
+        self.filename = level
+            .path
+            .file_stem()
+            .map(|os| os.to_string_lossy().to_string())
+            .unwrap_or(String::from("unknown"));
+        self.width = level.info.width;
+        self.height = level.info.height;
+    }
+
     pub fn ui(&mut self, ui: &mut Ui) -> UiActions {
         let mut result = UiActions::Nothing;
         ui.heading("Instructions");
