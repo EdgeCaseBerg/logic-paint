@@ -54,6 +54,16 @@ fn spawn_io_worker(
     (main_thread_sender, worker_thread_reciever)
 }
 
+fn kill_self(io_sender: Sender<IOWorkerRequest>) -> ! {
+    match io_sender.send(IOWorkerRequest::Shutdown) {
+        Ok(_) => {},
+        Err(error) => {
+            eprintln!("while shutting down io worker, experienced: {:?}", error);
+        }
+    }
+    std::process::exit(0)
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut level_settings = LevelSettings::default();
     let mut grids = EditorGrids::default();
@@ -69,15 +79,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for event in &frame_context.events {
                 match event {
                     WindowEvent::CloseRequested => {
-                        let _ = io_sender.send(IOWorkerRequest::Shutdown);
-                        std::process::exit(0);
+                        // This feels very silly to have to clone to avoid a move when the program is
+                        // going to kill itself. But that's what rust feels like doing.
+                        kill_self(io_sender.clone());
                     }
                     _ => {}
                 }
             }
             if frame_context.input.key_pressed(KeyCode::Escape) {
-                let _ = io_sender.send(IOWorkerRequest::Shutdown);
-                std::process::exit(0);
+                kill_self(io_sender.clone());
             }
 
             if let Ok(io_response) = io_reciever.try_recv() {
@@ -106,8 +116,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         UiActions::OpenLevel => {
                             match io_sender.send(IOWorkerRequest::OpenFileDialog) {
                                 Ok(_) => {}
-                                Err(errr) => {
-                                    eprintln!("Uh oh {:?}", errr)
+                                Err(error) => {
+                                    save_pop_up = Some(PopUp {
+                                        heading: "Error".to_owned(),
+                                        msg: format!("An error has occurred: {}", error).to_owned(),
+                                        visible: true,
+                                    });
                                 }
                             }
                         }
