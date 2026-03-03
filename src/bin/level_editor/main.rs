@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut grids = EditorGrids::default();
     let mut save_pop_up: Option<PopUp> = None;
 
-    let base = base_dir();
+    let base = base_dir().join("levels");
     let (io_sender, io_reciever) = spawn_io_worker(base);
 
     App::new()
