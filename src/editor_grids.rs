@@ -44,6 +44,19 @@ impl Default for EditorGrids {
 }
 
 impl EditorGrids {
+    pub fn load_level(&mut self, level: &Level) {
+        for (r, row) in level.info.rows().into_iter().enumerate() {
+            for (c, b) in row.into_iter().enumerate() {
+                self.pbm_grid[r][c] = b;
+            }
+        }
+        for (r, row) in level.image.rows().into_iter().enumerate() {
+            for (c, triplet) in row.into_iter().enumerate() {
+                self.ppm_grid[r][c] = level.image.to_rgba(triplet);
+            }
+        }
+    }
+
     pub fn unique_colors(&self) -> Vec<[f32; 4]> {
         let mut unique = HashMap::new();
         for row in &self.ppm_grid {
