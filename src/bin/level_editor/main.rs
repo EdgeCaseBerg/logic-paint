@@ -1,6 +1,7 @@
 use logicpaint::base_dir;
 use logicpaint::editor_grids::{EditorGrids, save_grid_as_level};
 use logicpaint::editor_settings::LevelSettings;
+use logicpaint::levels::{Level, load_level};
 use logicpaint::pop_up::PopUp;
 use logicpaint::ui_actions::UiActions;
 use logicpaint::ui_actions::{IOWorkerRequest, IOWorkerResponse};
@@ -48,9 +49,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             if let Ok(io_response) = io_reciever.try_recv() {
                 match io_response {
-                    IOWorkerResponse::IoOpenChoice(to_open) => {
-                        eprintln!("Open plz {:?}", to_open);
-                    }
+                    IOWorkerResponse::IoOpenChoice(to_open) => match load_level(to_open) {
+                        Err(error) => {
+                            save_pop_up = Some(PopUp {
+                                heading: "Error".to_owned(),
+                                msg: format!("Could not load level: {}", error).to_owned(),
+                                visible: true,
+                            });
+                        }
+                        Ok(level) => {
+                            load_level_in_editor(level, &mut level_settings, &mut grids);
+                        }
+                    },
                 }
             }
 
@@ -75,7 +85,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 Err(error) => {
                                     save_pop_up = Some(PopUp {
                                         heading: "Error".to_owned(),
-                                        msg: format!("An error has occurred: {}", error).to_owned(),
+                                        msg: format!(
+                                            "An error has occurred, cannot open file: {}",
+                                            error
+                                        )
+                                        .to_owned(),
                                         visible: true,
                                     });
                                 }
@@ -110,8 +124,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-
-
 fn spawn_io_worker(
     start_directory: PathBuf,
 ) -> (Sender<IOWorkerRequest>, Receiver<IOWorkerResponse>) {
@@ -128,13 +140,9 @@ fn spawn_io_worker(
                         .pick_file();
                     if let Some(file) = selected_file {
                         match worker_thread_sender.send(IOWorkerResponse::IoOpenChoice(file)) {
-                            Ok(something) => {
-                                eprintln!("OK: {something:?}");
-                                // TODO dont break thing
-                                break;
-                            }
+                            Ok(_) => {}
                             Err(error) => {
-                                // TODO
+                                eprintln!("io worker experienced error: {}", error);
                                 break;
                             }
                         }
@@ -148,10 +156,16 @@ fn spawn_io_worker(
 
 fn kill_self(io_sender: Sender<IOWorkerRequest>) -> ! {
     match io_sender.send(IOWorkerRequest::Shutdown) {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(error) => {
-            eprintln!("while shutting down io worker, experienced: {:?}", error);
+            eprintln!("while shutting down io worker, experienced: {}", error);
         }
     }
     std::process::exit(0)
+}
+
+fn load_level_in_editor(level: Level, level_settings: &mut LevelSettings, grids: &mut EditorGrids) {
+    grids.load_level(&level);
+    level_settings.load_level(&level);
+    level_settings.refresh_palette_with(grids.unique_colors());
 }
