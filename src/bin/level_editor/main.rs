@@ -20,50 +20,6 @@ use egor::{
     render::Color,
 };
 
-fn spawn_io_worker(
-    start_directory: PathBuf,
-) -> (Sender<IOWorkerRequest>, Receiver<IOWorkerResponse>) {
-    let (main_thread_sender, main_thread_reciever) = channel::<IOWorkerRequest>();
-    let (worker_thread_sender, worker_thread_reciever) = channel::<IOWorkerResponse>();
-    thread::spawn(move || {
-        while let Ok(request) = main_thread_reciever.recv() {
-            match request {
-                IOWorkerRequest::Shutdown => break,
-                IOWorkerRequest::OpenFileDialog => {
-                    let selected_file = FileDialog::new()
-                        .add_filter("level", &["level"])
-                        .set_directory(&start_directory)
-                        .pick_file();
-                    if let Some(file) = selected_file {
-                        match worker_thread_sender.send(IOWorkerResponse::IoOpenChoice(file)) {
-                            Ok(something) => {
-                                eprintln!("OK: {something:?}");
-                                // TODO dont break thing
-                                break;
-                            }
-                            Err(error) => {
-                                // TODO
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    });
-    (main_thread_sender, worker_thread_reciever)
-}
-
-fn kill_self(io_sender: Sender<IOWorkerRequest>) -> ! {
-    match io_sender.send(IOWorkerRequest::Shutdown) {
-        Ok(_) => {},
-        Err(error) => {
-            eprintln!("while shutting down io worker, experienced: {:?}", error);
-        }
-    }
-    std::process::exit(0)
-}
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut level_settings = LevelSettings::default();
     let mut grids = EditorGrids::default();
@@ -152,4 +108,50 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
 
     Ok(())
+}
+
+
+
+fn spawn_io_worker(
+    start_directory: PathBuf,
+) -> (Sender<IOWorkerRequest>, Receiver<IOWorkerResponse>) {
+    let (main_thread_sender, main_thread_reciever) = channel::<IOWorkerRequest>();
+    let (worker_thread_sender, worker_thread_reciever) = channel::<IOWorkerResponse>();
+    thread::spawn(move || {
+        while let Ok(request) = main_thread_reciever.recv() {
+            match request {
+                IOWorkerRequest::Shutdown => break,
+                IOWorkerRequest::OpenFileDialog => {
+                    let selected_file = FileDialog::new()
+                        .add_filter("level", &["level"])
+                        .set_directory(&start_directory)
+                        .pick_file();
+                    if let Some(file) = selected_file {
+                        match worker_thread_sender.send(IOWorkerResponse::IoOpenChoice(file)) {
+                            Ok(something) => {
+                                eprintln!("OK: {something:?}");
+                                // TODO dont break thing
+                                break;
+                            }
+                            Err(error) => {
+                                // TODO
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+    (main_thread_sender, worker_thread_reciever)
+}
+
+fn kill_self(io_sender: Sender<IOWorkerRequest>) -> ! {
+    match io_sender.send(IOWorkerRequest::Shutdown) {
+        Ok(_) => {},
+        Err(error) => {
+            eprintln!("while shutting down io worker, experienced: {:?}", error);
+        }
+    }
+    std::process::exit(0)
 }
