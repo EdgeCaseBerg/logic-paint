@@ -92,6 +92,16 @@ mod pbm_tests {
     }
 
     #[test]
+    fn can_gen_the_only_option_as_needed() {
+        let mut patterns = generate_line_pattern(1, &[1]);
+        patterns.sort();
+        print_patterns(&patterns);
+        assert_eq!(patterns.len(), 1);
+        // 1000...
+        assert_eq!(u32::MAX ^ (u32::MAX >> 1), patterns[0]);
+    }
+
+    #[test]
     fn can_gen_a_10_and_01_type_pattern() {
         let mut patterns = generate_line_pattern(2, &[1]);
         patterns.sort();
@@ -104,12 +114,53 @@ mod pbm_tests {
     }
 
     #[test]
-    fn can_gen_the_only_option_as_needed() {
-        let mut patterns = generate_line_pattern(1, &[1]);
+    fn can_gen_a_1_across_3_cells_pattern() {
+        let mut patterns = generate_line_pattern(3, &[1]);
+        patterns.sort();
+        print_patterns(&patterns);
+        assert_eq!(patterns.len(), 3);
+        // 001...
+        assert_eq!((u32::MAX ^ (u32::MAX >> 1)) >> 2, patterns[0]);
+        // 010...
+        assert_eq!((u32::MAX ^ (u32::MAX >> 1)) >> 1, patterns[1]);
+        // 100...
+        assert_eq!(u32::MAX ^ (u32::MAX >> 1), patterns[2]);
+    }
+
+    #[test]
+    fn can_gen_two_1s_in_a_3_pattern() {
+        let mut patterns = generate_line_pattern(3, &[1, 1]);
         patterns.sort();
         print_patterns(&patterns);
         assert_eq!(patterns.len(), 1);
-        // 1000...
-        assert_eq!(u32::MAX ^ (u32::MAX >> 1), patterns[0]);
+        // 101
+        let one_in_3rd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
+        let one_in_1st_place = u32::MAX ^ (u32::MAX >> 1);
+        assert_eq!(one_in_1st_place | one_in_3rd_place, patterns[2]);
+    }
+
+    #[test]
+    fn can_gen_two_groups_in_five_example() {
+        let mut patterns = generate_line_pattern(5, &[2, 1]);
+        patterns.sort();
+        print_patterns(&patterns);
+        assert_eq!(patterns.len(), 3);
+        // 101
+        let one_in_1st_place = u32::MAX ^ (u32::MAX >> 1);
+        let one_in_2nd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
+        let one_in_3rd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
+        let one_in_4th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 3;
+        let one_in_5th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 4;
+        /*  Only valid patterns are:
+            11010
+            11001
+            01101
+        */
+        let one_one_zero_one_zero = one_in_1st_place | one_in_2nd_place | one_in_4th_place;
+        let one_one_zero_zero_one = one_in_1st_place | one_in_2nd_place | one_in_5th_place;
+        let zero_one_one_zero_one = one_in_1st_place | one_in_3rd_place | one_in_5th_place;
+        assert_eq!(zero_one_one_zero_one, patterns[0]);
+        assert_eq!(one_one_zero_zero_one, patterns[1]);
+        assert_eq!(one_one_zero_one_zero, patterns[2]);
     }
 }
