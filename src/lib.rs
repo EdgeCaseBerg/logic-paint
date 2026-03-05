@@ -1,5 +1,6 @@
 pub mod editor_grids;
 pub mod editor_settings;
+pub mod editor_ui_actions;
 pub mod levels;
 pub mod netbpm;
 pub mod netppm;
@@ -7,7 +8,6 @@ pub mod playstate;
 pub mod pop_up;
 pub mod screens;
 pub mod ui;
-pub mod ui_actions;
 
 pub fn base_dir() -> std::path::PathBuf {
     let dir = std::env::current_exe()

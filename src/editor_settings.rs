@@ -1,8 +1,8 @@
 use egor::app::egui::Rgba;
 use egor::app::{egui::Slider, egui::TextEdit, egui::Ui};
 
+use crate::editor_ui_actions::UiActions;
 use crate::levels::Level;
-use crate::ui_actions::UiActions;
 
 pub struct LevelSettings {
     pub width: usize,
