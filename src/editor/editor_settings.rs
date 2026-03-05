@@ -1,7 +1,7 @@
 use egor::app::egui::Rgba;
 use egor::app::{egui::Slider, egui::TextEdit, egui::Ui};
 
-use crate::editor_ui_actions::UiActions;
+use crate::editor::editor_ui_actions::UiActions;
 use crate::levels::Level;
 
 pub struct LevelSettings {
