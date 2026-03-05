@@ -19,9 +19,66 @@ type LinePattern = u32;
 // is_empty p == 0
 // is_full? p == u32::MAX
 
-pub fn generate_line_pattern(size: usize, groups: &[usize]) -> Vec<LinePattern> {
-    // TODO: Shift the bits around wahoo
-    vec![2147483648]
+pub fn generate_line_pattern(remaining_space: usize, groups: &[usize]) -> Vec<LinePattern> {
+    // for the groups we we can generate the spot the first one should be at
+    // up to the space required for the other groups, aka, if we have 2,1 then
+    // x x _ _ _ _ _ [reserved] and then shift the xx along to the right. Then,
+    // I suppose each of those acts as a base for where the reserved patterns
+    // can do the same, so each time the space to wiggle and jiggle stays the
+    // same.
+    // Base case: we have no more groups to consider, run.
+    if groups.len() == 0 || remaining_space == 0 {
+        return vec![];
+    }
+
+    let Some((group, others)) = groups.split_at_checked(1) else {
+        return vec![];
+    };
+    eprintln!("{:?} {:?}", group, others);
+
+    let size_of_first_group = group[0];
+    let other_patterns = generate_line_pattern(
+        remaining_space
+            .saturating_sub(size_of_first_group)
+            .saturating_sub(1),
+        others,
+    );
+    // other patterns will be smaller by remaining space, and so will need to be shifted to the correct place
+    // to be combined with any patterns we construct from the current group.
+    // so, lets make the bits for the current group!
+    let one_bit_on_the_left = u32::MAX ^ (u32::MAX >> 1);
+    let mut pattern = 0;
+    for _ in 0..size_of_first_group {
+        let shifted = pattern >> 1;
+        pattern = one_bit_on_the_left | shifted;
+    }
+    eprintln!("{:032b}", pattern);
+
+    // K, now I've got 111000 with a left aligned block. So, how much space needs to be reserved
+    // on the right hand side that I shouldn't touch?
+    let reserved = match others.len() {
+        0 => 0,
+        remaining_groups => others.iter().sum::<usize>() + remaining_groups - 1,
+    };
+    let mut patterns = Vec::with_capacity(remaining_space);
+    // for each potential shift to the right...
+    eprintln!("{} {}", remaining_space, reserved);
+    for _ in 0..=remaining_space.saturating_sub(reserved) {
+        // combine it with each potential pattern of the other patterns
+        for other_pattern in &other_patterns {
+            let other_pattern = other_pattern >> reserved;
+            // We need to shift the other pattern down
+            patterns.push(pattern | other_pattern);
+        }
+        if other_patterns.is_empty() {
+            patterns.push(pattern);
+        }
+        eprintln!("{:032b}", pattern);
+        pattern = pattern >> 1;
+    }
+    eprintln!("patterns: {:?}", patterns);
+
+    patterns
 }
 
 #[cfg(test)]
@@ -30,9 +87,11 @@ mod pbm_tests {
 
     #[test]
     fn name() {
-        let patterns = generate_line_pattern(1, &[1]);
-        assert_eq!(patterns.len(), 1);
+        let mut patterns = generate_line_pattern(1, &[1]);
+        patterns.sort();
+        assert_eq!(patterns.len(), 2);
         //2147483648 aka 10000000000000000000000000000000
-        assert_eq!(u32::MAX ^ (u32::MAX >> 1), patterns[0]);
+        assert_eq!((u32::MAX ^ (u32::MAX >> 1)) >> 1, patterns[0]);
+        assert_eq!(u32::MAX ^ (u32::MAX >> 1), patterns[1]);
     }
 }
