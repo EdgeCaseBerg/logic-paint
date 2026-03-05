@@ -85,14 +85,31 @@ pub fn generate_line_pattern(remaining_space: usize, groups: &[usize]) -> Vec<Li
 mod pbm_tests {
     use super::*;
 
+    fn print_patterns(patterns: &[u32]) {
+        for pattern in patterns {
+            eprintln!("{:032b}", pattern);
+        }
+    }
+
     #[test]
     fn can_gen_a_10_and_01_type_pattern() {
         let mut patterns = generate_line_pattern(2, &[1]);
         patterns.sort();
         assert_eq!(patterns.len(), 2);
+        print_patterns(&patterns);
         // 0100...
         assert_eq!((u32::MAX ^ (u32::MAX >> 1)) >> 1, patterns[0]);
         // 1000...
         assert_eq!(u32::MAX ^ (u32::MAX >> 1), patterns[1]);
+    }
+
+    #[test]
+    fn can_gen_the_only_option_as_needed() {
+        let mut patterns = generate_line_pattern(1, &[1]);
+        patterns.sort();
+        print_patterns(&patterns);
+        assert_eq!(patterns.len(), 1);
+        // 1000...
+        assert_eq!(u32::MAX ^ (u32::MAX >> 1), patterns[0]);
     }
 }
