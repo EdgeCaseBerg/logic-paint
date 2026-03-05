@@ -1,10 +1,10 @@
 use logicpaint::base_dir;
-use logicpaint::levels::{Level, load_level};
-use logicpaint::pop_up::PopUp;
 use logicpaint::editor::editor_grids::{EditorGrids, save_grid_as_level};
 use logicpaint::editor::editor_settings::LevelSettings;
 use logicpaint::editor::editor_ui_actions::UiActions;
 use logicpaint::editor::editor_ui_actions::{IOWorkerRequest, IOWorkerResponse};
+use logicpaint::levels::{Level, load_level};
+use logicpaint::pop_up::PopUp;
 
 use rfd::FileDialog;
 use std::path::PathBuf;

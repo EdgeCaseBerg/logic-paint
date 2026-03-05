@@ -1,12 +1,12 @@
-use crate::editor::editor_settings::LevelSettings;
 use crate::editor::editor_grids::EditorGrids;
-use crate::playstate::PlayState;
+use crate::editor::editor_settings::LevelSettings;
 use crate::netbpm::Pbm;
+use crate::playstate::PlayState;
 
 pub enum SolvedState {
-	Unsolvable,
-	UniqueSolution,
-	MultipleSolutions,
+    Unsolvable,
+    UniqueSolution,
+    MultipleSolutions,
 }
 
 pub fn editor_to_initial_state(level_settings: &LevelSettings, grids: &EditorGrids) -> PlayState {
