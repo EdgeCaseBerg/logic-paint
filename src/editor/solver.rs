@@ -63,7 +63,7 @@ pub fn generate_line_pattern(remaining_space: usize, groups: &[usize]) -> Vec<Li
     let mut patterns = Vec::with_capacity(remaining_space);
     // for each potential shift to the right...
     eprintln!("{} {}", remaining_space, reserved);
-    for _ in 0..=remaining_space.saturating_sub(reserved) {
+    for _ in 0..remaining_space.saturating_sub(reserved) {
         // combine it with each potential pattern of the other patterns
         for other_pattern in &other_patterns {
             let other_pattern = other_pattern >> reserved;
@@ -86,12 +86,13 @@ mod pbm_tests {
     use super::*;
 
     #[test]
-    fn name() {
-        let mut patterns = generate_line_pattern(1, &[1]);
+    fn can_gen_a_10_and_01_type_pattern() {
+        let mut patterns = generate_line_pattern(2, &[1]);
         patterns.sort();
         assert_eq!(patterns.len(), 2);
-        //2147483648 aka 10000000000000000000000000000000
+        // 0100...
         assert_eq!((u32::MAX ^ (u32::MAX >> 1)) >> 1, patterns[0]);
+        // 1000...
         assert_eq!(u32::MAX ^ (u32::MAX >> 1), patterns[1]);
     }
 }
