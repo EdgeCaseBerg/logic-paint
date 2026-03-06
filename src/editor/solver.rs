@@ -106,6 +106,7 @@ mod pbm_tests {
     use super::*;
 
     fn print_patterns(patterns: &[u32]) {
+        eprintln!("Debug pattern list:");
         for pattern in patterns {
             eprintln!("{:032b}", pattern);
         }
