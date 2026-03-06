@@ -248,4 +248,23 @@ mod pbm_tests {
         assert_eq!(first | second >> 1, patterns[1]);
         assert_eq!(first | second, patterns[2]);
     }
+
+    #[test]
+    fn quick_perf_test() {
+        //(25 - 2 + 1) choose 1 aka
+        let mut patterns = generate_line_pattern(25, &[1]);
+        assert_eq!(patterns.len(), 25);
+
+        //(25 - 2 + 1) choose 2 aka
+        let mut patterns = generate_line_pattern(25, &[1, 1]);
+        assert_eq!(patterns.len(), 276);
+
+        //(25 - 3 + 1) choose 3 aka
+        let mut patterns = generate_line_pattern(25, &[1, 1, 1]);
+        assert_eq!(patterns.len(), 1771);
+
+        //(25 - 4 + 1) choose 3 aka
+        let mut patterns = generate_line_pattern(25, &[1, 2, 1]);
+        assert_eq!(patterns.len(), 1540);
+    }
 }
