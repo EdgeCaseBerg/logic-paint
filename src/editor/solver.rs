@@ -196,4 +196,17 @@ mod pbm_tests {
         assert_eq!(one_one_zero_zero_one, patterns[1]);
         assert_eq!(one_one_zero_one_zero, patterns[2]);
     }
+
+    #[test]
+    fn can_gen_three_1s_in_a_5_pattern() {
+        let mut patterns = generate_line_pattern(5, &[1, 1, 1]);
+        patterns.sort();
+        print_patterns(&patterns);
+        assert_eq!(patterns.len(), 1);
+        // 101
+        let one_in_5th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 4;
+        let one_in_3rd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
+        let one_in_1st_place = u32::MAX ^ (u32::MAX >> 1);
+        assert_eq!(one_in_1st_place | one_in_3rd_place | one_in_5th_place, patterns[0]);
+    }
 }
