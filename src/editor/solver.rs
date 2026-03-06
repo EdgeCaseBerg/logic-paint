@@ -234,4 +234,18 @@ mod pbm_tests {
             patterns[0]
         );
     }
+
+    #[test]
+    fn can_gen_two_2s_in_a_6_pattern() {
+        let mut patterns = generate_line_pattern(6, &[2, 2]);
+        patterns.sort();
+        print_patterns(&patterns);
+        assert_eq!(patterns.len(), 3);
+        // 101
+        let first = bitblock_of(2, 0);
+        let second = bitblock_of(2, 3);
+        assert_eq!(first >> 1 | second >> 1, patterns[0]);
+        assert_eq!(first | second >> 1, patterns[1]);
+        assert_eq!(first | second, patterns[2]);
+    }
 }
