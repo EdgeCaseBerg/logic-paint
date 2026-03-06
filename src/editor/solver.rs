@@ -97,6 +97,37 @@ pub fn generate_line_pattern(remaining_space: usize, groups: &[usize]) -> Vec<Li
     patterns
 }
 
+pub struct TheMultiVerseOfLines {
+    pub rows: Vec<Vec<LinePattern>>,
+    pub columns: Vec<Vec<LinePattern>>,
+}
+
+impl TheMultiVerseOfLines {
+    pub fn new(play_state: PlayState) -> Self {
+        let mut multiverse = Self {
+            rows: Vec::new(),
+            columns: Vec::new(),
+        };
+        for r in 0..play_state.num_rows {
+            let row_groups: Vec<usize> = play_state.row_groups[r]
+                .iter()
+                .map(|g| g.num_cells)
+                .collect();
+            let row_patterns = generate_line_pattern(play_state.num_rows, &row_groups);
+            multiverse.rows.push(row_patterns);
+            for c in 0..play_state.num_columns {
+                let column_groups: Vec<usize> = play_state.column_groups[c]
+                    .iter()
+                    .map(|g| g.num_cells)
+                    .collect();
+                let column_patterns = generate_line_pattern(play_state.num_columns, &column_groups);
+                multiverse.rows.push(column_patterns);
+            }
+        }
+        multiverse
+    }
+}
+
 /* The tests are beneath here and I like having something to cleanly
    separate the code and the tests for easy scanning.
 =====================================================================
