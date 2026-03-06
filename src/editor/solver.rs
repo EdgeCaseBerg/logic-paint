@@ -131,6 +131,15 @@ mod pbm_tests {
     }
 
     #[test]
+    fn empty_line_handled_correctly() {
+        let empty: Vec<usize> = vec![];
+        let patterns = generate_line_pattern(1, &empty);
+        print_patterns(&patterns);
+        assert_eq!(patterns.len(), 1);
+        assert_eq!(0, patterns[0]);
+    }
+
+    #[test]
     fn can_gen_the_only_option_as_needed() {
         let mut patterns = generate_line_pattern(1, &[1]);
         patterns.sort();
