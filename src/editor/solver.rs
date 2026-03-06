@@ -111,7 +111,6 @@ mod pbm_tests {
         }
     }
 
-
     #[test]
     fn bitblock_works_as_expected() {
         let block = bitblock_of(1, 31);
@@ -259,21 +258,21 @@ mod pbm_tests {
     }
 
     #[test]
-    fn quick_perf_test() {
+    fn confirm_number_of_compositions_aligns_to_formula_test() {
         //(25 - 2 + 1) choose 1 aka
-        let mut patterns = generate_line_pattern(25, &[1]);
+        let patterns = generate_line_pattern(25, &[1]);
         assert_eq!(patterns.len(), 25);
 
         //(25 - 2 + 1) choose 2 aka
-        let mut patterns = generate_line_pattern(25, &[1, 1]);
+        let patterns = generate_line_pattern(25, &[1, 1]);
         assert_eq!(patterns.len(), 276);
 
         //(25 - 3 + 1) choose 3 aka
-        let mut patterns = generate_line_pattern(25, &[1, 1, 1]);
+        let patterns = generate_line_pattern(25, &[1, 1, 1]);
         assert_eq!(patterns.len(), 1771);
 
         //(25 - 4 + 1) choose 3 aka
-        let mut patterns = generate_line_pattern(25, &[1, 2, 1]);
+        let patterns = generate_line_pattern(25, &[1, 2, 1]);
         assert_eq!(patterns.len(), 1540);
     }
 }
