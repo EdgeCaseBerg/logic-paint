@@ -114,16 +114,16 @@ impl TheMultiVerseOfLines {
                 .iter()
                 .map(|g| g.num_cells)
                 .collect();
-            let row_patterns = generate_line_pattern(play_state.num_rows, &row_groups);
+            let row_patterns = generate_line_pattern(play_state.num_columns, &row_groups);
             multiverse.rows.push(row_patterns);
-            for c in 0..play_state.num_columns {
-                let column_groups: Vec<usize> = play_state.column_groups[c]
-                    .iter()
-                    .map(|g| g.num_cells)
-                    .collect();
-                let column_patterns = generate_line_pattern(play_state.num_columns, &column_groups);
-                multiverse.rows.push(column_patterns);
-            }
+        }
+        for c in 0..play_state.num_columns {
+            let column_groups: Vec<usize> = play_state.column_groups[c]
+                .iter()
+                .map(|g| g.num_cells)
+                .collect();
+            let column_patterns = generate_line_pattern(play_state.num_rows, &column_groups);
+            multiverse.columns.push(column_patterns);
         }
         multiverse
     }
