@@ -15,9 +15,19 @@ pub fn editor_to_initial_state(level_settings: &LevelSettings, grids: &EditorGri
 }
 
 type LinePattern = u32;
+const MAX_BITS: usize = 32; // this should match to LinePattern. Always!
 
-// is_empty p == 0
-// is_full? p == u32::MAX
+pub fn bitblock_of(size: usize, at: usize) -> LinePattern {
+    assert!(at < MAX_BITS);
+    let one_bit_on_the_left = u32::MAX ^ (u32::MAX >> 1);
+    let mut base_pattern = 0;
+    for _ in 0..size {
+        base_pattern = (base_pattern >> 1) | one_bit_on_the_left;
+    }
+    assert!(size + at - 1 < MAX_BITS);
+    base_pattern = base_pattern >> at;
+    base_pattern
+}
 
 pub fn generate_line_pattern(remaining_space: usize, groups: &[usize]) -> Vec<LinePattern> {
     // for the groups we we can generate the spot the first one should be at
@@ -89,6 +99,25 @@ mod pbm_tests {
         for pattern in patterns {
             eprintln!("{:032b}", pattern);
         }
+    }
+
+
+    #[test]
+    fn bitblock_works_as_expected() {
+        let block = bitblock_of(1, 31);
+        assert_eq!(0b00000000000000000000000000000001, block);
+        let block = bitblock_of(2, 30);
+        assert_eq!(0b00000000000000000000000000000011, block);
+        let block = bitblock_of(2, 2);
+        assert_eq!(0b00110000000000000000000000000000, block);
+        let block = bitblock_of(32, 0);
+        assert_eq!(0b11111111111111111111111111111111, block);
+    }
+
+    #[should_panic]
+    #[test]
+    fn bitblock_panics_as_expected() {
+        bitblock_of(33, 0);
     }
 
     #[test]
