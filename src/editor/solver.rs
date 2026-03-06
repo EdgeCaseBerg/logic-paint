@@ -97,13 +97,14 @@ pub fn generate_line_pattern(remaining_space: usize, groups: &[usize]) -> Vec<Li
     patterns
 }
 
+#[derive(Debug)]
 pub struct TheMultiVerseOfLines {
     pub rows: Vec<Vec<LinePattern>>,
     pub columns: Vec<Vec<LinePattern>>,
 }
 
 impl TheMultiVerseOfLines {
-    pub fn new(play_state: PlayState) -> Self {
+    pub fn new(play_state: &PlayState) -> Self {
         let mut multiverse = Self {
             rows: Vec::new(),
             columns: Vec::new(),
