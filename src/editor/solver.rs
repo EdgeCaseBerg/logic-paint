@@ -29,64 +29,69 @@ pub fn bitblock_of(size: usize, at: usize) -> LinePattern {
     base_pattern
 }
 
+// Remaining space is how much inclaimed space lays before our army of bits eagerly ready
+// to conquer and claim the electric homes of their permutious multitude.
 pub fn generate_line_pattern(remaining_space: usize, groups: &[usize]) -> Vec<LinePattern> {
-    // for the groups we we can generate the spot the first one should be at
-    // up to the space required for the other groups, aka, if we have 2,1 then
-    // x x _ _ _ _ _ [reserved] and then shift the xx along to the right. Then,
-    // I suppose each of those acts as a base for where the reserved patterns
-    // can do the same, so each time the space to wiggle and jiggle stays the
-    // same.
-    // Base case: we have no more groups to consider, run.
-    if groups.len() == 0 || remaining_space == 0 {
+    // If no groups remain, the line is empty so it can be filled as desired by the caller
+    if groups.is_empty() {
+        return vec![0];
+    }
+
+    // If there is no space, no places exist for the bits to make their home.
+    // Solemnly cry out to the void and beg for a place to lay thy head only
+    // to be cast aside with an empty space offered in return.
+    if remaining_space == 0 {
         return vec![];
     }
 
-    let Some((group, others)) = groups.split_at_checked(1) else {
+    // If we can't split, then there isn't anything TO consider. Begone.
+    let Some((group, others)) = groups.split_first() else {
         return vec![];
     };
-    eprintln!("{:?} {:?}", group, others);
 
-    let size_of_first_group = group[0];
-    let other_patterns = generate_line_pattern(
-        remaining_space
+    let size_of_first_group = *group;
+    if size_of_first_group == remaining_space {
+        return vec![bitblock_of(size_of_first_group, 0)];
+    }
+
+    // Minimum space required for remaining groups, when this is empty
+    // then we can let the bits run rampant to the far side and plant their
+    // flag upon those fertile hills.
+    let reserved = if others.is_empty() {
+        0
+    } else {
+        others.iter().sum::<usize>() + (others.len() - 1)
+    };
+
+    // Construct left-aligned block for the first group
+    let base_pattern = bitblock_of(size_of_first_group, 0);
+    let mut patterns = Vec::new();
+
+    // How far we can shift the first group
+    let max_shift = remaining_space
+        .saturating_sub(size_of_first_group)
+        .saturating_sub(reserved);
+
+    for inset in 0..=max_shift {
+        let pattern = base_pattern >> inset;
+
+        // Remaining space AFTER placing first group + separator
+        let remaining_after_group = remaining_space
+            .saturating_sub(inset)
             .saturating_sub(size_of_first_group)
-            .saturating_sub(1),
-        others,
-    );
-    // other patterns will be smaller by remaining space, and so will need to be shifted to the correct place
-    // to be combined with any patterns we construct from the current group.
-    // so, lets make the bits for the current group!
-    let one_bit_on_the_left = u32::MAX ^ (u32::MAX >> 1);
-    let mut pattern = 0;
-    for _ in 0..size_of_first_group {
-        let shifted = pattern >> 1;
-        pattern = one_bit_on_the_left | shifted;
-    }
-    eprintln!("{:032b}", pattern);
+            .saturating_sub(if others.is_empty() { 0 } else { 1 });
 
-    // K, now I've got 111000 with a left aligned block. So, how much space needs to be reserved
-    // on the right hand side that I shouldn't touch?
-    let reserved = match others.len() {
-        0 => 0,
-        remaining_groups => others.iter().sum::<usize>() + remaining_groups - 1,
-    };
-    let mut patterns = Vec::with_capacity(remaining_space);
-    // for each potential shift to the right...
-    eprintln!("{} {}", remaining_space, reserved);
-    for _ in 0..remaining_space.saturating_sub(reserved) {
-        // combine it with each potential pattern of the other patterns
-        for other_pattern in &other_patterns {
-            let other_pattern = other_pattern >> reserved;
-            // We need to shift the other pattern down
-            patterns.push(pattern | other_pattern);
-        }
+        let other_patterns = generate_line_pattern(remaining_after_group, others);
+
         if other_patterns.is_empty() {
-            patterns.push(pattern);
+        } else {
+            let shift = inset + size_of_first_group + 1;
+
+            for other in other_patterns {
+                patterns.push(pattern | (other >> shift));
+            }
         }
-        eprintln!("{:032b}", pattern);
-        pattern = pattern >> 1;
     }
-    eprintln!("patterns: {:?}", patterns);
 
     patterns
 }
@@ -165,7 +170,7 @@ mod pbm_tests {
         // 101
         let one_in_3rd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
         let one_in_1st_place = u32::MAX ^ (u32::MAX >> 1);
-        assert_eq!(one_in_1st_place | one_in_3rd_place, patterns[2]);
+        assert_eq!(one_in_1st_place | one_in_3rd_place, patterns[0]);
     }
 
     #[test]
@@ -174,9 +179,8 @@ mod pbm_tests {
         patterns.sort();
         print_patterns(&patterns);
         assert_eq!(patterns.len(), 3);
-        // 101
         let one_in_1st_place = u32::MAX ^ (u32::MAX >> 1);
-        let one_in_2nd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
+        let one_in_2nd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 1;
         let one_in_3rd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
         let one_in_4th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 3;
         let one_in_5th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 4;
@@ -187,7 +191,7 @@ mod pbm_tests {
         */
         let one_one_zero_one_zero = one_in_1st_place | one_in_2nd_place | one_in_4th_place;
         let one_one_zero_zero_one = one_in_1st_place | one_in_2nd_place | one_in_5th_place;
-        let zero_one_one_zero_one = one_in_1st_place | one_in_3rd_place | one_in_5th_place;
+        let zero_one_one_zero_one = one_in_2nd_place | one_in_3rd_place | one_in_5th_place;
         assert_eq!(zero_one_one_zero_one, patterns[0]);
         assert_eq!(one_one_zero_zero_one, patterns[1]);
         assert_eq!(one_one_zero_one_zero, patterns[2]);
