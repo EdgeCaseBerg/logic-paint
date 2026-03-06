@@ -152,7 +152,7 @@ impl TheMultiVerseOfLines {
 */
 
 #[cfg(test)]
-mod pbm_tests {
+mod solver_tests {
     use super::*;
 
     fn print_patterns(patterns: &[u32]) {
