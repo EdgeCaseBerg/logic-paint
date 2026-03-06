@@ -174,7 +174,7 @@ mod pbm_tests {
         assert_eq!(patterns.len(), 1);
         // 101
         let one_in_3rd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
-        let one_in_1st_place = u32::MAX ^ (u32::MAX >> 1);
+        let one_in_1st_place = bitblock_of(1, 0);
         assert_eq!(one_in_1st_place | one_in_3rd_place, patterns[0]);
     }
 
@@ -184,11 +184,11 @@ mod pbm_tests {
         patterns.sort();
         print_patterns(&patterns);
         assert_eq!(patterns.len(), 3);
-        let one_in_1st_place = u32::MAX ^ (u32::MAX >> 1);
-        let one_in_2nd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 1;
-        let one_in_3rd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
-        let one_in_4th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 3;
-        let one_in_5th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 4;
+        let one_in_1st_place = bitblock_of(1, 0);
+        let one_in_2nd_place = bitblock_of(1, 1);
+        let one_in_3rd_place = bitblock_of(1, 2);
+        let one_in_4th_place = bitblock_of(1, 3);
+        let one_in_5th_place = bitblock_of(1, 4);
         /*  Only valid patterns are:
             11010
             11001
@@ -209,9 +209,9 @@ mod pbm_tests {
         print_patterns(&patterns);
         assert_eq!(patterns.len(), 1);
         // 101
-        let one_in_5th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 4;
+        let one_in_5th_place = bitblock_of(1, 4);
         let one_in_3rd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
-        let one_in_1st_place = u32::MAX ^ (u32::MAX >> 1);
+        let one_in_1st_place = bitblock_of(1, 0);
         assert_eq!(
             one_in_1st_place | one_in_3rd_place | one_in_5th_place,
             patterns[0]
@@ -225,10 +225,10 @@ mod pbm_tests {
         print_patterns(&patterns);
         assert_eq!(patterns.len(), 1);
         // 101
-        let one_in_1st_place = u32::MAX ^ (u32::MAX >> 1);
-        let one_in_2nd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 1;
-        let one_in_4th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 3;
-        let one_in_5th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 4;
+        let one_in_1st_place = bitblock_of(1, 0);
+        let one_in_2nd_place = bitblock_of(1, 1);
+        let one_in_4th_place = bitblock_of(1, 3);
+        let one_in_5th_place = bitblock_of(1, 4);
         assert_eq!(
             one_in_1st_place | one_in_2nd_place | one_in_4th_place | one_in_5th_place,
             patterns[0]
