@@ -78,7 +78,6 @@ pub fn generate_line_pattern(remaining_space: usize, groups: &[usize]) -> Vec<Li
         if max_shift == 0 {
             continue;
         }
-        /* How do we tell we're accidentally shifting too far? */
         let pattern = base_pattern >> inset;
 
         // Remaining space AFTER placing first group + separator
@@ -88,14 +87,9 @@ pub fn generate_line_pattern(remaining_space: usize, groups: &[usize]) -> Vec<Li
             .saturating_sub(if others.is_empty() { 0 } else { 1 });
 
         let other_patterns = generate_line_pattern(remaining_after_group, others);
-
-        if other_patterns.is_empty() {
-        } else {
-            let shift = inset + size_of_first_group + 1;
-
-            for other in other_patterns {
-                patterns.push(pattern | (other >> shift));
-            }
+        let shift = inset + size_of_first_group + 1;
+        for other in other_patterns {
+            patterns.push(pattern | (other >> shift));
         }
     }
 
@@ -147,7 +141,7 @@ mod pbm_tests {
         print_patterns(&patterns);
         assert_eq!(patterns.len(), 1);
         // 1000...
-        assert_eq!(u32::MAX ^ (u32::MAX >> 1), patterns[0]);
+        assert_eq!(bitblock_of(1, 0), patterns[0]);
     }
 
     #[test]
@@ -157,9 +151,9 @@ mod pbm_tests {
         assert_eq!(patterns.len(), 2);
         print_patterns(&patterns);
         // 0100...
-        assert_eq!((u32::MAX ^ (u32::MAX >> 1)) >> 1, patterns[0]);
+        assert_eq!(bitblock_of(1, 1), patterns[0]);
         // 1000...
-        assert_eq!(u32::MAX ^ (u32::MAX >> 1), patterns[1]);
+        assert_eq!(bitblock_of(1, 0), patterns[1]);
     }
 
     #[test]
@@ -169,11 +163,11 @@ mod pbm_tests {
         print_patterns(&patterns);
         assert_eq!(patterns.len(), 3);
         // 001...
-        assert_eq!((u32::MAX ^ (u32::MAX >> 1)) >> 2, patterns[0]);
+        assert_eq!(bitblock_of(1, 2), patterns[0]);
         // 010...
-        assert_eq!((u32::MAX ^ (u32::MAX >> 1)) >> 1, patterns[1]);
+        assert_eq!(bitblock_of(1, 1), patterns[1]);
         // 100...
-        assert_eq!(u32::MAX ^ (u32::MAX >> 1), patterns[2]);
+        assert_eq!(bitblock_of(1, 0), patterns[2]);
     }
 
     #[test]
@@ -183,7 +177,7 @@ mod pbm_tests {
         print_patterns(&patterns);
         assert_eq!(patterns.len(), 1);
         // 101
-        let one_in_3rd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
+        let one_in_3rd_place = bitblock_of(1, 2);
         let one_in_1st_place = bitblock_of(1, 0);
         assert_eq!(one_in_1st_place | one_in_3rd_place, patterns[0]);
     }
@@ -220,7 +214,7 @@ mod pbm_tests {
         assert_eq!(patterns.len(), 1);
         // 101
         let one_in_5th_place = bitblock_of(1, 4);
-        let one_in_3rd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
+        let one_in_3rd_place = bitblock_of(1, 2);
         let one_in_1st_place = bitblock_of(1, 0);
         assert_eq!(
             one_in_1st_place | one_in_3rd_place | one_in_5th_place,
