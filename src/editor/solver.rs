@@ -73,6 +73,11 @@ pub fn generate_line_pattern(remaining_space: usize, groups: &[usize]) -> Vec<Li
         .saturating_sub(reserved);
 
     for inset in 0..=max_shift {
+        // If there is no space at all, then skip.
+        if max_shift == 0 {
+            continue;
+        }
+        /* How do we tell we're accidentally shifting too far? */
         let pattern = base_pattern >> inset;
 
         // Remaining space AFTER placing first group + separator
@@ -207,6 +212,26 @@ mod pbm_tests {
         let one_in_5th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 4;
         let one_in_3rd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 2;
         let one_in_1st_place = u32::MAX ^ (u32::MAX >> 1);
-        assert_eq!(one_in_1st_place | one_in_3rd_place | one_in_5th_place, patterns[0]);
+        assert_eq!(
+            one_in_1st_place | one_in_3rd_place | one_in_5th_place,
+            patterns[0]
+        );
+    }
+
+    #[test]
+    fn can_gen_two_2s_in_a_5_pattern() {
+        let mut patterns = generate_line_pattern(5, &[2, 2]);
+        patterns.sort();
+        print_patterns(&patterns);
+        assert_eq!(patterns.len(), 1);
+        // 101
+        let one_in_1st_place = u32::MAX ^ (u32::MAX >> 1);
+        let one_in_2nd_place = (u32::MAX ^ (u32::MAX >> 1)) >> 1;
+        let one_in_4th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 3;
+        let one_in_5th_place = (u32::MAX ^ (u32::MAX >> 1)) >> 4;
+        assert_eq!(
+            one_in_1st_place | one_in_2nd_place | one_in_4th_place | one_in_5th_place,
+            patterns[0]
+        );
     }
 }
