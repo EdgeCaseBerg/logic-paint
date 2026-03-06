@@ -47,6 +47,7 @@ pub fn generate_line_pattern(remaining_space: usize, groups: &[usize]) -> Vec<Li
     // If we can't split, then there isn't anything TO consider. Begone.
     // (Note this is actually redundant to our first case but I dont want the None so...)
     let Some((group, others)) = groups.split_first() else {
+        assert!(false, "This code will never be reached");
         return vec![0];
     };
 
