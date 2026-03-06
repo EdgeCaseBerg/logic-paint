@@ -1,5 +1,7 @@
 use std::str::FromStr;
 
+// TODO Netpbm is the name of the group of formats, both Pbm and Ppm. We should fix the files to reflect this
+
 #[derive(Debug)]
 pub struct Pbm {
     pub width: usize,
