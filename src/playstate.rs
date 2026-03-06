@@ -67,8 +67,8 @@ pub struct PlayState {
     pub column_groups: Vec<Vec<Group>>,
     pub row_groups: Vec<Vec<Group>>,
     goal_state: Vec<CellState>,
-    num_rows: usize,
-    num_columns: usize,
+    pub num_rows: usize,
+    pub num_columns: usize,
 }
 
 // Simple, not full fields display, of PlayState for easy test debugging
