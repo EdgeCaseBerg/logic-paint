@@ -129,6 +129,26 @@ impl TheMultiVerseOfLines {
     }
 }
 
+impl std::fmt::Display for TheMultiVerseOfLines {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "Rows:\n")?;
+        for patterns in &self.rows {
+            write!(f, "Row:\n")?;
+            for line in patterns {
+                write!(f, "{:032b}\n", line)?;
+            }
+        }
+        write!(f, "Columns:\n")?;
+        for patterns in &self.columns {
+            write!(f, "Column:\n")?;
+            for line in patterns {
+                write!(f, "{:032b}\n", line)?;
+            }
+        }
+        Ok(())
+    }
+}
+
 /* The tests are beneath here and I like having something to cleanly
    separate the code and the tests for easy scanning.
 =====================================================================
