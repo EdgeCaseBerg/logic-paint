@@ -154,8 +154,16 @@ impl TheMultiVerseOfLines {
     }
 
     fn assured_cells(patterns: &[LinePattern]) -> (LinePattern, LinePattern) {
-        let must_be_filled: LinePattern = patterns.iter().fold(LinePattern::MAX, |l, r| l & r);
-        let must_be_empty: LinePattern = !(patterns.iter().fold(0, |l, r| l | r));
+        let mut all_filled_together = LinePattern::MAX;
+        let mut all_empty_together = 0;
+
+        for &pattern in patterns {
+            all_filled_together &= pattern;
+            all_empty_together |= pattern;
+        }
+
+        let must_be_filled = all_filled_together;
+        let must_be_empty = !all_empty_together;
         (must_be_filled, must_be_empty)
     }
 }
