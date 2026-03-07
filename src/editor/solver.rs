@@ -3,6 +3,7 @@ use crate::editor::editor_settings::LevelSettings;
 use crate::netbpm::Pbm;
 use crate::playstate::PlayState;
 
+#[derive(PartialEq, Debug)]
 pub enum SolvedState {
     Unsolvable,
     UniqueSolution,
@@ -166,6 +167,78 @@ impl TheMultiVerseOfLines {
         let must_be_filled = all_filled_together;
         let must_be_empty = !all_empty_together;
         (must_be_filled, must_be_empty)
+    }
+
+    pub fn collapse(&mut self) {
+        loop {
+            let mut changed = false;
+            changed = changed || self.collapse_rows();
+            changed = changed || self.collapse_columns();
+            if !changed {
+                break;
+            }
+        }
+    }
+
+    fn collapse_rows(&mut self) -> bool {
+        let mut changed = false;
+        for r in 0..self.rows.len() {
+            let (must_be_filled, must_be_empty) = self.get_assured_row_cells(r);
+            for c in 0..self.columns.len() {
+                // if this changes before and after we reduce, then changed is true!
+                let number_patterns = self.columns[c].len();
+                self.columns[c].retain(|&pattern| {
+                    let fill_agree = lines_agree(must_be_filled, pattern, c, r);
+                    let empty_agree = lines_agree(must_be_empty, !pattern, c, r);
+                    fill_agree && empty_agree
+                });
+                changed = changed || number_patterns != self.columns[c].len();
+            }
+        }
+        changed
+    }
+
+    fn collapse_columns(&mut self) -> bool {
+        let mut changed = false;
+        for c in 0..self.columns.len() {
+            let (must_be_filled, must_be_empty) = self.get_assured_column_cells(c);
+            for r in 0..self.rows.len() {
+                // if this changes before and after we reduce, then changed is true!
+                let number_patterns = self.rows[r].len();
+                self.rows[r].retain(|&pattern| {
+                    let fill_agree = lines_agree(must_be_filled, pattern, r, c);
+                    let empty_agree = lines_agree(must_be_empty, !pattern, r, c);
+                    fill_agree && empty_agree
+                });
+                changed = changed || number_patterns != self.rows[r].len();
+            }
+        }
+        changed
+    }
+
+    pub fn state(&self) -> SolvedState {
+        // If we collapsed and found no options, there is a contradiction
+        // or guesswork required, so fail it because we only want line solveable
+        // puzzles!
+        if self.rows.iter().any(|p| p.is_empty()) {
+            return SolvedState::Unsolvable;
+        }
+        if self.columns.iter().any(|p| p.is_empty()) {
+            return SolvedState::Unsolvable;
+        }
+
+        // But if each has a unique pattern left, then it is solveable with only 1 way!
+        for pattern in &self.rows {
+            if pattern.len() > 1 {
+                return SolvedState::MultipleSolutions;
+            }
+        }
+        for pattern in &self.columns {
+            if pattern.len() > 1 {
+                return SolvedState::MultipleSolutions;
+            }
+        }
+        SolvedState::UniqueSolution
     }
 }
 
@@ -472,7 +545,7 @@ mod solver_tests {
     fn should_filter_to_single_solution_if_found_already() {
         let tps = test_play_state();
         let multiverse = TheMultiVerseOfLines::new(&tps);
-        let filled = bitblock_of(1, 0);    //10000...
+        let filled = bitblock_of(1, 0); //10000...
         let empty = LinePattern::MAX >> 1; //01111....
         let options = multiverse.filter_row(0, filled, empty);
         assert_eq!(1, options.len());
@@ -483,13 +556,46 @@ mod solver_tests {
     fn should_filter_row_based_on_constraints() {
         let tps = test_play_state();
         let multiverse = TheMultiVerseOfLines::new(&tps);
-        // true , true , true , true  , false,
-        let filled = bitblock_of(3, 1);    //10000...
+        let filled = bitblock_of(3, 1); //10000...
         let empty = 0;
+        // true , true , true , true  , false,
         let mut options = multiverse.filter_row(3, filled, empty);
         assert_eq!(2, options.len());
         options.sort();
-        assert_eq!(bitblock_of(4,1), options[0]);
-        assert_eq!(bitblock_of(4,0), options[1]);
+        assert_eq!(bitblock_of(4, 1), options[0]);
+        assert_eq!(bitblock_of(4, 0), options[1]);
+    }
+
+    #[test]
+    fn should_filter_row_to_assured_when_nothing_known() {
+        let tps = test_play_state();
+        let multiverse = TheMultiVerseOfLines::new(&tps);
+        // We know nothing about 11100, 01110, 00111 ?
+        let filled = 0;
+        let empty = 0;
+        let mut options = multiverse.filter_row(2, filled, empty);
+        assert_eq!(3, options.len());
+        options.sort();
+        assert_eq!(bitblock_of(3, 2), options[0]);
+        assert_eq!(bitblock_of(3, 1), options[1]);
+        assert_eq!(bitblock_of(3, 0), options[2]);
+    }
+
+    #[test]
+    fn requires_guessing_multi_solution() {
+        let tps: PlayState = {
+            let pbm = Pbm {
+                width: 2,
+                height: 2,
+                cells: vec![
+                    true  , false,
+                    false , true ,
+                ]
+            };
+            (&pbm).into()
+        };
+        let mut multiverse = TheMultiVerseOfLines::new(&tps);
+        multiverse.collapse();
+        assert_eq!(SolvedState::MultipleSolutions, multiverse.state());
     }
 }
