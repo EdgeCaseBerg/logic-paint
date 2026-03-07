@@ -346,4 +346,40 @@ mod solver_tests {
         let patterns = generate_line_pattern(25, &[1, 2, 1]);
         assert_eq!(patterns.len(), 1540);
     }
+
+    #[rustfmt::skip]
+    fn test_play_state() -> PlayState {
+        let pbm = Pbm {
+            width: 5,
+            height: 5,
+            cells: vec![
+                true , false, false, false , false,
+                true , true , false, false , false,
+                true , true , true , false , false,
+                true , true , true , true  , false,
+                true , true , true , true  , true,
+            ]
+        };
+        (&pbm).into()
+    }
+
+    #[test] // dr strange called.
+    fn generate_correct_multiverse() {
+        let tps = test_play_state();
+        let multiverse = TheMultiVerseOfLines::new(&tps);
+        eprintln!("{multiverse}");
+        // the possibilites for the cells decrease as we go down
+        assert_eq!(5, multiverse.rows[0].len());
+        assert_eq!(4, multiverse.rows[1].len());
+        assert_eq!(3, multiverse.rows[2].len());
+        assert_eq!(2, multiverse.rows[3].len());
+        assert_eq!(1, multiverse.rows[4].len());
+
+        // the possibilites for the columns increase as we go to the right
+        assert_eq!(1, multiverse.columns[0].len());
+        assert_eq!(2, multiverse.columns[1].len());
+        assert_eq!(3, multiverse.columns[2].len());
+        assert_eq!(4, multiverse.columns[3].len());
+        assert_eq!(5, multiverse.columns[4].len());
+    }
 }
