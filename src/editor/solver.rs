@@ -188,9 +188,23 @@ impl TheMultiVerseOfLines {
                 // if this changes before and after we reduce, then changed is true!
                 let number_patterns = self.columns[c].len();
                 self.columns[c].retain(|&pattern| {
-                    let fill_agree = lines_agree(must_be_filled, pattern, c, r);
-                    let empty_agree = lines_agree(must_be_empty, !pattern, c, r);
-                    fill_agree && empty_agree
+                    let row_bit = MAX_BITS - 1 - r;
+                    let column_bit = MAX_BITS - 1 - c;
+                    if (must_be_filled >> column_bit) & 1 == 1 {
+                        let fill_agree =
+                            bit_agreed_at(must_be_filled, pattern, column_bit, row_bit);
+                        if !fill_agree {
+                            return false;
+                        }
+                    }
+                    if (must_be_empty >> column_bit) & 1 == 1 {
+                        let empty_agree =
+                            bit_agreed_at(must_be_empty, !pattern, column_bit, row_bit);
+                        if !empty_agree {
+                            return false;
+                        }
+                    }
+                    true
                 });
                 changed = changed || number_patterns != self.columns[c].len();
             }
@@ -204,11 +218,25 @@ impl TheMultiVerseOfLines {
             let (must_be_filled, must_be_empty) = self.get_assured_column_cells(c);
             for r in 0..self.rows.len() {
                 // if this changes before and after we reduce, then changed is true!
+                let row_bit = MAX_BITS - 1 - r;
+                let column_bit = MAX_BITS - 1 - c;
                 let number_patterns = self.rows[r].len();
                 self.rows[r].retain(|&pattern| {
-                    let fill_agree = lines_agree(must_be_filled, pattern, r, c);
-                    let empty_agree = lines_agree(must_be_empty, !pattern, r, c);
-                    fill_agree && empty_agree
+                    if (must_be_filled >> row_bit) & 1 == 1 {
+                        let fill_agree =
+                            bit_agreed_at(must_be_filled, pattern, row_bit, column_bit);
+                        if !fill_agree {
+                            return false;
+                        }
+                    }
+                    if (must_be_empty >> row_bit) & 1 == 1 {
+                        let empty_agree =
+                            bit_agreed_at(must_be_empty, !pattern, row_bit, column_bit);
+                        if !empty_agree {
+                            return false;
+                        }
+                    }
+                    true
                 });
                 changed = changed || number_patterns != self.rows[r].len();
             }
@@ -242,7 +270,7 @@ impl TheMultiVerseOfLines {
     }
 }
 
-pub fn lines_agree(line1: LinePattern, line2: LinePattern, idx_1: usize, idx_2: usize) -> bool {
+pub fn bit_agreed_at(line1: LinePattern, line2: LinePattern, idx_1: usize, idx_2: usize) -> bool {
     let bit1 = (line1 >> idx_1) & 1;
     let bit2 = (line2 >> idx_2) & 1;
     bit1 == bit2
@@ -466,6 +494,34 @@ mod solver_tests {
         assert_eq!(patterns.len(), 1540);
     }
 
+    #[test]
+    fn bit_agreed_at_works_as_expected() {
+        assert!(bit_agreed_at(1, 1, 0, 0));
+        let three_on_left_offset_one = bitblock_of(3, 1);
+        let three_on_left_offset_two = bitblock_of(3, 2);
+        // zero
+        assert!(bit_agreed_at(
+            three_on_left_offset_one,
+            three_on_left_offset_two,
+            31,
+            31
+        ));
+        // 1 and 0 disagree
+        assert!(!bit_agreed_at(
+            three_on_left_offset_one,
+            three_on_left_offset_two,
+            30,
+            30
+        ));
+        // aligned again with overlap
+        assert!(bit_agreed_at(
+            three_on_left_offset_one,
+            three_on_left_offset_two,
+            29,
+            29
+        ));
+    }
+
     #[rustfmt::skip]
     fn test_play_state() -> PlayState {
         let pbm = Pbm {
@@ -597,5 +653,14 @@ mod solver_tests {
         let mut multiverse = TheMultiVerseOfLines::new(&tps);
         multiverse.collapse();
         assert_eq!(SolvedState::MultipleSolutions, multiverse.state());
+    }
+
+    #[test]
+    fn has_one_solution() {
+        let tps = test_play_state();
+        let mut multiverse = TheMultiVerseOfLines::new(&tps);
+        multiverse.collapse();
+        eprintln!("{multiverse}");
+        assert_eq!(SolvedState::UniqueSolution, multiverse.state());
     }
 }
