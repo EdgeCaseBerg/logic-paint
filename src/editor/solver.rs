@@ -127,6 +127,43 @@ impl TheMultiVerseOfLines {
         }
         multiverse
     }
+
+    // known_filled = 1's where 1s are in row.
+    // known_empty = 1's where 0s are in row
+    pub fn filter_row(
+        &self,
+        row_idx: usize,
+        known_filled: LinePattern,
+        known_empty: LinePattern,
+    ) -> Vec<LinePattern> {
+        self.rows[row_idx]
+            .iter()
+            .copied()
+            .filter(|pattern| {
+                (pattern & known_filled) == known_filled && (!pattern & known_empty) == known_empty // we could also pattern & known_empty == 0 but that's bleh (╯°□°)╯
+            })
+            .collect()
+    }
+
+    pub fn get_assured_row_cells(&self, row_idx: usize) -> (LinePattern, LinePattern) {
+        Self::assured_cells(&self.rows[row_idx])
+    }
+
+    pub fn get_assured_column_cells(&self, column_idx: usize) -> (LinePattern, LinePattern) {
+        Self::assured_cells(&self.columns[column_idx])
+    }
+
+    fn assured_cells(patterns: &[LinePattern]) -> (LinePattern, LinePattern) {
+        let must_be_filled: LinePattern = patterns.iter().fold(LinePattern::MAX, |l, r| l & r);
+        let must_be_empty: LinePattern = !(patterns.iter().fold(0, |l, r| l | r));
+        (must_be_filled, must_be_empty)
+    }
+}
+
+pub fn lines_agree(line1: LinePattern, line2: LinePattern, idx_1: usize, idx_2: usize) -> bool {
+    let bit1 = (line1 >> idx_1) & 1;
+    let bit2 = (line2 >> idx_2) & 1;
+    bit1 == bit2
 }
 
 impl std::fmt::Display for TheMultiVerseOfLines {
@@ -381,5 +418,44 @@ mod solver_tests {
         assert_eq!(3, multiverse.columns[2].len());
         assert_eq!(4, multiverse.columns[3].len());
         assert_eq!(5, multiverse.columns[4].len());
+    }
+
+    #[test]
+    fn get_assured_row_cells_3_in_5_pattern() {
+        let tps = test_play_state();
+        let mut multiverse = TheMultiVerseOfLines::new(&tps);
+        let potential = multiverse.get_assured_row_cells(2);
+        let must_fill = bitblock_of(1, 2);
+        let empty_first_5 = LinePattern::MAX >> 5;
+        // For debugging when fail:
+        print_patterns(&[must_fill, potential.0, potential.1]);
+        assert_eq!(must_fill, potential.0);
+        assert_eq!(empty_first_5, potential.1);
+    }
+
+    #[test]
+    fn get_assured_col_cells_3_in_5_pattern() {
+        let tps = test_play_state();
+        let mut multiverse = TheMultiVerseOfLines::new(&tps);
+        let potential = multiverse.get_assured_column_cells(2);
+        let must_fill = bitblock_of(1, 2);
+        let empty_first_5 = LinePattern::MAX >> 5;
+        // For debugging when fail:
+        print_patterns(&[must_fill, potential.0, potential.1]);
+        assert_eq!(must_fill, potential.0);
+        assert_eq!(empty_first_5, potential.1);
+    }
+
+    #[test]
+    fn get_no_assurances_about_anything_when_not_enough_constraints() {
+        let tps = test_play_state();
+        let mut multiverse = TheMultiVerseOfLines::new(&tps);
+        let potential = multiverse.get_assured_row_cells(0);
+        let must_fill = 0;
+        let empty_first_5 = LinePattern::MAX >> 5;
+        // For debugging when fail:
+        print_patterns(&[must_fill, potential.0, potential.1]);
+        assert_eq!(must_fill, potential.0);
+        assert_eq!(empty_first_5, potential.1);
     }
 }
