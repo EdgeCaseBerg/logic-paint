@@ -140,7 +140,8 @@ impl TheMultiVerseOfLines {
             .iter()
             .copied()
             .filter(|pattern| {
-                (pattern & known_filled) == known_filled && (!pattern & known_empty) == known_empty // we could also pattern & known_empty == 0 but that's bleh (╯°□°)╯
+                // we could also pattern & known_empty == 0 but that's bleh (╯°□°)╯
+                (pattern & known_filled) == known_filled && (!pattern & known_empty) == known_empty
             })
             .collect()
     }
