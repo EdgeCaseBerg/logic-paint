@@ -432,7 +432,7 @@ mod solver_tests {
     #[test]
     fn get_assured_row_cells_3_in_5_pattern() {
         let tps = test_play_state();
-        let mut multiverse = TheMultiVerseOfLines::new(&tps);
+        let multiverse = TheMultiVerseOfLines::new(&tps);
         let potential = multiverse.get_assured_row_cells(2);
         let must_fill = bitblock_of(1, 2);
         let empty_first_5 = LinePattern::MAX >> 5;
@@ -445,7 +445,7 @@ mod solver_tests {
     #[test]
     fn get_assured_col_cells_3_in_5_pattern() {
         let tps = test_play_state();
-        let mut multiverse = TheMultiVerseOfLines::new(&tps);
+        let multiverse = TheMultiVerseOfLines::new(&tps);
         let potential = multiverse.get_assured_column_cells(2);
         let must_fill = bitblock_of(1, 2);
         let empty_first_5 = LinePattern::MAX >> 5;
@@ -458,7 +458,7 @@ mod solver_tests {
     #[test]
     fn get_no_assurances_about_anything_when_not_enough_constraints() {
         let tps = test_play_state();
-        let mut multiverse = TheMultiVerseOfLines::new(&tps);
+        let multiverse = TheMultiVerseOfLines::new(&tps);
         let potential = multiverse.get_assured_row_cells(0);
         let must_fill = 0;
         let empty_first_5 = LinePattern::MAX >> 5;
