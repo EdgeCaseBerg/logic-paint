@@ -467,4 +467,29 @@ mod solver_tests {
         assert_eq!(must_fill, potential.0);
         assert_eq!(empty_first_5, potential.1);
     }
+
+    #[test]
+    fn should_filter_to_single_solution_if_found_already() {
+        let tps = test_play_state();
+        let multiverse = TheMultiVerseOfLines::new(&tps);
+        let filled = bitblock_of(1, 0);    //10000...
+        let empty = LinePattern::MAX >> 1; //01111....
+        let options = multiverse.filter_row(0, filled, empty);
+        assert_eq!(1, options.len());
+        assert_eq!(filled, options[0]);
+    }
+
+    #[test]
+    fn should_filter_row_based_on_constraints() {
+        let tps = test_play_state();
+        let multiverse = TheMultiVerseOfLines::new(&tps);
+        // true , true , true , true  , false,
+        let filled = bitblock_of(3, 1);    //10000...
+        let empty = 0;
+        let mut options = multiverse.filter_row(3, filled, empty);
+        assert_eq!(2, options.len());
+        options.sort();
+        assert_eq!(bitblock_of(4,1), options[0]);
+        assert_eq!(bitblock_of(4,0), options[1]);
+    }
 }
