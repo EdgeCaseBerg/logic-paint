@@ -185,7 +185,7 @@ impl TheMultiVerseOfLines {
         for r in 0..self.rows.len() {
             let (must_be_filled, must_be_empty) = self.get_assured_row_cells(r);
             for c in 0..self.columns.len() {
-                // if this changes before and after we reduce, then changed is true!
+                // We are LEFT aligned, so row and column must be translated!
                 let number_patterns = self.columns[c].len();
                 self.columns[c].retain(|&pattern| {
                     let row_bit = MAX_BITS - 1 - r;
@@ -217,7 +217,7 @@ impl TheMultiVerseOfLines {
         for c in 0..self.columns.len() {
             let (must_be_filled, must_be_empty) = self.get_assured_column_cells(c);
             for r in 0..self.rows.len() {
-                // if this changes before and after we reduce, then changed is true!
+                // We are LEFT aligned, so row and column must be translated!
                 let row_bit = MAX_BITS - 1 - r;
                 let column_bit = MAX_BITS - 1 - c;
                 let number_patterns = self.rows[r].len();
