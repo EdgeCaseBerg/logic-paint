@@ -82,7 +82,11 @@ impl EditorGrids {
         unique
     }
 
-    pub fn ui(&mut self, frame_context: &mut FrameContext, level_settings: &mut LevelSettings) -> UiActions {
+    pub fn ui(
+        &mut self,
+        frame_context: &mut FrameContext,
+        level_settings: &mut LevelSettings,
+    ) -> UiActions {
         let mut action = UiActions::Nothing;
 
         let gfx = &mut (frame_context.gfx);

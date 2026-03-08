@@ -3,10 +3,9 @@ use logicpaint::editor::editor_grids::{EditorGrids, save_grid_as_level};
 use logicpaint::editor::editor_settings::LevelSettings;
 use logicpaint::editor::editor_ui_actions::UiActions;
 use logicpaint::editor::editor_ui_actions::{IOWorkerRequest, IOWorkerResponse};
+use logicpaint::editor::solver_display::SolverDisplay;
 use logicpaint::levels::{Level, load_level};
 use logicpaint::pop_up::PopUp;
-use logicpaint::editor::solver_display::SolverDisplay;
-
 
 use rfd::FileDialog;
 use std::path::PathBuf;

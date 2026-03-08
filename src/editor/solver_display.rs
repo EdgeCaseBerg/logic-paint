@@ -1,11 +1,10 @@
-use crate::editor::editor_settings::LevelSettings;
 use crate::editor::editor_grids::EditorGrids;
+use crate::editor::editor_settings::LevelSettings;
+use crate::editor::solver::SolvedState;
+use crate::editor::solver::TheMultiVerseOfLines;
 use crate::netbpm::Pbm;
 use crate::playstate::PlayState;
-use crate::editor::solver::TheMultiVerseOfLines;
-use crate::editor::solver::SolvedState;
 use egor::app::egui::Ui;
-
 
 pub struct SolverDisplay {
     pub iterations: usize,
@@ -22,7 +21,7 @@ impl Default for SolverDisplay {
 }
 
 impl SolverDisplay {
-    pub fn ui(&mut self, ui: &mut Ui) { 
+    pub fn ui(&mut self, ui: &mut Ui) {
         ui.separator();
         ui.heading("Level Correctness");
         let state = match self.state {
@@ -41,9 +40,7 @@ impl SolverDisplay {
         let mut possibilities = TheMultiVerseOfLines::new(&ps);
         // TODO remove
         eprintln!("STATE: {possibilities}");
-        self.iterations = possibilities.collapse(); 
+        self.iterations = possibilities.collapse();
         self.state = possibilities.state();
     }
 }
-
-
