@@ -5,6 +5,8 @@ use logicpaint::editor::editor_ui_actions::UiActions;
 use logicpaint::editor::editor_ui_actions::{IOWorkerRequest, IOWorkerResponse};
 use logicpaint::levels::{Level, load_level};
 use logicpaint::pop_up::PopUp;
+use logicpaint::editor::solver_display::SolverDisplay;
+
 
 use rfd::FileDialog;
 use std::path::PathBuf;
@@ -25,6 +27,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut level_settings = LevelSettings::default();
     let mut grids = EditorGrids::default();
     let mut save_pop_up: Option<PopUp> = None;
+    let mut solver = SolverDisplay::default();
 
     let base = base_dir().join("levels");
     let (io_sender, io_reciever) = spawn_io_worker(base);
@@ -69,13 +72,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             gfx.clear(Color::new([0.5, 0.5, 0.5, 1.0]));
 
-            grids.ui(frame_context, &mut level_settings);
+            match grids.ui(frame_context, &mut level_settings) {
+                UiActions::LevelGridUpdated => solver.recompute(&level_settings, &grids),
+                _ => {}
+            };
             Window::new("Settings")
                 .anchor(Align2::LEFT_TOP, egor::app::egui::Vec2::ZERO)
                 .default_size([100.0, 500.0])
                 .show(egui_ctx, |ui| {
                     match level_settings.ui(ui) {
                         UiActions::Nothing => {}
+                        UiActions::LevelGridUpdated => {
+                            unreachable!();
+                        }
                         UiActions::RecomputePalette => {
                             level_settings.refresh_palette_with(grids.unique_colors());
                         }
@@ -115,6 +124,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             }
                         }
                     }
+                    solver.ui(ui);
                     if let Some(popup) = save_pop_up.as_mut() {
                         popup.ui(ui);
                     }
