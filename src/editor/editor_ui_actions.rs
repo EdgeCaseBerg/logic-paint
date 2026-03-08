@@ -7,6 +7,7 @@ pub enum UiActions {
     SaveLevel,
     RecomputePalette,
     OpenLevel,
+    LevelGridUpdated,
 }
 
 pub enum IOWorkerRequest {

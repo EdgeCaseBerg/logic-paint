@@ -1,5 +1,6 @@
 use crate::base_dir;
 use crate::editor::editor_settings::LevelSettings;
+use crate::editor::editor_ui_actions::UiActions;
 use crate::levels::Level;
 use crate::netbpm::Pbm;
 use crate::netppm::Ppm;
@@ -81,7 +82,9 @@ impl EditorGrids {
         unique
     }
 
-    pub fn ui(&mut self, frame_context: &mut FrameContext, level_settings: &mut LevelSettings) {
+    pub fn ui(&mut self, frame_context: &mut FrameContext, level_settings: &mut LevelSettings) -> UiActions {
+        let mut action = UiActions::Nothing;
+
         let gfx = &mut (frame_context.gfx);
         let input = &mut (frame_context.input);
         let left_mouse_pressed =
@@ -109,9 +112,11 @@ impl EditorGrids {
                 let position = pbm_anchor + vec2(c as f32, r as f32) * (cell_size + gutter);
 
                 if Rect::new(position, cell_size).contains(world_xy) && left_mouse_pressed {
+                    action = UiActions::LevelGridUpdated;
                     self.pbm_grid[r][c] = true;
                 }
                 if Rect::new(position, cell_size).contains(world_xy) && right_mouse_pressed {
+                    action = UiActions::LevelGridUpdated;
                     self.pbm_grid[r][c] = false;
                 }
                 let color = if self.pbm_grid[r][c] {
