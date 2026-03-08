@@ -131,22 +131,6 @@ impl TheMultiVerseOfLines {
 
     // known_filled = 1's where 1s are in row.
     // known_empty = 1's where 0s are in row
-    pub fn filter_row(
-        &self,
-        row_idx: usize,
-        known_filled: LinePattern,
-        known_empty: LinePattern,
-    ) -> Vec<LinePattern> {
-        self.rows[row_idx]
-            .iter()
-            .copied()
-            .filter(|pattern| {
-                // we could also pattern & known_empty == 0 but that's bleh (╯°□°)╯
-                (pattern & known_filled) == known_filled && (!pattern & known_empty) == known_empty
-            })
-            .collect()
-    }
-
     pub fn get_assured_row_cells(&self, row_idx: usize) -> (LinePattern, LinePattern) {
         Self::assured_cells(&self.rows[row_idx])
     }
@@ -181,64 +165,40 @@ impl TheMultiVerseOfLines {
     }
 
     fn collapse_rows(&mut self) -> bool {
-        let mut changed = false;
-        for r in 0..self.rows.len() {
-            let (must_be_filled, must_be_empty) = self.get_assured_row_cells(r);
-            for c in 0..self.columns.len() {
-                // We are LEFT aligned, so row and column must be translated!
-                let number_patterns = self.columns[c].len();
-                self.columns[c].retain(|&pattern| {
-                    let row_bit = MAX_BITS - 1 - r;
-                    let column_bit = MAX_BITS - 1 - c;
-                    if (must_be_filled >> column_bit) & 1 == 1 {
-                        let fill_agree =
-                            bit_agreed_at(must_be_filled, pattern, column_bit, row_bit);
-                        if !fill_agree {
-                            return false;
-                        }
-                    }
-                    if (must_be_empty >> column_bit) & 1 == 1 {
-                        let empty_agree =
-                            bit_agreed_at(must_be_empty, !pattern, column_bit, row_bit);
-                        if !empty_agree {
-                            return false;
-                        }
-                    }
-                    true
-                });
-                changed = changed || number_patterns != self.columns[c].len();
-            }
-        }
-        changed
+        Self::collapse_lines(&self.rows, &mut self.columns)
     }
 
     fn collapse_columns(&mut self) -> bool {
+        Self::collapse_lines(&self.columns, &mut self.rows)
+    }
+
+    fn collapse_lines(lines: &[Vec<LinePattern>], patterns: &mut [Vec<LinePattern>]) -> bool {
         let mut changed = false;
-        for c in 0..self.columns.len() {
-            let (must_be_filled, must_be_empty) = self.get_assured_column_cells(c);
-            for r in 0..self.rows.len() {
-                // We are LEFT aligned, so row and column must be translated!
-                let row_bit = MAX_BITS - 1 - r;
-                let column_bit = MAX_BITS - 1 - c;
-                let number_patterns = self.rows[r].len();
-                self.rows[r].retain(|&pattern| {
-                    if (must_be_filled >> row_bit) & 1 == 1 {
+        for l in 0..lines.len() {
+            let (must_be_filled, must_be_empty) = Self::assured_cells(&lines[l]);
+            for p in 0..patterns.len() {
+                let valid_patterns = patterns[p].len();
+                // This is no longer row and bit, but just source and target sorta, or line and pattern idx
+                let line_idx = MAX_BITS - 1 - l;
+                let pattern_idx = MAX_BITS - 1 - p;
+                patterns[p].retain(|&pattern| {
+                    if (must_be_filled >> pattern_idx) & 1 == 1 {
                         let fill_agree =
-                            bit_agreed_at(must_be_filled, pattern, row_bit, column_bit);
+                            bit_agreed_at(must_be_filled, pattern, pattern_idx, line_idx);
                         if !fill_agree {
                             return false;
                         }
                     }
-                    if (must_be_empty >> row_bit) & 1 == 1 {
+                    if (must_be_empty >> pattern_idx) & 1 == 1 {
                         let empty_agree =
-                            bit_agreed_at(must_be_empty, !pattern, row_bit, column_bit);
+                            bit_agreed_at(must_be_empty, !pattern, pattern_idx, line_idx);
                         if !empty_agree {
                             return false;
                         }
                     }
                     true
                 });
-                changed = changed || number_patterns != self.rows[r].len();
+                changed = changed || valid_patterns != patterns[p].len();
             }
         }
         changed
@@ -595,46 +555,6 @@ mod solver_tests {
         print_patterns(&[must_fill, potential.0, potential.1]);
         assert_eq!(must_fill, potential.0);
         assert_eq!(empty_first_5, potential.1);
-    }
-
-    #[test]
-    fn should_filter_to_single_solution_if_found_already() {
-        let tps = test_play_state();
-        let multiverse = TheMultiVerseOfLines::new(&tps);
-        let filled = bitblock_of(1, 0); //10000...
-        let empty = LinePattern::MAX >> 1; //01111....
-        let options = multiverse.filter_row(0, filled, empty);
-        assert_eq!(1, options.len());
-        assert_eq!(filled, options[0]);
-    }
-
-    #[test]
-    fn should_filter_row_based_on_constraints() {
-        let tps = test_play_state();
-        let multiverse = TheMultiVerseOfLines::new(&tps);
-        let filled = bitblock_of(3, 1); //10000...
-        let empty = 0;
-        // true , true , true , true  , false,
-        let mut options = multiverse.filter_row(3, filled, empty);
-        assert_eq!(2, options.len());
-        options.sort();
-        assert_eq!(bitblock_of(4, 1), options[0]);
-        assert_eq!(bitblock_of(4, 0), options[1]);
-    }
-
-    #[test]
-    fn should_filter_row_to_assured_when_nothing_known() {
-        let tps = test_play_state();
-        let multiverse = TheMultiVerseOfLines::new(&tps);
-        // We know nothing about 11100, 01110, 00111 ?
-        let filled = 0;
-        let empty = 0;
-        let mut options = multiverse.filter_row(2, filled, empty);
-        assert_eq!(3, options.len());
-        options.sort();
-        assert_eq!(bitblock_of(3, 2), options[0]);
-        assert_eq!(bitblock_of(3, 1), options[1]);
-        assert_eq!(bitblock_of(3, 0), options[2]);
     }
 
     #[test]
