@@ -144,6 +144,17 @@ pub struct GridLayout {
 }
 
 impl GridLayout {
+    pub fn shifted_by(&self, top_left_moved_by: Vec2) -> GridLayout {
+        let mut area = self.area.clone();
+        area.position += top_left_moved_by;
+        GridLayout {
+            area,
+            rows: self.rows,
+            columns: self.columns,
+            cell_gap: self.cell_gap,
+        }
+    }
+
     pub fn cell_size(&self) -> Vec2 {
         let total = self.area.size;
 
