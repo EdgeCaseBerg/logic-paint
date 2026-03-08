@@ -109,7 +109,6 @@ impl EditorGrids {
         let cell_size = vec2(cell_size_x, cell_size_y);
 
         let pbm_anchor = self.top_left;
-        gfx.rect().at(pbm_anchor).size(self.size).color(Color::BLUE);
 
         let layout = GridLayout {
             area: Rect {
@@ -120,6 +119,10 @@ impl EditorGrids {
             columns: level_settings.width,
             cell_gap: 2.,
         };
+        gfx.rect()
+            .at(layout.area.position)
+            .size(layout.area.size)
+            .color(Color::BLUE);
         for (r, c, rect) in layout.iter_cells() {
             if rect.contains(world_xy) && left_mouse_pressed {
                 action = UiActions::LevelGridUpdated;
@@ -138,31 +141,25 @@ impl EditorGrids {
             gfx.rect().at(rect.position).size(rect.size).color(color);
         }
 
-        let pbm_anchor = pbm_anchor + gutter;
-        let ppm_anchor = pbm_anchor + vec2(400. + 50., 0.);
+        let layout = layout.shifted_by(vec2(400. + 50., 0.));
         gfx.rect()
-            .at(ppm_anchor)
-            .size(self.size)
+            .at(layout.area.position)
+            .size(layout.area.size)
             .color(Color::WHITE);
 
-        let ppm_anchor = ppm_anchor + gutter;
-        for r in 0..num_boxes_y {
-            for c in 0..num_boxes_x {
-                let position = ppm_anchor + vec2(c as f32, r as f32) * (cell_size + gutter);
-
-                if Rect::new(position, cell_size).contains(world_xy) && left_mouse_pressed {
-                    self.ppm_grid[r][c] = level_settings.current_color;
-                }
-                if Rect::new(position, cell_size).contains(world_xy) && right_mouse_pressed {
-                    self.ppm_grid[r][c] = [0.0, 0.0, 0.0, 1.0];
-                }
-                let rgb = self.ppm_grid[r][c];
-
-                gfx.rect()
-                    .at(position)
-                    .size(cell_size)
-                    .color(Color::new(rgb));
+        for (r, c, rect) in layout.iter_cells() {
+            if rect.contains(world_xy) && left_mouse_pressed {
+                self.ppm_grid[r][c] = level_settings.current_color;
             }
+            if rect.contains(world_xy) && right_mouse_pressed {
+                self.ppm_grid[r][c] = [0.0, 0.0, 0.0, 1.0];
+            }
+            let rgb = self.ppm_grid[r][c];
+
+            gfx.rect()
+                .at(rect.position)
+                .size(rect.size)
+                .color(Color::new(rgb));
         }
         action
     }
