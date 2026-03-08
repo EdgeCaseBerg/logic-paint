@@ -158,6 +158,7 @@ impl EditorGrids {
                     .color(Color::new(rgb));
             }
         }
+        action
     }
 }
 
