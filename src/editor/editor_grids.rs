@@ -4,6 +4,7 @@ use crate::editor::editor_ui_actions::UiActions;
 use crate::levels::Level;
 use crate::netbpm::Pbm;
 use crate::netppm::Ppm;
+use crate::ui::GridLayout;
 use egor::app::FrameContext;
 use egor::input::MouseButton;
 use egor::math::Rect;
@@ -110,29 +111,34 @@ impl EditorGrids {
         let pbm_anchor = self.top_left;
         gfx.rect().at(pbm_anchor).size(self.size).color(Color::BLUE);
 
-        let pbm_anchor = pbm_anchor + gutter;
-        for r in 0..num_boxes_y {
-            for c in 0..num_boxes_x {
-                let position = pbm_anchor + vec2(c as f32, r as f32) * (cell_size + gutter);
-
-                if Rect::new(position, cell_size).contains(world_xy) && left_mouse_pressed {
-                    action = UiActions::LevelGridUpdated;
-                    self.pbm_grid[r][c] = true;
-                }
-                if Rect::new(position, cell_size).contains(world_xy) && right_mouse_pressed {
-                    action = UiActions::LevelGridUpdated;
-                    self.pbm_grid[r][c] = false;
-                }
-                let color = if self.pbm_grid[r][c] {
-                    Color::WHITE
-                } else {
-                    Color::BLACK
-                };
-
-                gfx.rect().at(position).size(cell_size).color(color);
+        let layout = GridLayout {
+            area: Rect {
+                position: self.top_left,
+                size: self.size,
+            },
+            rows: level_settings.height,
+            columns: level_settings.width,
+            cell_gap: 2.,
+        };
+        for (r, c, rect) in layout.iter_cells() {
+            if rect.contains(world_xy) && left_mouse_pressed {
+                action = UiActions::LevelGridUpdated;
+                self.pbm_grid[r][c] = true;
             }
+            if rect.contains(world_xy) && right_mouse_pressed {
+                action = UiActions::LevelGridUpdated;
+                self.pbm_grid[r][c] = false;
+            }
+            let color = if self.pbm_grid[r][c] {
+                Color::WHITE
+            } else {
+                Color::BLACK
+            };
+
+            gfx.rect().at(rect.position).size(rect.size).color(color);
         }
 
+        let pbm_anchor = pbm_anchor + gutter;
         let ppm_anchor = pbm_anchor + vec2(400. + 50., 0.);
         gfx.rect()
             .at(ppm_anchor)
