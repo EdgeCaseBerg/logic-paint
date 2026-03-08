@@ -156,8 +156,10 @@ impl TheMultiVerseOfLines {
         (must_be_filled, must_be_empty)
     }
 
-    pub fn collapse(&mut self) {
+    pub fn collapse(&mut self) -> usize {
+        let mut iterations = 0;
         loop {
+            iterations += 1;
             let mut changed = false;
             changed = changed || self.collapse_rows();
             changed = changed || self.collapse_columns();
@@ -165,6 +167,7 @@ impl TheMultiVerseOfLines {
                 break;
             }
         }
+        iterations
     }
 
     fn collapse_rows(&mut self) -> bool {
