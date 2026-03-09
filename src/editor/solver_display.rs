@@ -31,6 +31,11 @@ impl SolverDisplay {
         };
         ui.label(state);
         ui.label(format!("Solved in {}", self.iterations));
+        ui.label("Left click to apply changes to the grids, right click to remove");
+        ui.label("If multiple solutions are possible, or if there is no solution,");
+        ui.label("corresponding rows and columns will be highlighted.");
+        ui.label("The number shown is the number of potential solutions.");
+        ui.label("If your puzzle is good, the highlight will be green.");
         ui.separator();
     }
 
