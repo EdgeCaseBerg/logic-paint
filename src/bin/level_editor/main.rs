@@ -80,7 +80,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             };
             Window::new("Settings")
                 .anchor(Align2::LEFT_TOP, egor::app::egui::Vec2::ZERO)
-                .default_size([100.0, 500.0])
+                .default_size([90.0, 400.0])
                 .show(egui_ctx, |ui| {
                     match level_settings.ui(ui) {
                         UiActions::Nothing => {}

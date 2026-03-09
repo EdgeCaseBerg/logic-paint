@@ -62,7 +62,7 @@ impl LevelSettings {
         ui.label("Saving will overwrite any file with the same name");
         ui.horizontal(|ui| {
             ui.label("Filename (do not enter an extension)");
-            ui.add(TextEdit::singleline(&mut self.filename).desired_width(100.));
+            ui.add(TextEdit::singleline(&mut self.filename).desired_width(48.));
             if ui.button("Save").clicked() {
                 result = UiActions::SaveLevel;
             }
