@@ -27,6 +27,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut grids = EditorGrids::default();
     let mut save_pop_up: Option<PopUp> = None;
     let mut solver = SolverDisplay::default();
+    let mut last_known_solve = solver.recompute(&level_settings, &grids);
 
     let base = base_dir().join("levels");
     let (io_sender, io_reciever) = spawn_io_worker(base);
@@ -71,8 +72,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             gfx.clear(Color::new([0.5, 0.5, 0.5, 1.0]));
 
-            match grids.ui(frame_context, &mut level_settings) {
-                UiActions::LevelGridUpdated => solver.recompute(&level_settings, &grids),
+            match grids.ui(frame_context, &mut level_settings, &last_known_solve) {
+                UiActions::LevelGridUpdated => {
+                    last_known_solve = solver.recompute(&level_settings, &grids);
+                }
                 _ => {}
             };
             Window::new("Settings")

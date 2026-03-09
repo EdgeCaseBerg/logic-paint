@@ -1,10 +1,12 @@
 use crate::base_dir;
 use crate::editor::editor_settings::LevelSettings;
 use crate::editor::editor_ui_actions::UiActions;
+use crate::editor::solver::TheMultiVerseOfLines;
 use crate::levels::Level;
 use crate::netbpm::Pbm;
 use crate::netppm::Ppm;
 use crate::ui::GridLayout;
+use crate::ui::draw_centered_text;
 use egor::app::FrameContext;
 use egor::input::MouseButton;
 use egor::math::Rect;
@@ -87,6 +89,7 @@ impl EditorGrids {
         &mut self,
         frame_context: &mut FrameContext,
         level_settings: &mut LevelSettings,
+        last_known_solve: &TheMultiVerseOfLines,
     ) -> UiActions {
         let mut action = UiActions::Nothing;
 
@@ -119,10 +122,73 @@ impl EditorGrids {
             columns: level_settings.width,
             cell_gap: 2.,
         };
-        gfx.rect()
-            .at(layout.area.position)
-            .size(layout.area.size)
-            .color(Color::BLUE);
+
+        // Draw the background, highlighting bad cells as needed
+        let mut bg_layout = layout.shifted_by(Vec2::splat(-layout.cell_gap));
+        bg_layout.cell_gap = 0.0;
+        let foo = [Color::BLUE, Color::WHITE, Color::RED, Color::GREEN];
+        for (r, c, rect) in bg_layout.iter_cells() {
+            // When we resize bad things can happen, so skip until the user is done.
+            if r >= last_known_solve.rows.len() {
+                continue;
+            }
+            if c >= last_known_solve.columns.len() {
+                continue;
+            }
+            let potential_row_patterns = last_known_solve.rows[r].len();
+            let potential_column_patterns = last_known_solve.columns[c].len();
+            let color = match (potential_row_patterns, potential_column_patterns) {
+                (1, 1) => Color::GREEN,
+                (0, 0) => Color::RED,
+                (1, _) => Color::new([1.0, 0.5, 0.0, 1.0]),
+                (_, 1) => Color::new([1.0, 0.5, 0.0, 1.0]),
+                _ => Color::new([1.0, 1.0, 0.0, 1.0]),
+            };
+            gfx.rect().at(rect.position).size(rect.size).color(color);
+        }
+
+        // List how many potential options there are next to the side
+        let row_potential_listing = layout.shifted_by(Vec2::new(-layout.cell_size().x, 0.));
+        for (r, c, rect) in row_potential_listing.iter_cells() {
+            // When we resize bad things can happen, so skip until the user is done.
+            // also, we don't care about columns beyond
+            if r >= last_known_solve.rows.len() || c > 0 {
+                continue;
+            }
+            let potential_patterns = last_known_solve.rows[r].len();
+            if potential_patterns == 1 {
+                continue;
+            }
+            draw_centered_text(
+                gfx,
+                &format!("{}", potential_patterns),
+                rect.position + rect.size * 0.5,
+                rect.size.y,
+                Color::RED,
+            );
+        }
+
+        // List how many potential options there are next to the top
+        let column_potential_listing = layout.shifted_by(Vec2::new(0., -layout.cell_size().y));
+        for (r, c, rect) in column_potential_listing.iter_cells() {
+            // When we resize bad things can happen, so skip until the user is done.
+            // also, we don't care about rows beyond the first
+            if c >= last_known_solve.columns.len() || r > 0 {
+                continue;
+            }
+            let potential_patterns = last_known_solve.columns[c].len();
+            if potential_patterns == 1 {
+                continue;
+            }
+            draw_centered_text(
+                gfx,
+                &format!("{}", potential_patterns),
+                rect.position + rect.size * 0.5,
+                rect.size.y,
+                Color::RED,
+            );
+        }
+
         for (r, c, rect) in layout.iter_cells() {
             if rect.contains(world_xy) && left_mouse_pressed {
                 action = UiActions::LevelGridUpdated;

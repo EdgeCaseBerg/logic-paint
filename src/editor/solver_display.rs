@@ -15,7 +15,7 @@ impl Default for SolverDisplay {
     fn default() -> Self {
         Self {
             iterations: 0,
-            state: SolvedState::Unsolvable,
+            state: SolvedState::UniqueSolution,
         }
     }
 }
@@ -34,13 +34,17 @@ impl SolverDisplay {
         ui.separator();
     }
 
-    pub fn recompute(&mut self, level_settings: &LevelSettings, editor_grids: &EditorGrids) {
+    pub fn recompute(
+        &mut self,
+        level_settings: &LevelSettings,
+        editor_grids: &EditorGrids,
+    ) -> TheMultiVerseOfLines {
         let pbm: Pbm = (level_settings, editor_grids).into();
         let ps: PlayState = (&pbm).into();
         let mut possibilities = TheMultiVerseOfLines::new(&ps);
         // TODO remove
-        eprintln!("STATE: {possibilities}");
         self.iterations = possibilities.collapse();
         self.state = possibilities.state();
+        possibilities
     }
 }
