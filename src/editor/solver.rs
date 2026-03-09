@@ -564,6 +564,7 @@ mod solver_tests {
     }
 
     #[test]
+    #[rustfmt::skip]
     fn requires_guessing_multi_solution() {
         let tps: PlayState = {
             let pbm = Pbm {
