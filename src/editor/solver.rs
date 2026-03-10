@@ -1,6 +1,6 @@
 use crate::editor::editor_grids::EditorGrids;
 use crate::editor::editor_settings::LevelSettings;
-use crate::netbpm::Pbm;
+use crate::netpbm::Pbm;
 use crate::playstate::PlayState;
 
 #[derive(PartialEq, Debug)]

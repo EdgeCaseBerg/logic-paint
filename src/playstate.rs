@@ -1,4 +1,4 @@
-use crate::netbpm::Pbm;
+use crate::netpbm::Pbm;
 use std::iter::zip;
 
 #[derive(Debug, PartialEq)]

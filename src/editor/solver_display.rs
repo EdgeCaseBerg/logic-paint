@@ -2,7 +2,7 @@ use crate::editor::editor_grids::EditorGrids;
 use crate::editor::editor_settings::LevelSettings;
 use crate::editor::solver::SolvedState;
 use crate::editor::solver::TheMultiVerseOfLines;
-use crate::netbpm::Pbm;
+use crate::netpbm::Pbm;
 use crate::playstate::PlayState;
 use egor::app::egui::Ui;
 

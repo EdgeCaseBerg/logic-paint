@@ -1,4 +1,4 @@
-use crate::netppm::Ppm;
+use crate::netpbm::Ppm;
 use crate::playstate::CellState;
 use crate::playstate::PlayState;
 use crate::screens::ScreenAction;

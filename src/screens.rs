@@ -1,5 +1,5 @@
 use crate::levels::Level;
-use crate::netppm::Ppm;
+use crate::netpbm::Ppm;
 use crate::playstate::PlayState;
 use crate::ui::{
     ColorPalette, GridLayout, LoadedPpms, PlayArea, PlayerInput, draw_centered_text, draw_ppm_at,

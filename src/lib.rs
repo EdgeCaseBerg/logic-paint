@@ -1,7 +1,6 @@
 pub mod editor;
 pub mod levels;
-pub mod netbpm;
-pub mod netppm;
+pub mod netpbm;
 pub mod playstate;
 pub mod pop_up;
 pub mod screens;

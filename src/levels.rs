@@ -1,5 +1,5 @@
-use crate::netbpm::{LoadPbmErr, Pbm};
-use crate::netppm::{LoadPpmErr, Ppm};
+use crate::netpbm::{LoadPbmErr, Pbm};
+use crate::netpbm::{LoadPpmErr, Ppm};
 
 use std::fs::{read_dir, read_to_string, write};
 use std::path::Path;
