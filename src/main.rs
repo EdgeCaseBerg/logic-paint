@@ -28,6 +28,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut transition_duration = 1.8;
 
     // TODO: Refactor this to be one struct passed around
+    assert!(levels.len() > 0, "You must have levels in the levels folder to boot the game");
     let mut win_image = levels[0].image.clone();
     let mut current_level = levels[0].path.clone();
     let mut game_state: PlayState = (&levels[0].info).into();
