@@ -126,7 +126,6 @@ impl EditorGrids {
         // Draw the background, highlighting bad cells as needed
         let mut bg_layout = layout.shifted_by(Vec2::splat(-layout.cell_gap));
         bg_layout.cell_gap = 0.0;
-        let foo = [Color::BLUE, Color::WHITE, Color::RED, Color::GREEN];
         for (r, c, rect) in bg_layout.iter_cells() {
             // When we resize bad things can happen, so skip until the user is done.
             if r >= last_known_solve.rows.len() {
