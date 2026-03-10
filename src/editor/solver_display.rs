@@ -46,7 +46,6 @@ impl SolverDisplay {
         let pbm: Pbm = (level_settings, editor_grids).into();
         let ps: PlayState = (&pbm).into();
         let mut possibilities = TheMultiVerseOfLines::new(&ps);
-        // TODO remove
         self.iterations = possibilities.collapse();
         self.state = possibilities.state();
         possibilities
